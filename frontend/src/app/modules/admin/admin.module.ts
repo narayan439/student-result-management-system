@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
 
 
 import { AdminRoutingModule } from './admin-routing.module';
@@ -35,7 +36,8 @@ import { AddTeacherComponent } from './manage-teachers/add-teacher/add-teacher.c
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTableModule 
   ]
 })
 export class AdminModule { }

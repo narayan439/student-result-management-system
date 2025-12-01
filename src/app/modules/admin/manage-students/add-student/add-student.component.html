@@ -1,0 +1,34 @@
+<div class="container">
+  <h2>Add Student</h2>
+
+  <form (ngSubmit)="createStudent()" #studentForm="ngForm">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="student.name" name="name" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="student.email" name="email" required email>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Class</mat-label>
+      <input matInput [(ngModel)]="student.className" name="className" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Roll No</mat-label>
+      <input matInput [(ngModel)]="student.rollNo" name="rollNo" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Date of Birth</mat-label>
+      <input matInput type="date" [(ngModel)]="student.dob" name="dob" required>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="full-width">Add Student</button>
+
+  </form>
+</div>

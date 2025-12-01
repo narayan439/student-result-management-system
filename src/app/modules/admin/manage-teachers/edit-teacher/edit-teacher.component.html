@@ -1,0 +1,31 @@
+<div class="container">
+  <h2>Edit Teacher</h2>
+
+  <form (ngSubmit)="updateTeacher()" #teacherForm="ngForm">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="teacher.name" name="name" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="teacher.email" name="email" required email>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Subject</mat-label>
+      <input matInput [(ngModel)]="teacher.subject" name="subject" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>DOB</mat-label>
+      <input matInput type="date" [(ngModel)]="teacher.dob" name="dob" required>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="full-width">
+      Update Teacher
+    </button>
+
+  </form>
+</div>

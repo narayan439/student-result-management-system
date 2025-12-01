@@ -1,0 +1,97 @@
+.dashboard {
+  padding: 30px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+h2 {
+  margin-bottom: 15px;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  color: white;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.blue { background: #1e40af; }
+.pink { background: #d81b60; }
+.orange { background: #fb8c00; }
+.purple { background: #6a1b9a; }
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.summary {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin: 20px 0;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.card.pass {
+  border-left: 6px solid #2e7d32;
+}
+
+.card.fail {
+  border-left: 6px solid #c62828;
+}
+
+.card h4 {
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.card p {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.marks-box {
+  margin-top: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background: #304ffe;
+  color: white;
+  text-align: left;
+}
+
+@media(max-width: 600px) {
+  .nav-buttons {
+    flex-direction: column;
+  }
+}

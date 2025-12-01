@@ -1,0 +1,33 @@
+<!-- Teacher Dashboard Navbar -->
+<nav class="teacher-navbar">
+  <div class="logo">👨‍🏫 Teacher Portal</div>
+
+  <ul>
+   >
+
+    <li>
+      <a routerLink="/teacher/add-marks" routerLinkActive="active">
+        Add Marks
+      </a>
+    </li>
+
+    <li>
+      <a routerLink="/teacher/recheck-requests" routerLinkActive="active">
+        Recheck Requests
+      </a>
+    </li>
+
+    <li>
+      <a routerLink="/teacher/profile" routerLinkActive="active">
+        Profile
+      </a>
+    </li>
+  </ul>
+
+  <button class="logout-btn" (click)="logout()">Logout</button>
+</nav>
+
+<!-- PAGE CONTENT HERE -->
+<div class="teacher-content">
+  <router-outlet></router-outlet>
+</div>

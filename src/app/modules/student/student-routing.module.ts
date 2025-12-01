@@ -9,6 +9,9 @@ import { ProfileComponent } from './profile/profile.component';
 import { ViewResultComponent } from './view-result/view-result.component';
 
 const routes: Routes = [
+
+        { path: 'view-result/:rollNo/:dob', component: ViewResultComponent },
+
   {
     path: '',
     component: StudentDashboardComponent,   // Navbar + router-outlet 
@@ -18,7 +21,6 @@ const routes: Routes = [
       { path: 'profile', component: ProfileComponent },
       { path: 'request-recheck', component: RequestRecheckComponent },
       { path: 'track-recheck', component: TrackRecheckComponent },
-      { path: 'view-result/:rollNo/:dob', component: ViewResultComponent }
     ]
   }
 ];

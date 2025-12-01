@@ -1,112 +1,702 @@
+/* Main Container */
 .result-container {
-  max-width: 600px;
-  margin: 40px auto;
+  max-width: 900px;
+  margin: 30px auto;
   background: #ffffff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  border: 1px solid #e0e0e0;
 }
 
-h2 {
+/* Header Section */
+.header-section {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
 }
 
-.student-info p {
-  margin: 4px 0;
+.school-info h1 {
+  color: #1a237e;
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.school-info h1 i {
+  color: #ff9800;
+  margin-right: 10px;
+}
+
+.subtitle {
+  color: #666;
   font-size: 16px;
+  margin: 0 0 15px 0;
+  font-weight: 500;
+}
+
+.official-stamp {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #fff8e1;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ffb300;
+}
+
+.stamp-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e65100;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.page-title {
+  text-align: center;
+  color: #1a237e;
+  margin: 20px 0 25px;
+  font-size: 24px;
+  font-weight: 600;
+  padding: 15px;
+  background: #f5f7ff;
+  border-radius: 6px;
+}
+
+/* Student Information */
+.student-info {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 6px;
+  margin-bottom: 25px;
+  border: 1px solid #e0e0e0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 5px;
+  border-left: 3px solid #304ffe;
+}
+
+.info-item i {
+  color: #304ffe;
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+.info-item label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.info-item p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Marks Section */
+.marks-section {
+  margin: 30px 0;
+}
+
+.section-title {
+  color: #1a237e;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title i {
+  color: #304ffe;
+}
+
+.marks-table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
 }
 
 .marks-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  min-width: 500px;
 }
 
-.marks-table th, .marks-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-}
-
-.marks-table th {
+/* Main header "Subject Name" */
+.marks-table thead tr:first-child th {
   background: #304ffe;
   color: white;
-}
-
-.summary {
-  margin-top: 20px;
-  font-size: 16px;
-}
-
-.status {
-  padding: 10px;
-  margin-top: 10px;
-  font-weight: bold;
-  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 18px;
+  border-bottom: 2px solid #283593;
   text-align: center;
 }
 
-.pass {
-  background: #c8f7c5;
-  color: #2e7d32;
+/* Column headers row */
+.marks-table thead tr:last-child {
+  background: #3d5afe;
 }
 
-.fail {
-  background: #ffcccc;
-  color: #b71c1c;
+.marks-table thead tr:last-child th {
+  font-weight: 500;
+  font-size: 15px;
+  padding: 14px 80px;
+  text-align: center;
+  border-bottom: 2px solid #283593;
 }
+
+.subject-name {
+  text-align: left;
+  padding-left: 20px !important;
+  font-weight: 500;
+}
+
+.marks-col {
+  width: 140px;
+}
+
+.marks-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.marks-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.marks-table td {
+  padding: 14px 12px;
+  text-align: center;
+  font-size: 15px;
+  color: #333;
+}
+
+.marks-table tbody td:first-child {
+  text-align: left;
+  padding-left: 20px;
+  font-weight: 500;
+}
+
+.obtained {
+  font-weight: 600;
+  color: #1a237e;
+}
+
+.marks-table tfoot {
+  background: #f5f7ff;
+  border-top: 2px solid #e0e0e0;
+}
+
+.total-row {
+  font-weight: 700;
+}
+
+.total-label {
+  text-align: left;
+  padding-left: 20px;
+  font-size: 16px;
+  color: #1a237e;
+}
+
+.total-value {
+  font-size: 16px;
+  color: #1a237e;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .marks-table {
+    min-width: 300px;
+  }
+  
+  .marks-table thead tr:first-child th {
+    font-size: 16px;
+    padding: 14px;
+  }
+  
+  .marks-table thead tr:last-child th,
+  .marks-table td {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+  
+  .subject-name,
+  .marks-table tbody td:first-child,
+  .total-label {
+    padding-left: 12px;
+  }
+  
+  .total-label,
+  .total-value {
+    font-size: 15px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marks-section {
+    margin: 20px 0;
+  }
+  
+  .marks-table thead tr:first-child th {
+    padding: 12px;
+    font-size: 15px;
+  }
+  
+  .marks-table thead tr:last-child th,
+  .marks-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  
+  .marks-col {
+    width: 120px;
+  }
+}
+
+/* Summary Cards */
+.summary-section {
+  margin: 25px 0;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.card-icon {
+  margin-bottom: 12px;
+}
+
+.card-icon i {
+  font-size: 32px;
+}
+
+.card-content h4 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.card-content .big-number {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.card-content .status-text {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.total-card {
+  border-top: 3px solid #2196f3;
+}
+
+.total-card i {
+  color: #2196f3;
+}
+
+.percentage-card {
+  border-top: 3px solid #4caf50;
+}
+
+.percentage-card i {
+  color: #4caf50;
+}
+
+.status-card.pass {
+  border-top: 3px solid #4caf50;
+}
+
+.status-card.pass i {
+  color: #4caf50;
+}
+
+.status-card.fail {
+  border-top: 3px solid #f44336;
+}
+
+.status-card.fail i {
+  color: #f44336;
+}
+
+/* Verification Section */
+.verification-section {
+  background: white;
+  padding: 25px;
+  border-radius: 6px;
+  margin: 25px 0;
+  border: 1px solid #e0e0e0;
+}
+
+.verification-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.qr-verification {
+  flex: 1;
+  min-width: 250px;
+}
+
+.qr-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.qr-header i {
+  color: #304ffe;
+  font-size: 20px;
+}
+
+.qr-header h4 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.qr-container {
+  text-align: center;
+}
+
+.qr-code-image {
+  display: block;
+  margin: 0 auto 10px;
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.scan-text {
+  color: #666;
+  font-size: 14px;
+  margin: 8px 0 0;
+}
+
+.signature-section {
+  text-align: center;
+  min-width: 200px;
+}
+
+.signature-line {
+  width: 180px;
+  height: 1px;
+  background: #333;
+  margin: 0 auto 8px;
+}
+
+.signature-label {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 4px;
+}
+
+.teacher-name {
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 2px;
+  font-size: 15px;
+}
+
+.teacher-designation {
+  color: #666;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Notes Section */
+.notes-section {
+  background: #fff8e1;
+  padding: 20px;
+  border-radius: 6px;
+  margin: 25px 0;
+  border-left: 4px solid #ff9800;
+}
+
+.notes-section h4 {
+  color: #e65100;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notes-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.notes-section li {
+  margin-bottom: 8px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.notes-section li:last-child {
+  margin-bottom: 0;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 25px 0;
+}
+
+button {
+  padding: 14px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+button i {
+  font-size: 18px;
+}
+
 .pdf-btn {
-  margin-top: 20px;
-  padding: 10px 20px;
   background: #304ffe;
   color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
 }
 
 .pdf-btn:hover {
-  background: #1b2fcc;
-}
-.qr-box {
-  margin-top: 25px;
-  text-align: center;
+  background: #283593;
 }
 
-.qr-box p {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #444;
-}
-.back-btn {
-  margin-top: 15px;
-  padding: 10px 20px;
-  background: #757575;
+.print-btn {
+  background: #4caf50;
   color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  display: block;
-  width: 100%;
 }
 
-.back-btn:hover {
-  background: #5a5a5a;
+.print-btn:hover {
+  background: #388e3c;
 }
+
 .recheck-btn {
-  margin-top: 15px;
-  padding: 12px 20px;
-  background: #ff8f00;
+  background: #ff9800;
   color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  width: 100%;
 }
 
 .recheck-btn:hover {
-  background: #e67a00;
+  background: #f57c00;
+}
+
+.back-btn {
+  background: #757575;
+  color: white;
+}
+
+.back-btn:hover {
+  background: #616161;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.footer p {
+  margin: 6px 0;
+  color: #666;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.footer i {
+  color: #304ffe;
+}
+
+.contact {
+  font-size: 13px !important;
+  color: #888 !important;
+  margin-top: 4px !important;
+}
+
+/* Print Styles */
+@media print {
+  .action-buttons {
+    display: none !important;
+  }
+  
+  .result-container {
+    box-shadow: none;
+    border: 1px solid #000;
+    margin: 0;
+    padding: 20px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .result-container {
+    padding: 20px 15px;
+    margin: 15px;
+    border-radius: 6px;
+  }
+  
+  .school-info h1 {
+    font-size: 22px;
+    margin-right: 40px;
+  }
+  
+  .official-stamp {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin: 10px auto;
+    width: fit-content;
+  }
+  
+  .page-title {
+    font-size: 20px;
+    padding: 12px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .marks-table {
+    font-size: 13px;
+  }
+  
+  .marks-table th, 
+  .marks-table td {
+    padding: 10px 8px;
+  }
+  
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .verification-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .qr-verification {
+    width: 100%;
+  }
+  
+  .signature-section {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  button {
+    padding: 12px;
+  }
+  
+  .footer p {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .result-container {
+    padding: 15px 12px;
+    margin: 10px;
+  }
+  
+  .school-info h1 {
+    font-size: 20px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+  }
+  
+  .marks-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .marks-table th,
+  .marks-table td {
+    min-width: 100px;
+  }
+  
+  .card {
+    padding: 15px;
+  }
+  
+  .card-content .big-number {
+    font-size: 24px;
+  }
+  
+  .notes-section {
+    padding: 15px;
+  }
 }

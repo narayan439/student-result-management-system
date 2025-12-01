@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';   // ✅ ADD THIS
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-welcome',
@@ -11,15 +11,13 @@ export class WelcomeComponent {
   rollNo: string = '';
   dob: string = '';
 
-  constructor(private router: Router) {}   // ✅ constructor at top
+  constructor(private router: Router) {}
 
   viewResult() {
     if (!this.rollNo || !this.dob) {
       alert("Please enter Roll Number and Date of Birth");
       return;
     }
-
     this.router.navigate(['/student/view-result', this.rollNo, this.dob]);
   }
-
 }

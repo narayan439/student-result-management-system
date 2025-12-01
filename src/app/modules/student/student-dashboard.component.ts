@@ -8,35 +8,48 @@ import { Router } from '@angular/router';
 })
 export class StudentDashboardComponent {
 
+  mobileMenuOpen = false;
+
+
   constructor(private router: Router) {}
 
-  // Mock Data (You will replace with API response later)
-  result = {
-    total: 358,
-    percentage: 72,
-    grade: 'B'
-  };
+  // Toggle mobile menu
+  toggleMobileMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  // Close mobile menu
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
+  }
 
   // Logout function
   logout() {
     localStorage.clear();
-    this.router.navigate(['/home']);
+    this.router.navigate(['/']);
   }
 
-  // Navigation (Optional Helper methods)
+  // Navigation methods
   goToViewMarks() {
     this.router.navigate(['/student/view-marks']);
+    this.closeMobileMenu();
   }
 
   goToRequestRecheck() {
     this.router.navigate(['/student/request-recheck']);
+    this.closeMobileMenu();
   }
 
   goToTrackRecheck() {
     this.router.navigate(['/student/track-recheck']);
+    this.closeMobileMenu();
   }
 
   goToProfile() {
     this.router.navigate(['/student/profile']);
+    this.closeMobileMenu();
   }
+  /* Force show menu button on mobile */
+
+
 }

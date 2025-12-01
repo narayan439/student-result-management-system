@@ -1,11 +1,92 @@
-<div class="container">
-  <h2>My Profile</h2>
+<div class="profile-container">
+  
+  <!-- Header -->
+  <div class="profile-header">
+    <h2>
+      <i class="fas fa-user-circle"></i> My Profile
+    </h2>
+    <p>View your basic information</p>
+  </div>
 
-  <mat-card>
-    <p><b>Name:</b> {{ student.name }}</p>
-    <p><b>Email:</b> {{ student.email }}</p>
-    <p><b>Roll No:</b> {{ student.rollNo }}</p>
-    <p><b>Class:</b> {{ student.className }}</p>
-    <p><b>Date of Birth:</b> {{ student.dob }}</p>
-  </mat-card>
+  <!-- Profile Card -->
+  <div class="profile-card">
+    
+    <!-- Profile Top Section -->
+    <div class="profile-top">
+      <div class="profile-avatar">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <h3 class="profile-name">{{ student.name }}</h3>
+      <p class="profile-class">Class {{ student.className }}</p>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="profile-info">
+      <div class="info-grid">
+        
+        <!-- Name -->
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-signature"></i>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Full Name</span>
+            <p class="info-value">{{ student.name }}</p>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Email Address</span>
+            <p class="info-value">{{ student.email }}</p>
+          </div>
+        </div>
+
+        <!-- Roll Number -->
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-hashtag"></i>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Roll Number</span>
+            <p class="info-value">{{ student.rollNo }}</p>
+          </div>
+        </div>
+
+        <!-- Class -->
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-school"></i>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Class</span>
+            <p class="info-value">{{ student.className }}</p>
+          </div>
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Date of Birth</span>
+            <p class="info-value">{{ student.dob }}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="profile-footer">
+    <p>© 2023 Delhi Public School</p>
+    <p>Profile information is read-only</p>
+  </div>
+
 </div>

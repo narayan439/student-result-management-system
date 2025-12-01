@@ -700,3 +700,33 @@ button i {
     padding: 15px;
   }
 }
+
+@media (max-width: 768px) {
+  .track-recheck-container {
+    padding: 20px 15px;
+  }
+  
+  .track-header-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px 25px;
+  }
+  
+  .track-content {
+    padding: 30px 25px;
+  }
+  
+  table {
+    min-width: 400px;
+  }
+  
+  th, td {
+    padding: 14px 12px;
+  }
+  
+  .stats-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Remove timeline responsive styles */
+}

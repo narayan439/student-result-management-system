@@ -1,29 +1,108 @@
-<div class="container">
-  <h2>Request Recheck</h2>
+<div class="request-recheck-container">
+  
+  <!-- Header -->
+  <div class="recheck-header">
+    <h2>Request Recheck</h2>
+    <p>Submit a request for re-evaluation of your marks. Please provide clear reasoning for your request.</p>
+  </div>
 
-  <form (ngSubmit)="submitRecheck()" #reForm="ngForm">
+  <!-- Recheck Card -->
+  <div class="recheck-card">
+    
+    <!-- Recheck Header Section -->
+    <div class="recheck-header-section">
+      <h3>
+        <i class="fas fa-redo-alt"></i> Submit Recheck Request
+      </h3>
+      <p>Fill out the form below to request re-evaluation of your marks</p>
+    </div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Select Subject</mat-label>
-      <mat-select [(ngModel)]="recheck.subject" name="subject" required>
-        <mat-option *ngFor="let s of subjects" [value]="s">{{ s }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <!-- Recheck Content -->
+    <div class="recheck-content">
+      
+      <!-- Form -->
+      <form (ngSubmit)="submitRecheck()" #reForm="ngForm" class="form-container">
+        
+        <!-- Subject Selection -->
+        <div class="form-group">
+          <label for="subject">Select Subject</label>
+          <select 
+            id="subject"
+            class="form-control"
+            [(ngModel)]="recheck.subject"
+            name="subject"
+            required
+          >
+            <option value="" disabled selected>Choose a subject</option>
+            <option *ngFor="let s of subjects" [value]="s">{{ s }}</option>
+          </select>
+        </div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Reason</mat-label>
-      <textarea 
-        matInput 
-        rows="3"
-        [(ngModel)]="recheck.reason"
-        name="reason"
-        required>
-      </textarea>
-    </mat-form-field>
+        <!-- Reason -->
+        <div class="form-group">
+          <label for="reason">Reason for Recheck</label>
+          <textarea 
+            id="reason"
+            class="form-control"
+            rows="4"
+            [(ngModel)]="recheck.reason"
+            name="reason"
+            required
+            placeholder="Please explain why you believe a recheck is necessary..."
+          ></textarea>
+        </div>
 
-    <button mat-raised-button color="primary" class="full-width">
-      Submit Recheck
-    </button>
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          class="submit-btn"
+          [disabled]="reForm.invalid"
+        >
+          Submit Recheck Request
+        </button>
 
-  </form>
+      </form>
+
+      <!-- Important Notes -->
+      <div class="notes-section">
+        <h4>
+          <i class="fas fa-exclamation-circle"></i> Important Information
+        </h4>
+        <ul>
+          <li><strong>Processing Time:</strong> Recheck requests typically take 7-10 working days to process</li>
+          <li><strong>Fee:</strong> A fee of ₹500 per subject is applicable for re-evaluation</li>
+          <li><strong>Result:</strong> Marks may increase, decrease, or remain the same after recheck</li>
+          <li><strong>Last Date:</strong> Requests must be submitted within 15 days of result declaration</li>
+          <li><strong>Contact:</strong> For queries, email: recheck@dps.edu.in</li>
+        </ul>
+      </div>
+
+      <!-- Recent Requests Status -->
+      <div class="status-section">
+        <h4>
+          <i class="fas fa-history"></i> Recent Request Status
+        </h4>
+        <div class="status-item">
+          <span class="status-label">Mathematics</span>
+          <span class="status-value pending">Pending</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Science</span>
+          <span class="status-value completed">Completed</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">English</span>
+          <span class="status-value completed">Completed</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="recheck-footer">
+    <p>© 2023 Delhi Public School. All rights reserved.</p>
+    <p>Recheck requests are processed by the Examination Department</p>
+  </div>
+
 </div>

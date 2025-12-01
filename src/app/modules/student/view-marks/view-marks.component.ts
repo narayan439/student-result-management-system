@@ -14,7 +14,7 @@ export class ViewMarksComponent implements OnInit {
     { subject: 'Science', score: 72 },
     { subject: 'English', score: 90 },
     { subject: 'Geography', score: 45 }
-  ];
+  ]
 
   total = 0;
   percentage = 0;

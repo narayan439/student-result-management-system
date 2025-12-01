@@ -1,0 +1,45 @@
+<nav class="admin-navbar">
+
+  <div class="logo">Admin Panel</div>
+
+  <ul class="nav-links">
+
+    <li><a routerLink="/admin">Dashboard</a></li>
+
+    <!-- Students Dropdown -->
+    <li class="dropdown">
+      <a>Students ▼</a>
+      <ul class="dropdown-menu">
+        <li><a routerLink="/admin/manage-students">Manage Students</a></li>
+        <li><a routerLink="/admin/manage-students/add">Add Student</a></li>
+      </ul>
+    </li>
+
+    <!-- Teachers Dropdown -->
+    <li class="dropdown">
+      <a>Teachers ▼</a>
+      <ul class="dropdown-menu">
+        <li><a routerLink="/admin/manage-teachers">Manage Teachers</a></li>
+        <li><a routerLink="/admin/manage-teachers/add">Add Teacher</a></li>
+      </ul>
+    </li>
+
+    <!-- Subjects -->
+    <li><a routerLink="/admin/manage-subjects">Subjects</a></li>
+
+    <!-- Rechecks -->
+    <li><a routerLink="/admin/manage-rechecks">Rechecks</a></li>
+
+    <!-- Logout -->
+    <li class="logout">
+      <a routerLink="/login">Logout</a>
+    </li>
+
+  </ul>
+
+</nav>
+
+<!-- Page Content -->
+<div class="admin-content">
+  <router-outlet></router-outlet>
+</div>

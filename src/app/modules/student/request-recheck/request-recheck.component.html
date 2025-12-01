@@ -1,0 +1,29 @@
+<div class="container">
+  <h2>Request Recheck</h2>
+
+  <form (ngSubmit)="submitRecheck()" #reForm="ngForm">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Select Subject</mat-label>
+      <mat-select [(ngModel)]="recheck.subject" name="subject" required>
+        <mat-option *ngFor="let s of subjects" [value]="s">{{ s }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Reason</mat-label>
+      <textarea 
+        matInput 
+        rows="3"
+        [(ngModel)]="recheck.reason"
+        name="reason"
+        required>
+      </textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="full-width">
+      Submit Recheck
+    </button>
+
+  </form>
+</div>

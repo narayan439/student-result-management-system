@@ -1,0 +1,35 @@
+<div class="container">
+  <h2>Manage Subjects</h2>
+
+  <!-- Add Subject Form -->
+  <div class="add-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>New Subject</mat-label>
+      <input matInput [(ngModel)]="newSubject" name="subjectName">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="addSubject()">
+      Add Subject
+    </button>
+  </div>
+
+  <!-- Subject List Table -->
+  <table mat-table [dataSource]="subjects" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Subject Name </th>
+      <td mat-cell *matCellDef="let s"> {{ s }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let s">
+        <button mat-button color="warn" (click)="deleteSubject(s)">Delete</button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+  </table>
+</div>

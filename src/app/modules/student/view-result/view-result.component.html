@@ -1,0 +1,54 @@
+<div class="result-container">
+
+  <h2>Student Result</h2>
+
+  <div class="student-info">
+    <p><strong>Name:</strong> {{ result.name }}</p>
+    <p><strong>Roll No:</strong> {{ result.rollNo }}</p>
+    <p><strong>DOB:</strong> {{ result.dob }}</p>
+    <p><strong>Class:</strong> {{ result.className }}</p>
+  </div>
+
+  <table class="marks-table">
+    <tr>
+      <th>Subject</th>
+      <th>Marks</th>
+    </tr>
+
+    <tr *ngFor="let m of result.marks">
+      <td>{{ m.subject }}</td>
+      <td>{{ m.score }}</td>
+    </tr>
+  </table>
+
+  <div class="summary">
+    <p><strong>Total Marks:</strong> {{ result.total }}</p>
+    <p><strong>Percentage:</strong> {{ result.percentage }}%</p>
+
+    <p class="status" [ngClass]="{pass: result.status=='PASS', fail: result.status=='FAIL'}">
+      <strong>Status:</strong> {{ result.status }}
+    </p>
+  </div>
+
+  <div class="qr-box">
+  <qrcode 
+    [qrdata]="qrData"
+    [width]="150"
+    [errorCorrectionLevel]="'M'">
+  </qrcode>
+
+  <p>Scan to verify this result</p>
+</div>
+
+
+  
+
+
+  <button class="pdf-btn" (click)="downloadPDF()">Download Marksheet (PDF)</button>
+   <button class="back-btn" routerLink="/">← Back to Home</button>
+    <button class="recheck-btn" (click)="goToLoginForRecheck()">
+  Request Recheck (Login your Email and pass)
+</button>
+
+
+</div>

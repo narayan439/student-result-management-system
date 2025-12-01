@@ -1,0 +1,60 @@
+<div class="table-container">
+  <h2>All Teachers</h2>
+
+  <table mat-table [dataSource]="teachers" class="mat-elevation-z8">
+
+    <!-- Name -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let t"> {{ t.name }} </td>
+    </ng-container>
+
+    <!-- Email -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef> Email </th>
+      <td mat-cell *matCellDef="let t"> {{ t.email }} </td>
+    </ng-container>
+
+    <!-- Subject -->
+    <ng-container matColumnDef="subject">
+      <th mat-header-cell *matHeaderCellDef> Subject </th>
+      <td mat-cell *matCellDef="let t"> {{ t.subject }} </td>
+    </ng-container>
+
+    <!-- DOB -->
+    <ng-container matColumnDef="dob">
+      <th mat-header-cell *matHeaderCellDef> DOB </th>
+      <td mat-cell *matCellDef="let t"> {{ t.dob }} </td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let t">
+
+        <!-- EDIT BUTTON FIXED -->
+        <button 
+          mat-button 
+          color="primary" 
+          [routerLink]="['/admin/manage-teachers/edit', t.email]"
+        >
+          Edit
+        </button>
+
+        <!-- DELETE BUTTON -->
+        <button 
+          mat-button 
+          color="warn"
+          (click)="deleteTeacher(t.email)"
+        >
+          Delete
+        </button>
+
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+  </table>
+</div>

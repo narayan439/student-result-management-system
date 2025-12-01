@@ -1,0 +1,39 @@
+<div class="container">
+  <h2>Recheck Requests</h2>
+
+  <table mat-table [dataSource]="requests" class="mat-elevation-z8">
+
+    <!-- Roll -->
+    <ng-container matColumnDef="rollNo">
+      <th mat-header-cell *matHeaderCellDef> Roll </th>
+      <td mat-cell *matCellDef="let r"> {{ r.rollNo }} </td>
+    </ng-container>
+
+    <!-- Subject -->
+    <ng-container matColumnDef="subject">
+      <th mat-header-cell *matHeaderCellDef> Subject </th>
+      <td mat-cell *matCellDef="let r"> {{ r.subject }} </td>
+    </ng-container>
+
+    <!-- Reason -->
+    <ng-container matColumnDef="reason">
+      <th mat-header-cell *matHeaderCellDef> Reason </th>
+      <td mat-cell *matCellDef="let r"> {{ r.reason }} </td>
+    </ng-container>
+
+    <!-- Action -->
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef> Action </th>
+      <td mat-cell *matCellDef="let r">
+        <button mat-raised-button color="primary"
+          [routerLink]="['/teacher/update-marks', r.rollNo]">
+          Update Marks
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="cols"></tr>
+    <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+
+  </table>
+</div>

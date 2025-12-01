@@ -1,0 +1,112 @@
+.result-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.student-info p {
+  margin: 4px 0;
+  font-size: 16px;
+}
+
+.marks-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.marks-table th, .marks-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.marks-table th {
+  background: #304ffe;
+  color: white;
+}
+
+.summary {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.status {
+  padding: 10px;
+  margin-top: 10px;
+  font-weight: bold;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.pass {
+  background: #c8f7c5;
+  color: #2e7d32;
+}
+
+.fail {
+  background: #ffcccc;
+  color: #b71c1c;
+}
+.pdf-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #304ffe;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.pdf-btn:hover {
+  background: #1b2fcc;
+}
+.qr-box {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.qr-box p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #444;
+}
+.back-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #757575;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+
+.back-btn:hover {
+  background: #5a5a5a;
+}
+.recheck-btn {
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: #ff8f00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.recheck-btn:hover {
+  background: #e67a00;
+}

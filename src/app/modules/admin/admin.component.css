@@ -1,0 +1,90 @@
+/* Navbar Container */
+.admin-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #304ffe;
+  padding: 12px 25px;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Logo */
+.admin-navbar .logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Main Nav */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  position: relative;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 6px;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  opacity: 0.8;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  color: black;
+  list-style: none;
+  padding: 10px 0;
+  top: 30px;
+  left: 0;
+  width: 180px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.dropdown-menu a {
+  color: black;
+  padding: 10px 15px;
+  display: block;
+}
+
+.dropdown-menu a:hover {
+  background: #f1f1f1;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+/* Logout button */
+.logout a {
+  background: #ff5252;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.logout a:hover {
+  background: #e53935;
+  color: white;
+}
+
+/* Main content */
+.admin-content {
+  padding: 25px;
+}

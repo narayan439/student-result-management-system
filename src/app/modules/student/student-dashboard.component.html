@@ -1,0 +1,29 @@
+<!-- Student Dashboard Navbar -->
+<nav class="student-navbar">
+  <div class="logo">🎓 Student Portal</div>
+
+  <ul>
+    <li>
+      <a routerLink="/student/view-marks" routerLinkActive="active">View Marks</a>
+    </li>
+
+    <li>
+      <a routerLink="/student/request-recheck" routerLinkActive="active">Request Recheck</a>
+    </li>
+
+    <li>
+      <a routerLink="/student/track-recheck" routerLinkActive="active">Track Recheck</a>
+    </li>
+
+    <li>
+      <a routerLink="/student/profile" routerLinkActive="active">Profile</a>
+    </li>
+  </ul>
+
+  <button class="logout-btn" (click)="logout()">Logout</button>
+</nav>
+
+<!-- 🔥 THIS IS REQUIRED TO SHOW ALL CHILD COMPONENTS -->
+<div class="student-content">
+  <router-outlet></router-outlet>
+</div>

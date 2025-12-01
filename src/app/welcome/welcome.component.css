@@ -1,0 +1,145 @@
+/* Background Hero Section */
+.hero-section {
+  width: 100%;
+  height: 100vh;
+  background: url('https://images.unsplash.com/photo-1581091012184-5c6afc7a1d79') no-repeat center center/cover;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 50, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.content {
+  position: relative;
+  text-align: center;
+  color: white;
+  max-width: 750px;
+  padding: 20px;
+}
+
+.title {
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  animation: fadeSlideDown 1s ease;
+}
+
+.subtitle {
+  font-size: 18px;
+  margin-bottom: 30px;
+  animation: fadeSlideUp 1.2s ease;
+}
+
+
+
+/* RESULT BOX */
+.result-box {
+  background: rgba(255,255,255,0.15);
+  padding: 25px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  margin-bottom: 30px;
+  animation: fadeIn 1.3s ease;
+}
+
+.result-box h3 {
+  color: #ffeb3b;
+  margin-bottom: 15px;
+}
+
+.result-box label {
+  display: block;
+  text-align: left;
+  margin: 5px 0 3px;
+  font-size: 14px;
+}
+
+.result-box input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.view-btn {
+  width: 100%;
+  padding: 12px;
+  background: #ffeb3b;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.25s ease;
+}
+
+.view-btn:hover {
+  background: #fff176;
+  transform: scale(1.03);
+}
+
+
+
+/* LOGIN BUTTON */
+.login-btn {
+  padding: 14px 35px;
+  font-size: 20px;
+  background: #304ffe;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.25s ease;
+  animation: fadeIn 1.5s ease;
+}
+
+.login-btn:hover {
+  background: #1b2fcc;
+  transform: scale(1.05);
+}
+
+
+
+/* Animations */
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+/* RESPONSIVE */
+@media(max-width: 600px) {
+  .title {
+    font-size: 28px;
+  }
+  .subtitle {
+    font-size: 16px;
+  }
+  .result-box {
+    padding: 18px;
+  }
+}

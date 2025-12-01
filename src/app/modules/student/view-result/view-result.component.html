@@ -1,54 +1,198 @@
 <div class="result-container">
 
-  <h2>Student Result</h2>
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="school-info">
+      <h1><i class="fas fa-graduation-cap"></i> NARAYAN PUBLIC SCHOOL</h1>
+      <p class="subtitle">Annual Examination Result 2023-24</p>
+      <div class="official-stamp">
+        <div class="stamp-content">
+          <i class="fas fa-stamp"></i>
+          <span>OFFICIAL</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <h2 class="page-title">STUDENT MARKSHEET</h2>
+
+  <!-- Student Information -->
   <div class="student-info">
-    <p><strong>Name:</strong> {{ result.name }}</p>
-    <p><strong>Roll No:</strong> {{ result.rollNo }}</p>
-    <p><strong>DOB:</strong> {{ result.dob }}</p>
-    <p><strong>Class:</strong> {{ result.className }}</p>
+    <div class="info-grid">
+      <div class="info-item">
+        <i class="fas fa-user"></i>
+        <div>
+          <label>Name:</label>
+          <p>{{ result.name }}</p>
+        </div>
+      </div>
+      
+      <div class="info-item">
+        <i class="fas fa-id-card"></i>
+        <div>
+          <label>Roll No:</label>
+          <p>{{ result.rollNo }}</p>
+        </div>
+      </div>
+      
+      <div class="info-item">
+        <i class="fas fa-calendar-alt"></i>
+        <div>
+          <label>Date of Birth:</label>
+          <p>{{ result.dob }}</p>
+        </div>
+      </div>
+      
+      <div class="info-item">
+        <i class="fas fa-school"></i>
+        <div>
+          <label>Class & Section:</label>
+          <p>{{ result.className }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <table class="marks-table">
-    <tr>
-      <th>Subject</th>
-      <th>Marks</th>
-    </tr>
-
-    <tr *ngFor="let m of result.marks">
-      <td>{{ m.subject }}</td>
-      <td>{{ m.score }}</td>
-    </tr>
-  </table>
-
-  <div class="summary">
-    <p><strong>Total Marks:</strong> {{ result.total }}</p>
-    <p><strong>Percentage:</strong> {{ result.percentage }}%</p>
-
-    <p class="status" [ngClass]="{pass: result.status=='PASS', fail: result.status=='FAIL'}">
-      <strong>Status:</strong> {{ result.status }}
-    </p>
+  <!-- Marks Table Section -->
+<div class="marks-section">
+  <h3 class="section-title"><i class="fas fa-chart-bar"></i> Subject-wise Marks</h3>
+  
+  <div class="marks-table-container">
+    <table class="marks-table">
+      <thead>
+        <tr>
+          <th class="subject-col">Subject Name</th>
+          <th class="marks-col">Maximum Marks</th>
+          <th class="marks-col">Marks Obtained</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mathematics</td>
+          <td>100</td>
+          <td class="obtained">92</td>
+        </tr>
+        <tr>
+          <td>Science</td>
+          <td>100</td>
+          <td class="obtained">85</td>
+        </tr>
+        <tr>
+          <td>English</td>
+          <td>100</td>
+          <td class="obtained">88</td>
+        </tr>
+        <tr>
+          <td>Hindi</td>
+          <td>100</td>
+          <td class="obtained">90</td>
+        </tr>
+        <tr>
+          <td>Social Science</td>
+          <td>100</td>
+          <td class="obtained">78</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td class="total-label">GRAND TOTAL</td>
+          <td class="total-value">500</td>
+          <td class="total-value obtained">433</td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
-
-  <div class="qr-box">
-  <qrcode 
-    [qrdata]="qrData"
-    [width]="150"
-    [errorCorrectionLevel]="'M'">
-  </qrcode>
-
-  <p>Scan to verify this result</p>
 </div>
 
+ 
+
+  <!-- Summary Section -->
+  <div class="summary-section">
+    <div class="summary-cards">
+      <div class="card total-card">
+        <div class="card-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="card-content">
+          <h4>Total Marks</h4>
+          <p class="big-number">{{ result.total }}/{{result.marks.length * 100}}</p>
+        </div>
+      </div>
+      
+      <div class="card percentage-card">
+        <div class="card-icon">
+          <i class="fas fa-percentage"></i>
+        </div>
+        <div class="card-content">
+          <h4>Percentage</h4>
+          <p class="big-number">{{ result.percentage }}%</p>
+        </div>
+      </div>
+      
+      <div class="card status-card" [ngClass]="{'pass': result.status=='PASS', 'fail': result.status=='FAIL'}">
+        <div class="card-icon">
+          <i class="fas" [ngClass]="result.status=='PASS' ? 'fa-check-circle' : 'fa-times-circle'"></i>
+        </div>
+        <div class="card-content">
+          <h4>Result</h4>
+          <p class="status-text">{{ result.status }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verification Section -->
+  <div class="verification-section">
+    <div class="verification-content">
+      <div class="qr-verification">
+        <div class="qr-header">
+          <i class="fas fa-qrcode"></i>
+          <h4>VERIFICATION QR CODE</h4>
+        </div>
+        <div class="qr-container">
+          <!-- Actual QR Code Component -->
+          <qrcode 
+            [qrdata]="qrData"
+            [width]="150"
+            [errorCorrectionLevel]="'M'"
+            elementType="img"
+            class="qr-code-image">
+          </qrcode>
+          <p class="scan-text">
+            Scan QR code to verify result authenticity
+          </p>
+        </div>
+      </div>
+      
+      <div class="signature-section">
+        <div class="signature-box">
+          <div class="signature-line"></div>
+          <p class="signature-label">Teacher's Signature</p>
+          <p class="teacher-name">Mrs. Sunita Mehta</p>
+          <p class="teacher-designation">Class Teacher</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button class="pdf-btn" (click)="downloadPDF()">
+      <i class="fas fa-file-pdf"></i> Download PDF
+    </button>
+    
+    <button class="print-btn" (click)="printResult()">
+      <i class="fas fa-print"></i> Print Result
+    </button>
+    
+    <button class="recheck-btn" (click)="goToLoginForRecheck()">
+      <i class="fas fa-redo-alt"></i> Request Recheck
+    </button>
+    
+    <button class="back-btn" routerLink="/">
+      <i class="fas fa-home"></i> Back to Home
+    </button>
+  </div>
 
   
-
-
-  <button class="pdf-btn" (click)="downloadPDF()">Download Marksheet (PDF)</button>
-   <button class="back-btn" routerLink="/">← Back to Home</button>
-    <button class="recheck-btn" (click)="goToLoginForRecheck()">
-  Request Recheck (Login your Email and pass)
-</button>
-
 
 </div>

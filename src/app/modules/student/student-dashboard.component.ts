@@ -20,8 +20,7 @@ export class StudentDashboardComponent {
   // Logout function
   logout() {
     localStorage.clear();
-    alert("Logged out successfully!");
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 
   // Navigation (Optional Helper methods)

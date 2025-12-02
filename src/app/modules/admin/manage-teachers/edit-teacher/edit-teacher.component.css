@@ -1,0 +1,385 @@
+.edit-teacher-container {
+  padding: 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+}
+
+/* Back Navigation */
+.back-nav {
+  margin-bottom: 24px;
+}
+
+.back-button {
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.back-button:hover {
+  color: #1a237e;
+  background: transparent;
+}
+
+/* Form Card */
+.form-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+/* Form Header */
+.form-header {
+  background: linear-gradient(135deg, #1a237e, #304ffe);
+  color: white;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.header-icon {
+  background: rgba(255, 255, 255, 0.2);
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-icon mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.header-text h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.header-text p {
+  font-size: 16px;
+  opacity: 0.9;
+  margin: 0 0 12px 0;
+}
+
+.teacher-id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.header-status {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+/* Info Summary */
+.info-summary {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.summary-item mat-icon {
+  color: #1a237e;
+  background: rgba(26, 35, 126, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.summary-item label {
+  display: block;
+  font-size: 12px;
+  color: #718096;
+  margin-bottom: 4px;
+}
+
+.summary-item p {
+  margin: 0;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* Form Content */
+.teacher-form {
+  padding: 0 32px 32px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Subject Option Styling */
+.subject-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subject-icon {
+  color: #1a237e;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Custom Form Field Styles */
+::ng-deep .mat-form-field-outline {
+  background: #f8fafc;
+  border-radius: 8px !important;
+}
+
+::ng-deep .mat-form-field-outline-thick {
+  color: #1a237e !important;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+  color: #1a237e;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+  color: #1a237e !important;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-outline-thick {
+  color: #1a237e !important;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.cancel-btn {
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  border-color: #cbd5e0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.reset-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.submit-btn {
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #1a237e, #304ffe);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 35, 126, 0.3);
+}
+
+.submit-btn[disabled] {
+  background: #cbd5e0;
+  color: #718096;
+  cursor: not-allowed;
+}
+
+/* Options Card */
+.options-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.options-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 20px 0;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.option-btn {
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.option-btn:hover {
+  background: #f8fafc;
+  transform: translateY(-2px);
+}
+
+.option-btn mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.option-btn span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .form-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+  }
+  
+  .header-status {
+    position: static;
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .edit-teacher-container {
+    padding: 16px;
+  }
+  
+  .form-header {
+    padding: 20px;
+  }
+  
+  .header-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .header-icon mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .header-text h1 {
+    font-size: 24px;
+  }
+  
+  .teacher-form {
+    padding: 0 20px 20px;
+  }
+  
+  .info-summary {
+    margin: 20px;
+    grid-template-columns: 1fr;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .action-buttons {
+    width: 100%;
+    justify-content: stretch;
+  }
+  
+  .reset-btn,
+  .submit-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-text p {
+    font-size: 14px;
+  }
+  
+  .summary-item {
+    flex-direction: column;
+    text-align: center;
+  }
+}

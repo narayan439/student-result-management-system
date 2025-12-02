@@ -1,33 +1,243 @@
-<!-- Teacher Dashboard Navbar -->
-<nav class="teacher-navbar">
-  <div class="logo">👨‍🏫 Teacher Portal</div>
+<div class="teacher-dashboard">
+  
+  <!-- Navbar -->
+  <nav class="teacher-navbar">
+    
+    <!-- Left Section: Logo & User Info -->
+    <div class="nav-left">
+      <div class="logo">
+        <i class="fas fa-chalkboard-teacher"></i>
+        Teacher Portal
+      </div>
+      
+      <div class="user-info-nav">
+        <div class="user-welcome">
+          <div class="greeting">Welcome</div>
+          <div class="teacher-name">Mrs. Sunita Mehta</div>
+        </div>
+        <div class="user-avatar">
+          <i class="fas fa-user-tie"></i>
+        </div>
+      </div>
+    </div>
 
-  <ul>
-   >
+    <!-- Center Section: Desktop Navigation -->
+    <div class="nav-center">
+      <ul>
+        <li>
+          <a routerLink="/teacher/add-marks" routerLinkActive="active">
+            <i class="fas fa-edit"></i> Add Marks
+          </a>
+        </li>
 
-    <li>
-      <a routerLink="/teacher/add-marks" routerLinkActive="active">
-        Add Marks
-      </a>
-    </li>
+        <li>
+          <a routerLink="/teacher/recheck-requests" routerLinkActive="active">
+            <i class="fas fa-redo-alt"></i> Recheck Requests
+          </a>
+        </li>
 
-    <li>
-      <a routerLink="/teacher/recheck-requests" routerLinkActive="active">
-        Recheck Requests
-      </a>
-    </li>
+        <li>
+          <a routerLink="/teacher/profile" routerLinkActive="active">
+            <i class="fas fa-user-circle"></i> Profile
+          </a>
+        </li>
+      </ul>
+    </div>
 
-    <li>
-      <a routerLink="/teacher/profile" routerLinkActive="active">
-        Profile
-      </a>
-    </li>
-  </ul>
+    <!-- Right Section: Logout & Mobile Menu -->
+    <div class="nav-right">
+      <!-- Desktop Logout Button -->
+      <button class="logout-btn desktop-logout" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
 
-  <button class="logout-btn" (click)="logout()">Logout</button>
-</nav>
+      <!-- Mobile Menu Toggle -->
+      <button class="menu-toggle" (click)="toggleMobileMenu()">
+        <span class="menu-icon" [class.open]="mobileMenuOpen"></span>
+      </button>
+    </div>
+  </nav>
 
-<!-- PAGE CONTENT HERE -->
-<div class="teacher-content">
-  <router-outlet></router-outlet>
-</div>
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" 
+       [class.active]="mobileMenuOpen" 
+       (click)="closeMobileMenu()">
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.active]="mobileMenuOpen">
+    <div class="mobile-menu-header">
+      <div class="mobile-user-header">
+        <div class="mobile-avatar">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div>
+          <h3>Mrs. Sunita Mehta</h3>
+          <p>Class Teacher | 10th Grade</p>
+        </div>
+      </div>
+
+      <button class="close-menu" (click)="closeMobileMenu()">
+        <span class="close-icon"></span>
+      </button>
+    </div>
+
+    <ul>
+      <li>
+        <a routerLink="/teacher/add-marks" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="fas fa-edit"></i> 
+          <span>Add Marks</span>
+        </a>
+      </li>
+
+      <li>
+        <a routerLink="/teacher/recheck-requests" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="fas fa-redo-alt"></i>
+          <span>Recheck Requests</span>
+        </a>
+      </li>
+
+      <li>
+        <a routerLink="/teacher/profile" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="fas fa-user-circle"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="mobile-logout">
+      <button class="logout-btn mobile-logout-btn" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="teacher-content">
+    
+    <!-- Welcome Banner -->
+    <!-- <div class="welcome-banner">
+      <div class="welcome-text">
+        <h1>Welcome, Teacher! 👨‍🏫</h1>
+        <p>Manage student marks, handle recheck requests, and track academic progress</p>
+      </div>
+      <div class="welcome-badge">
+        <i class="fas fa-star"></i>
+        Class 10th | 4 Subjects
+      </div>
+    </div> -->
+
+    <!-- Dashboard Cards -->
+    <!-- <div class="dashboard-grid"> -->
+      
+      <!-- Students Card -->
+      <!-- <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="card-count">{{ students.length }} Students</div>
+        </div>
+        <h3 class="card-title">Students Managed</h3>
+        <div class="card-value">{{ students.length }}</div>
+        <p class="card-subtext">Total students in your class</p>
+        <div class="card-actions">
+          <a class="card-btn" routerLink="/teacher/students">
+            <i class="fas fa-list"></i> View All
+          </a>
+        </div>
+      </div> -->
+
+      <!-- Subjects Card -->
+      <!-- <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="card-count">{{ subjects.length }} Subjects</div>
+        </div>
+        <h3 class="card-title">Subjects Teaching</h3>
+        <div class="card-value">{{ subjects.length }}</div>
+        <p class="card-subtext">Subjects you are assigned to</p>
+        <div class="card-actions">
+          <a class="card-btn secondary" routerLink="/teacher/subjects">
+            <i class="fas fa-eye"></i> View Subjects
+          </a>
+        </div>
+      </div> -->
+
+      <!-- Pending Tasks Card -->
+      <!-- <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fas fa-tasks"></i>
+          </div>
+          <div class="card-count">3 Pending</div>
+        </div>
+        <h3 class="card-title">Pending Tasks</h3>
+        <div class="card-value">3</div>
+        <p class="card-subtext">Recheck requests and mark entries</p>
+        <div class="card-actions">
+          <a class="card-btn" routerLink="/teacher/recheck-requests">
+            <i class="fas fa-redo-alt"></i> View Requests
+          </a>
+          <a class="card-btn secondary" routerLink="/teacher/add-marks">
+            <i class="fas fa-plus"></i> Add Marks
+          </a>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Recent Activity -->
+    <!-- <div class="recent-activity">
+      <h2>
+        <i class="fas fa-history"></i> Recent Activity
+      </h2>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="activity-content">
+            <h4>Marks Updated</h4>
+            <p>Updated marks for Narayan in Mathematics</p>
+          </div>
+          <div class="activity-time">2 hours ago</div>
+        </div> -->
+        
+        <!-- <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-redo-alt"></i>
+          </div>
+          <div class="activity-content">
+            <h4>Recheck Request Received</h4>
+            <p>New recheck request from Rakesh for Science</p>
+          </div>
+          <div class="activity-time">Yesterday</div>
+        </div> -->
+        
+        <!-- <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div class="activity-content">
+            <h4>New Student Added</h4>
+            <p>New student Priya joined your class</p>
+          </div>
+          <div class="activity-time">2 days ago</div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Router Outlet for Child Components -->
+    <div class="router-outlet">
+      <router-outlet></router-outlet>
+    </div>
+
+    <!-- Footer -->
+    <!-- <div class="teacher-footer">
+      <p>© 2023 Delhi Public School. All rights reserved.</p>
+      <p>Teacher Portal v2.0 | Last updated: December 2023</p>
+      <p>For support, contact: teacher-support@dps.edu.in</p>
+    </div> -->
+ 

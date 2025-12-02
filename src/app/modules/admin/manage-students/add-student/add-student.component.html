@@ -1,34 +1,183 @@
-<div class="container">
-  <h2>Add Student</h2>
+<div class="add-student-container">
+  <!-- Back Navigation -->
+  <div class="back-nav">
+    <button mat-button routerLink="/admin/manage-students" class="back-button">
+      <mat-icon>arrow_back</mat-icon> Back to Students
+    </button>
+  </div>
 
-  <form (ngSubmit)="createStudent()" #studentForm="ngForm">
+  <!-- Main Card -->
+  <div class="form-card">
+    <!-- Form Header -->
+    <div class="form-header">
+      <div class="header-icon">
+        <mat-icon>person_add</mat-icon>
+      </div>
+      <div class="header-text">
+        <h1>Add New Student</h1>
+        <p>Fill in the student details below to add a new student to the system</p>
+      </div>
+    </div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Name</mat-label>
-      <input matInput [(ngModel)]="student.name" name="name" required>
-    </mat-form-field>
+    <!-- Form Content -->
+    <form (ngSubmit)="createStudent()" #studentForm="ngForm" class="student-form">
+      <div class="form-grid">
+        <!-- Name Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Full Name</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="student.name" 
+            name="name" 
+            required
+            placeholder="Enter student's full name"
+          >
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-hint>Enter the student's complete name</mat-hint>
+          <mat-error *ngIf="studentForm.controls['name']?.invalid && studentForm.controls['name']?.touched">
+            Name is required
+          </mat-error>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Email</mat-label>
-      <input matInput [(ngModel)]="student.email" name="email" required email>
-    </mat-form-field>
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email Address</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="student.email" 
+            name="email" 
+            required
+            email
+            placeholder="student@example.com"
+            type="email"
+          >
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-hint>Enter a valid email address</mat-hint>
+          <mat-error *ngIf="studentForm.controls['email']?.invalid && studentForm.controls['email']?.touched">
+            Please enter a valid email address
+          </mat-error>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Class</mat-label>
-      <input matInput [(ngModel)]="student.className" name="className" required>
-    </mat-form-field>
+        <!-- Class Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Class/Grade</mat-label>
+          <mat-select [(ngModel)]="student.className" name="className" required>
+            <mat-option value="9">Class 9</mat-option>
+            <mat-option value="10">Class 10</mat-option>
+            <mat-option value="11">Class 11</mat-option>
+            <mat-option value="12">Class 12</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>school</mat-icon>
+          <mat-hint>Select the student's class</mat-hint>
+          <mat-error *ngIf="studentForm.controls['className']?.invalid && studentForm.controls['className']?.touched">
+            Class is required
+          </mat-error>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Roll No</mat-label>
-      <input matInput [(ngModel)]="student.rollNo" name="rollNo" required>
-    </mat-form-field>
+        <!-- Roll No Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Roll Number</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="student.rollNo" 
+            name="rollNo" 
+            required
+            placeholder="e.g., 001, 023"
+          >
+          <mat-icon matPrefix>badge</mat-icon>
+          <mat-hint>Enter unique roll number</mat-hint>
+          <mat-error *ngIf="studentForm.controls['rollNo']?.invalid && studentForm.controls['rollNo']?.touched">
+            Roll number is required
+          </mat-error>
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Date of Birth</mat-label>
-      <input matInput type="date" [(ngModel)]="student.dob" name="dob" required>
-    </mat-form-field>
+        <!-- Date of Birth Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Date of Birth</mat-label>
+          <input 
+            matInput 
+            [matDatepicker]="picker" 
+            [(ngModel)]="student.dob" 
+            name="dob" 
+            required
+            placeholder="MM/DD/YYYY"
+          >
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-hint>Select student's date of birth</mat-hint>
+          <mat-error *ngIf="studentForm.controls['dob']?.invalid && studentForm.controls['dob']?.touched">
+            Date of birth is required
+          </mat-error>
+        </mat-form-field>
 
-    <button mat-raised-button color="primary" class="full-width">Add Student</button>
+        <!-- Optional: Additional Fields -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Phone Number (Optional)</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="student.phone" 
+            name="phone"
+            placeholder="+91 9876543210"
+          >
+          <mat-icon matPrefix>phone</mat-icon>
+          <mat-hint>Enter guardian's phone number</mat-hint>
+        </mat-form-field>
 
-  </form>
+        <!-- Address Field -->
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Address (Optional)</mat-label>
+          <textarea 
+            matInput 
+            [(ngModel)]="student.address" 
+            name="address"
+            placeholder="Enter student's address"
+            rows="2"
+          ></textarea>
+          <mat-icon matPrefix>location_on</mat-icon>
+          <mat-hint>Enter permanent address</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          mat-stroked-button 
+          type="button" 
+          routerLink="/admin/manage-students"
+          class="cancel-btn"
+        >
+          Cancel
+        </button>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          [disabled]="studentForm.invalid"
+          class="submit-btn"
+        >
+          <mat-icon>save</mat-icon> 
+          Add Student
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Info Card -->
+  <div class="info-card">
+    <div class="info-icon">
+      <mat-icon>info</mat-icon>
+    </div>
+    <div class="info-content">
+      <h3>Important Information</h3>
+      <ul>
+        <li>Ensure all required fields are filled correctly</li>
+        <li>Roll number must be unique for each student</li>
+        <li>Email address will be used for student login</li>
+        <li>Date of birth must be accurate for age calculation</li>
+        <li>Student will receive login credentials via email</li>
+      </ul>
+    </div>
+  </div>
 </div>

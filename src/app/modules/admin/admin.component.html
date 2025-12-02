@@ -1,45 +1,149 @@
-<nav class="admin-navbar">
+<div class="admin-dashboard">
+  
+  <!-- Navbar -->
+  <nav class="admin-navbar">
+    
+    <!-- Left Section: Logo -->
+    <div class="nav-left">
+      <div class="logo">
+        <i class="fas fa-user-shield"></i>
+        Admin Panel
+      </div>
+    </div>
 
-  <div class="logo">Admin Panel</div>
+    <!-- Center Section: Desktop Navigation -->
+    <div class="nav-center">
+      <ul class="nav-links">
+        <!-- <li><a routerLink="/admin" routerLinkActive="active">Dashboard</a></li> -->
 
-  <ul class="nav-links">
+        <!-- Students Dropdown -->
+        <li class="dropdown">
+          <a>Students <i class="fas fa-chevron-down"></i></a>
+          <ul class="dropdown-menu">
+            <li><a routerLink="/admin/manage-students" routerLinkActive="active">Manage Students</a></li>
+            <li><a routerLink="/admin/manage-students/add" routerLinkActive="active">Add Student</a></li>
+          </ul>
+        </li>
 
-    <li><a routerLink="/admin">Dashboard</a></li>
+        <!-- Teachers Dropdown -->
+        <li class="dropdown">
+          <a>Teachers <i class="fas fa-chevron-down"></i></a>
+          <ul class="dropdown-menu">
+            <li><a routerLink="/admin/manage-teachers" routerLinkActive="active">Manage Teachers</a></li>
+            <li><a routerLink="/admin/manage-teachers/add" routerLinkActive="active">Add Teacher</a></li>
+          </ul>
+        </li>
 
-    <!-- Students Dropdown -->
-    <li class="dropdown">
-      <a>Students ▼</a>
-      <ul class="dropdown-menu">
-        <li><a routerLink="/admin/manage-students">Manage Students</a></li>
-        <li><a routerLink="/admin/manage-students/add">Add Student</a></li>
+        <!-- Subjects -->
+        <li><a routerLink="/admin/manage-subjects" routerLinkActive="active">Subjects</a></li>
+
+        <!-- Rechecks -->
+        <li><a routerLink="/admin/manage-rechecks" routerLinkActive="active">Rechecks</a></li>
+
+        <!-- Logout -->
+        <li class="logout">
+          <a routerLink="/login">Logout</a>
+        </li>
       </ul>
-    </li>
+    </div>
 
-    <!-- Teachers Dropdown -->
-    <li class="dropdown">
-      <a>Teachers ▼</a>
-      <ul class="dropdown-menu">
-        <li><a routerLink="/admin/manage-teachers">Manage Teachers</a></li>
-        <li><a routerLink="/admin/manage-teachers/add">Add Teacher</a></li>
-      </ul>
-    </li>
+    <!-- Right Section: Mobile Menu -->
+    <div class="nav-right">
+      <button class="menu-toggle" (click)="toggleMobileMenu()">
+        <span class="menu-icon" [class.open]="mobileMenuOpen"></span>
+      </button>
+    </div>
+  </nav>
 
-    <!-- Subjects -->
-    <li><a routerLink="/admin/manage-subjects">Subjects</a></li>
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" 
+       [class.active]="mobileMenuOpen" 
+       (click)="closeMobileMenu()">
+  </div>
 
-    <!-- Rechecks -->
-    <li><a routerLink="/admin/manage-rechecks">Rechecks</a></li>
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" [class.active]="mobileMenuOpen">
+    <div class="mobile-menu-header">
+      <div class="mobile-user-header">
+        <div class="mobile-avatar">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <div>
+          <h3>Admin Portal</h3>
+          <p>System Administrator</p>
+        </div>
+      </div>
 
-    <!-- Logout -->
-    <li class="logout">
-      <a routerLink="/login">Logout</a>
-    </li>
+      <button class="close-menu" (click)="closeMobileMenu()">
+        <span class="close-icon"></span>
+      </button>
+    </div>
 
-  </ul>
+    <ul>
+      <!-- <li>
+        <a routerLink="/admin" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="fas fa-tachometer-alt"></i> 
+          <span>Dashboard</span>
+        </a>
+      </li> -->
 
-</nav>
+      <li>
+        <a class="mobile-toggle" (click)="toggleMobileDropdown('students')" [class.active]="mobileDropdowns.students">
+          <i class="fas fa-user-graduate"></i>
+          <span>Students</span>
+          <i class="fas fa-chevron-down"></i>
+        </a>
+        <div class="mobile-dropdown" [class.active]="mobileDropdowns.students">
+          <a routerLink="/admin/manage-students" (click)="closeMobileMenu()">
+            <i class="fas fa-list"></i> Manage Students
+          </a>
+          <a routerLink="/admin/manage-students/add" (click)="closeMobileMenu()">
+            <i class="fas fa-plus"></i> Add Student
+          </a>
+        </div>
+      </li>
 
-<!-- Page Content -->
-<div class="admin-content">
-  <router-outlet></router-outlet>
+      <li>
+        <a class="mobile-toggle" (click)="toggleMobileDropdown('teachers')" [class.active]="mobileDropdowns.teachers">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>Teachers</span>
+          <i class="fas fa-chevron-down"></i>
+        </a>
+        <div class="mobile-dropdown" [class.active]="mobileDropdowns.teachers">
+          <a routerLink="/admin/manage-teachers" (click)="closeMobileMenu()">
+            <i class="fas fa-list"></i> Manage Teachers
+          </a>
+          <a routerLink="/admin/manage-teachers/add" (click)="closeMobileMenu()">
+            <i class="fas fa-plus"></i> Add Teacher
+          </a>
+        </div>
+      </li>
+
+      <li>
+        <a routerLink="/admin/manage-subjects" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="fas fa-book"></i>
+          <span>Subjects</span>
+        </a>
+      </li>
+
+      <li>
+        <a routerLink="/admin/manage-rechecks" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="fas fa-redo-alt"></i>
+          <span>Rechecks</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="mobile-logout">
+      <a routerLink="/login" class="mobile-logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div class="admin-content">
+    <router-outlet></router-outlet>
+  </div>
+
 </div>

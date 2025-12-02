@@ -1,56 +1,197 @@
-<div class="table-container">
-  <h2>All Students</h2>
+<div class="manage-students-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Student Management</h1>
+      <p class="page-subtitle">Manage all student records and information</p>
+    </div>
+    <div class="header-right">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        routerLink="/admin/manage-students/add"
+        class="add-button"
+      >
+        <mat-icon>person_add</mat-icon> Add New Student
+      </button>
+    </div>
+  </div>
 
-  <table mat-table [dataSource]="students" class="mat-elevation-z8">
+  <!-- Stats Cards -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #e3f2fd;">
+        <mat-icon style="color: #1976d2;">people</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>{{students.length}}</h3>
+        <p>Total Students</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #e8f5e9;">
+        <mat-icon style="color: #388e3c;">school</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>2</h3>
+        <p>Classes</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: #fff3e0;">
+        <mat-icon style="color: #f57c00;">trending_up</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>100%</h3>
+        <p>Active</p>
+      </div>
+    </div>
+  </div>
 
-    <!-- Name -->
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Name </th>
-      <td mat-cell *matCellDef="let s"> {{ s.name }} </td>
-    </ng-container>
-
-    <!-- Email -->
-    <ng-container matColumnDef="email">
-      <th mat-header-cell *matHeaderCellDef> Email </th>
-      <td mat-cell *matCellDef="let s"> {{ s.email }} </td>
-    </ng-container>
-
-    <!-- Class -->
-    <ng-container matColumnDef="className">
-      <th mat-header-cell *matHeaderCellDef> Class </th>
-      <td mat-cell *matCellDef="let s"> {{ s.className }} </td>
-    </ng-container>
-
-    <!-- Roll -->
-    <ng-container matColumnDef="rollNo">
-      <th mat-header-cell *matHeaderCellDef> Roll No </th>
-      <td mat-cell *matCellDef="let s"> {{ s.rollNo }} </td>
-    </ng-container>
-
-    <!-- Actions -->
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef> Actions </th>
-      <td mat-cell *matCellDef="let s">
-        <button
-          mat-button
-          color="primary"
-          [routerLink]="['/admin/manage-students/edit', s.rollNo]"
-        >
-          Edit
+  <!-- Table Container -->
+  <div class="table-card">
+    <div class="table-header">
+      <h2 class="table-title">All Students</h2>
+      <div class="table-controls">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search students...</mat-label>
+          <input matInput placeholder="Search by name, email, or roll no">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <button mat-stroked-button class="filter-btn">
+          <mat-icon>filter_list</mat-icon> Filter
         </button>
+      </div>
+    </div>
 
-        <button 
-          mat-button 
-          color="warn"
-          (click)="deleteStudent(s.rollNo)"
-        >
-          Delete
-        </button>
-      </td>
-    </ng-container>
+    <!-- Angular Material Table -->
+    <div class="table-responsive">
+      <table mat-table [dataSource]="students" class="students-table">
+        
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef class="table-header-cell">
+            <div class="column-header">
+              <mat-icon>person</mat-icon>
+              <span>Name</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let student" class="table-cell">
+            <div class="student-info">
+              <div class="avatar">{{student.name.charAt(0)}}</div>
+              <div>
+                <div class="student-name">{{ student.name }}</div>
+                <div class="student-id">ID: STU{{student.rollNo.padStart(4, '0')}}</div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <!-- Email Column -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef class="table-header-cell">
+            <div class="column-header">
+              <mat-icon>email</mat-icon>
+              <span>Email</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let student" class="table-cell">
+            <div class="email-cell">
+              <mat-icon class="email-icon">mail_outline</mat-icon>
+              {{ student.email }}
+            </div>
+          </td>
+        </ng-container>
 
-  </table>
+        <!-- Class Column -->
+        <ng-container matColumnDef="className">
+          <th mat-header-cell *matHeaderCellDef class="table-header-cell">
+            <div class="column-header">
+              <mat-icon>class</mat-icon>
+              <span>Class</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let student" class="table-cell">
+            <span class="class-badge">{{ student.className }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Roll No Column -->
+        <ng-container matColumnDef="rollNo">
+          <th mat-header-cell *matHeaderCellDef class="table-header-cell">
+            <div class="column-header">
+              <mat-icon>badge</mat-icon>
+              <span>Roll No</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let student" class="table-cell">
+            <div class="roll-no">
+              <mat-icon class="roll-icon">numbers</mat-icon>
+              {{ student.rollNo }}
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="table-header-cell actions-header">
+            <div class="column-header">
+              <mat-icon>settings</mat-icon>
+              <span>Actions</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let student" class="table-cell actions-cell">
+            <div class="action-buttons">
+              <button
+                mat-mini-fab
+                color="primary"
+                [routerLink]="['/admin/manage-students/edit', student.rollNo]"
+                matTooltip="Edit Student"
+                class="action-btn edit-btn"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              
+              <button 
+                mat-mini-fab
+                color="warn"
+                (click)="deleteStudent(student.rollNo)"
+                matTooltip="Delete Student"
+                class="action-btn delete-btn"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+
+              <button
+                mat-mini-fab
+                color="accent"
+                matTooltip="View Details"
+                class="action-btn view-btn"
+              >
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Header Row -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header-row"></tr>
+        
+        <!-- Data Rows -->
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+      </table>
+    </div>
+
+    <!-- Table Footer -->
+    <div class="table-footer">
+      <div class="footer-left">
+        <span class="showing-text">Showing {{students.length}} of {{students.length}} students</span>
+      </div>
+      <div class="footer-right">
+        <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+      </div>
+    </div>
+  </div>
 </div>

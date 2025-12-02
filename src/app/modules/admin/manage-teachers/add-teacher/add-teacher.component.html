@@ -1,61 +1,196 @@
-<div class="container">
-  <h2>Add Teacher</h2>
-
-  <form (ngSubmit)="createTeacher()" #teacherForm="ngForm">
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Name</mat-label>
-      <input
-        matInput
-        [(ngModel)]="teacher.name"
-        name="name"
-        required
-      >
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Email</mat-label>
-      <input
-        matInput
-        [(ngModel)]="teacher.email"
-        name="email"
-        required
-        email
-      >
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Subject</mat-label>
-      <mat-select
-        [(ngModel)]="teacher.subject"
-        name="subject"
-        required
-      >
-        <mat-option *ngFor="let sub of subjects" [value]="sub">
-          {{ sub }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Date of Birth</mat-label>
-      <input
-        matInput
-        type="date"
-        [(ngModel)]="teacher.dob"
-        name="dob"
-        required
-      >
-    </mat-form-field>
-
-    <button
-      mat-raised-button
-      color="primary"
-      class="full-width"
-      [disabled]="teacherForm.invalid"
-    >
-      Add Teacher
+<div class="add-teacher-container">
+  <!-- Back Navigation -->
+  <div class="back-nav">
+    <button mat-button routerLink="/admin/manage-teachers" class="back-button">
+      <mat-icon>arrow_back</mat-icon> Back to Teachers
     </button>
+  </div>
 
-  </form>
+  <!-- Main Card -->
+  <div class="form-card">
+    <!-- Form Header -->
+    <div class="form-header">
+      <div class="header-icon">
+        <mat-icon>school</mat-icon>
+      </div>
+      <div class="header-text">
+        <h1>Add New Teacher</h1>
+        <p>Fill in the teacher details below to add a new faculty member</p>
+      </div>
+    </div>
+
+    <!-- Form Content -->
+    <form (ngSubmit)="createTeacher()" #teacherForm="ngForm" class="teacher-form">
+      <div class="form-grid">
+        <!-- Name Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Full Name</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="teacher.name" 
+            name="name" 
+            required
+            placeholder="Enter teacher's full name"
+          >
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-hint>Enter the teacher's complete name</mat-hint>
+          <mat-error *ngIf="teacherForm.controls['name']?.invalid && teacherForm.controls['name']?.touched">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email Address</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="teacher.email" 
+            name="email" 
+            required
+            email
+            placeholder="teacher@school.com"
+            type="email"
+          >
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-hint>Official school email address</mat-hint>
+          <mat-error *ngIf="teacherForm.controls['email']?.invalid && teacherForm.controls['email']?.touched">
+            Please enter a valid email address
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Subject Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Teaching Subject</mat-label>
+          <mat-select [(ngModel)]="teacher.subject" name="subject" required>
+            <mat-option *ngFor="let sub of subjects" [value]="sub">
+              <div class="subject-option">
+                <mat-icon class="subject-icon">book</mat-icon>
+                <span>{{ sub }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>subject</mat-icon>
+          <mat-hint>Select primary teaching subject</mat-hint>
+          <mat-error *ngIf="teacherForm.controls['subject']?.invalid && teacherForm.controls['subject']?.touched">
+            Subject is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Date of Birth Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Date of Birth</mat-label>
+          <input 
+            matInput 
+            [matDatepicker]="picker" 
+            [(ngModel)]="teacher.dob" 
+            name="dob" 
+            required
+            placeholder="MM/DD/YYYY"
+          >
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-hint>Teacher's date of birth</mat-hint>
+          <mat-error *ngIf="teacherForm.controls['dob']?.invalid && teacherForm.controls['dob']?.touched">
+            Date of birth is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Additional Fields -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Phone Number</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="teacher.phone" 
+            name="phone"
+            placeholder="+91 9876543210"
+          >
+          <mat-icon matPrefix>phone</mat-icon>
+          <mat-hint>Contact number (optional)</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Qualification</mat-label>
+          <mat-select [(ngModel)]="teacher.qualification" name="qualification">
+            <mat-option value="M.Tech">M.Tech</mat-option>
+            <mat-option value="M.Sc">M.Sc</mat-option>
+            <mat-option value="B.Ed">B.Ed</mat-option>
+            <mat-option value="Ph.D">Ph.D</mat-option>
+            <mat-option value="Other">Other</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>school</mat-icon>
+          <mat-hint>Highest qualification (optional)</mat-hint>
+        </mat-form-field>
+
+        <!-- Experience Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Experience (Years)</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="teacher.experience" 
+            name="experience"
+            type="number"
+            min="0"
+            placeholder="e.g., 5"
+          >
+          <mat-icon matPrefix>work</mat-icon>
+          <mat-hint>Teaching experience in years (optional)</mat-hint>
+        </mat-form-field>
+
+        <!-- Address Field -->
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Address</mat-label>
+          <textarea 
+            matInput 
+            [(ngModel)]="teacher.address" 
+            name="address"
+            placeholder="Enter teacher's address"
+            rows="2"
+          ></textarea>
+          <mat-icon matPrefix>location_on</mat-icon>
+          <mat-hint>Residential address (optional)</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          mat-stroked-button 
+          type="button" 
+          routerLink="/admin/manage-teachers"
+          class="cancel-btn"
+        >
+          Cancel
+        </button>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          [disabled]="teacherForm.invalid"
+          class="submit-btn"
+        >
+          <mat-icon>person_add</mat-icon> 
+          Add Teacher
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Info Card -->
+  <div class="info-card">
+    <div class="info-icon">
+      <mat-icon>info</mat-icon>
+    </div>
+    <div class="info-content">
+      <h3>Teacher Information Guidelines</h3>
+      <ul>
+        <li>Use official school email address for communication</li>
+        <li>Select the primary subject the teacher will be teaching</li>
+        <li>Ensure date of birth is accurate for age verification</li>
+        <li>Teacher will receive login credentials via email</li>
+        <li>Additional information helps in better profile management</li>
+      </ul>
+    </div>
+  </div>
 </div>

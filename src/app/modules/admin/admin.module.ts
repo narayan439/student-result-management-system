@@ -22,6 +22,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+
 
 @NgModule({
   declarations: [
@@ -46,7 +52,12 @@ import { MatCardModule } from '@angular/material/card';
     MatButtonModule,
     MatSelectModule,
     MatTableModule,
-    MatCardModule
+    MatCardModule,
+    MatTooltipModule,
+    MatPaginatorModule,
+     MatDatepickerModule,
+  MatNativeDateModule,
+    MatIconModule
   ]
 })
 export class AdminModule { }

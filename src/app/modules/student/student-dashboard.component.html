@@ -8,7 +8,6 @@
       <div class="logo">
         <i class="fas fa-graduation-cap"></i>
         Student Portal
-        <span>2023-24</span>
       </div>
       
       <div class="user-info-nav">
@@ -16,9 +15,9 @@
           <div class="greeting">Welcome</div>
           <div class="student-name">Rahul Kumar</div>
         </div>
-        <div class="user-avatar">
+        <!-- <div class="user-avatar">
           <i class="fas fa-user"></i>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -54,14 +53,16 @@
     <!-- Right Section: Logout & Mobile Menu -->
     <div class="nav-right">
       <!-- Desktop Logout Button -->
-      <button class="logout-btn" (click)="logout()">
+      <button class="logout-btn desktop-logout" (click)="logout()">
         <i class="fas fa-sign-out-alt"></i> Logout
       </button>
 
       <!-- Mobile Menu Toggle -->
-      <button class="menu-toggle" (click)="toggleMobileMenu()">
-        <i class="fas fa-bars"></i>
-      </button>
+       <button class="menu-toggle" (click)="toggleMobileMenu()">
+          <span class="menu-icon" [class.open]="mobileMenuOpen"></span>
+       </button>
+
+      
     </div>
   </nav>
 
@@ -74,50 +75,55 @@
   <!-- Mobile Menu -->
   <div class="mobile-menu" [class.active]="mobileMenuOpen">
     <div class="mobile-menu-header">
-      <h3>
-        <i class="fas fa-user-graduate"></i>
-        Student Menu
-      </h3>
-      <button class="close-menu" (click)="closeMobileMenu()">
-        <i class="fas fa-times"></i>
-      </button>
+      <div class="mobile-user-header">
+        <div class="mobile-avatar">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+        <div>
+          <h3>Rahul Kumar</h3>
+          <p>Class 10th | Roll: 2023001</p>
+        </div>
+      </div>
+
+     <button class="close-menu" (click)="closeMobileMenu()">
+  <span class="close-icon"></span>
+</button>
+
+
     </div>
 
     <ul>
       <li>
         <a routerLink="/student/view-marks" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="fas fa-chart-bar"></i> View Marks
+          <i class="fas fa-chart-bar"></i> 
+          <span>View Marks</span>
         </a>
       </li>
 
       <li>
         <a routerLink="/student/request-recheck" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="fas fa-redo-alt"></i> Request Recheck
+          <i class="fas fa-redo-alt"></i>
+          <span>Request Recheck</span>
         </a>
       </li>
 
       <li>
         <a routerLink="/student/track-recheck" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="fas fa-tasks"></i> Track Recheck
+          <i class="fas fa-tasks"></i>
+          <span>Track Recheck</span>
         </a>
       </li>
 
       <li>
         <a routerLink="/student/profile" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="fas fa-user-circle"></i> Profile
+          <i class="fas fa-user-circle"></i>
+          <span>Profile</span>
         </a>
       </li>
     </ul>
 
-    <div class="mobile-user-info">
-      <p><i class="fas fa-user"></i> Rahul Kumar</p>
-      <p><i class="fas fa-id-card"></i> Roll No: 2023001</p>
-      <p><i class="fas fa-graduation-cap"></i> Class 10th</p>
-      <p><i class="fas fa-envelope"></i> student@dps.edu</p>
-    </div>
-
     <div class="mobile-logout">
-      <button class="logout-btn" (click)="logout()">
+      <button class="logout-btn mobile-logout-btn" (click)="logout()">
         <i class="fas fa-sign-out-alt"></i> Logout
       </button>
     </div>

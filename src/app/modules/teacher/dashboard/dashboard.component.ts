@@ -8,9 +8,8 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent {
 
-
-
-
+  mobileMenuOpen = false;
+  
   students = [
     { name: 'Narayan', rollNo: '23' },
     { name: 'Rakesh', rollNo: '19' }
@@ -36,4 +35,12 @@ export class DashboardComponent {
     this.router.navigate(['/login']);
   }
 
+  // Mobile menu methods
+  toggleMobileMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
+  }
 }

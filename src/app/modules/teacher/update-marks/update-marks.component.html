@@ -1,14 +1,83 @@
-<div class="container">
-  <h2>Update Marks</h2>
+<div class="update-marks-container">
+  <div class="update-card">
+    
+    <!-- Card Header -->
+    <div class="card-header">
+      <div class="header-icon">
+        <mat-icon>edit_note</mat-icon>
+      </div>
+      <h1>Update Marks</h1>
+      <p>Update student marks for re-evaluation</p>
+    </div>
 
-  <p><b>Roll No:</b> {{ rollNo }}</p>
+    <!-- Form Container -->
+    <div class="form-container">
+      
+      <!-- Student Information -->
+      <div class="student-info">
+        <div class="student-info-header">
+          <mat-icon>person</mat-icon>
+          <h3>Student Information</h3>
+        </div>
+        <div class="student-details">
+          <div class="detail-item">
+            <mat-icon>badge</mat-icon>
+            <span>Roll Number:</span>
+          </div>
+          <div class="roll-no">
+            <mat-icon>numbers</mat-icon>
+            {{ rollNo }}
+          </div>
+        </div>
+      </div>
 
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Updated Marks</mat-label>
-    <input matInput type="number" [(ngModel)]="updatedMarks">
-  </mat-form-field>
+      <!-- Form -->
+      <form>
+        
+        <!-- Marks Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Updated Marks</mat-label>
+          <input 
+            matInput 
+            type="number" 
+            [(ngModel)]="updatedMarks" 
+            name="updatedMarks"
+            placeholder="Enter updated marks"
+            min="0"
+            max="100"
+          >
+          <mat-icon matPrefix>grade</mat-icon>
+          <span matSuffix>/100</span>
+          <mat-hint>Enter marks between 0-100</mat-hint>
+          <span class="marks-range">Valid range: 0 - 100</span>
+        </mat-form-field>
 
-  <button mat-raised-button color="primary" class="full-width" (click)="save()">
-    Save Updated Marks
-  </button>
+        <!-- Save Button -->
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="full-width" 
+          (click)="save()"
+          [disabled]="updatedMarks === null || updatedMarks < 0 || updatedMarks > 100"
+        >
+          <mat-icon>save</mat-icon>
+          Save Updated Marks
+        </button>
+
+      </form>
+
+      <!-- Info Section -->
+      <div class="info-section">
+        <h3>
+          <mat-icon>info</mat-icon>
+          Important Note
+        </h3>
+        <p>
+          This update will permanently modify the student's marks record. 
+          Ensure the updated marks are accurate before saving.
+        </p>
+      </div>
+
+    </div>
+  </div>
 </div>

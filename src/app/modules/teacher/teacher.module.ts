@@ -15,7 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { ProfileComponent } from './profile/profile.component';
 import { MatCardModule } from '@angular/material/card';
-
+import{ MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -34,6 +34,7 @@ import { MatCardModule } from '@angular/material/card';
     MatSelectModule,
     MatButtonModule,
     MatTableModule,
+    MatIconModule,
     MatCardModule
   ]
 })

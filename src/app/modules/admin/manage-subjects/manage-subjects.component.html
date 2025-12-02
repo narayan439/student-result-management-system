@@ -1,35 +1,92 @@
-<div class="container">
-  <h2>Manage Subjects</h2>
-
-  <!-- Add Subject Form -->
-  <div class="add-form">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>New Subject</mat-label>
-      <input matInput [(ngModel)]="newSubject" name="subjectName">
-    </mat-form-field>
-
-    <button mat-raised-button color="primary" (click)="addSubject()">
-      Add Subject
-    </button>
+<div class="manage-subjects-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Manage Subjects</h1>
+      <p class="page-subtitle">Add, view, and manage all subjects in the system</p>
+    </div>
   </div>
 
-  <!-- Subject List Table -->
-  <table mat-table [dataSource]="subjects" class="mat-elevation-z8">
+  <!-- Main Card -->
+  <div class="subjects-card">
+    <!-- Card Header -->
+    <div class="card-header">
+      <h2>All Subjects</h2>
+      <div class="subject-count">
+        <span class="count-badge">{{subjects.length}} Subjects</span>
+      </div>
+    </div>
 
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Subject Name </th>
-      <td mat-cell *matCellDef="let s"> {{ s }} </td>
-    </ng-container>
+    <!-- Add Subject Form -->
+    <div class="add-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Enter New Subject Name</mat-label>
+        <input 
+          matInput 
+          [(ngModel)]="newSubject" 
+          name="subjectName"
+          placeholder="e.g., Computer Science, Economics, etc."
+        >
+        <mat-icon matPrefix>add_circle</mat-icon>
+      </mat-form-field>
 
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef> Actions </th>
-      <td mat-cell *matCellDef="let s">
-        <button mat-button color="warn" (click)="deleteSubject(s)">Delete</button>
-      </td>
-    </ng-container>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="addSubject()"
+      >
+        <mat-icon>add</mat-icon> Add Subject
+      </button>
+    </div>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <!-- Subjects Table -->
+    <div class="table-container">
+      <table mat-table [dataSource]="subjects" class="mat-elevation-z8">
+        
+        <!-- Subject Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Subject Name </th>
+          <td mat-cell *matCellDef="let subject">
+            <div class="subject-badge">
+              <mat-icon class="subject-icon">book</mat-icon>
+              {{ subject }}
+            </div>
+          </td>
+        </ng-container>
 
-  </table>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-header"> Actions </th>
+          <td mat-cell *matCellDef="let subject">
+            <button 
+              mat-button 
+              color="warn" 
+              (click)="deleteSubject(subject)"
+              class="delete-btn"
+            >
+              <mat-icon>delete</mat-icon> Delete
+            </button>
+          </td>
+        </ng-container>
+
+        <!-- Header Row -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        
+        <!-- Data Rows -->
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="subjects.length === 0" class="empty-row">
+          <td colspan="2">
+            <div class="empty-state">
+              <mat-icon>book</mat-icon>
+              <h3>No Subjects Added Yet</h3>
+              <p>Add your first subject using the form above</p>
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </div>
+  </div>
 </div>

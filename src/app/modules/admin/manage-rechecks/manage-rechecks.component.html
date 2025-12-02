@@ -1,58 +1,119 @@
-<div class="container">
-  <h2>Manage Recheck Requests</h2>
+<div class="manage-rechecks-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Recheck Requests</h1>
+      <p class="page-subtitle">Manage student recheck requests and evaluations</p>
+    </div>
+  </div>
 
-  <table mat-table [dataSource]="rechecks" class="mat-elevation-z8">
+  <!-- Stats Cards -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon pending-icon">
+        <mat-icon>schedule</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>{{getPendingCount()}}</h3>
+        <p>Pending Requests</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon approved-icon">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>{{getApprovedCount()}}</h3>
+        <p>Approved</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon rejected-icon">
+        <mat-icon>cancel</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>{{getRejectedCount()}}</h3>
+        <p>Rejected</p>
+      </div>
+    </div>
+  </div>
 
-    <!-- Roll No -->
-    <ng-container matColumnDef="rollNo">
-      <th mat-header-cell *matHeaderCellDef> Roll No </th>
-      <td mat-cell *matCellDef="let r"> {{ r.rollNo }} </td>
-    </ng-container>
+  <!-- Main Card -->
+  <div class="rechecks-card">
+    <!-- Card Header -->
+    <div class="card-header">
+      <h2>All Recheck Requests</h2>
+    </div>
 
-    <!-- Subject -->
-    <ng-container matColumnDef="subject">
-      <th mat-header-cell *matHeaderCellDef> Subject </th>
-      <td mat-cell *matCellDef="let r"> {{ r.subject }} </td>
-    </ng-container>
+    <!-- Rechecks Table -->
+    <div class="table-container">
+      <table mat-table [dataSource]="rechecks" class="mat-elevation-z8">
 
-    <!-- Reason -->
-    <ng-container matColumnDef="reason">
-      <th mat-header-cell *matHeaderCellDef> Reason </th>
-      <td mat-cell *matCellDef="let r"> {{ r.reason }} </td>
-    </ng-container>
+        <!-- Roll No -->
+        <ng-container matColumnDef="rollNo">
+          <th mat-header-cell *matHeaderCellDef> Roll No </th>
+          <td mat-cell *matCellDef="let r"> {{ r.rollNo }} </td>
+        </ng-container>
 
-    <!-- Status -->
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef> Status </th>
-      <td mat-cell *matCellDef="let r"> {{ r.status }} </td>
-    </ng-container>
+        <!-- Subject -->
+        <ng-container matColumnDef="subject">
+          <th mat-header-cell *matHeaderCellDef> Subject </th>
+          <td mat-cell *matCellDef="let r"> {{ r.subject }} </td>
+        </ng-container>
 
-    <!-- Actions -->
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef> Actions </th>
-      <td mat-cell *matCellDef="let r">
+        <!-- Reason -->
+        <ng-container matColumnDef="reason">
+          <th mat-header-cell *matHeaderCellDef> Reason </th>
+          <td mat-cell *matCellDef="let r"> {{ r.reason }} </td>
+        </ng-container>
 
-        <button 
-          mat-button 
-          color="primary" 
-          (click)="updateStatus(r, 'APPROVED')"
-          [disabled]="r.status === 'APPROVED'">
-          Approve
-        </button>
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef> Status </th>
+          <td mat-cell *matCellDef="let r">
+            <span class="status-badge status-{{r.status.toLowerCase()}}">
+              {{ r.status }}
+            </span>
+          </td>
+        </ng-container>
 
-        <button 
-          mat-button 
-          color="warn" 
-          (click)="updateStatus(r, 'REJECTED')"
-          [disabled]="r.status === 'REJECTED'">
-          Reject
-        </button>
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let r">
+            <div class="action-buttons">
+              <button 
+                class="approve-btn"
+                (click)="updateStatus(r, 'APPROVED')"
+                [disabled]="r.status === 'APPROVED'">
+                <mat-icon>check_circle</mat-icon> Approve
+              </button>
 
-      </td>
-    </ng-container>
+              <button 
+                class="reject-btn"
+                (click)="updateStatus(r, 'REJECTED')"
+                [disabled]="r.status === 'REJECTED'">
+                <mat-icon>cancel</mat-icon> Reject
+              </button>
+            </div>
+          </td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-  </table>
+        <!-- Empty State -->
+        <tr *ngIf="rechecks.length === 0" class="empty-row">
+          <td colspan="5">
+            <div class="empty-state">
+              <mat-icon>assignment</mat-icon>
+              <h3>No Recheck Requests</h3>
+              <p>All recheck requests have been processed</p>
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </div>
+  </div>
 </div>

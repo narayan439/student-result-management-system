@@ -1,31 +1,118 @@
-<div class="container">
-  <h2>Edit Teacher</h2>
-
-  <form (ngSubmit)="updateTeacher()" #teacherForm="ngForm">
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Name</mat-label>
-      <input matInput [(ngModel)]="teacher.name" name="name" required>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Email</mat-label>
-      <input matInput [(ngModel)]="teacher.email" name="email" required email>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Subject</mat-label>
-      <input matInput [(ngModel)]="teacher.subject" name="subject" required>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>DOB</mat-label>
-      <input matInput type="date" [(ngModel)]="teacher.dob" name="dob" required>
-    </mat-form-field>
-
-    <button mat-raised-button color="primary" class="full-width">
-      Update Teacher
+<div class="edit-teacher-container">
+  <!-- Back Navigation -->
+  <div class="back-nav">
+    <button mat-button routerLink="/admin/manage-teachers" class="back-button">
+      <mat-icon>arrow_back</mat-icon> Back to Teachers
     </button>
+  </div>
 
-  </form>
+  <!-- Main Card -->
+  <div class="form-card">
+    <!-- Form Header -->
+    <div class="form-header">
+      <div class="header-icon">
+        <mat-icon>edit</mat-icon>
+      </div>
+      <div class="header-text">
+        <h1>Edit Teacher</h1>
+        <p>Update teacher information</p>
+      </div>
+    </div>
+
+    <!-- Form Content -->
+    <form (ngSubmit)="updateTeacher()" #teacherForm="ngForm" class="teacher-form">
+      <div class="form-grid">
+        <!-- Name Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Name</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="teacher.name" 
+            name="name" 
+            required
+            placeholder="Enter teacher's full name"
+          >
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-hint>Teacher's full name</mat-hint>
+          <mat-error *ngIf="teacherForm.controls['name']?.invalid && teacherForm.controls['name']?.touched">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="teacher.email" 
+            name="email" 
+            required
+            email
+            placeholder="teacher@school.com"
+            type="email"
+          >
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-hint>Official email address</mat-hint>
+          <mat-error *ngIf="teacherForm.controls['email']?.invalid && teacherForm.controls['email']?.touched">
+            Please enter a valid email address
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Subject Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Subject</mat-label>
+          <mat-select [(ngModel)]="teacher.subject" name="subject" required>
+            <mat-option *ngFor="let sub of subjects" [value]="sub">
+              {{ sub }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>subject</mat-icon>
+          <mat-hint>Primary teaching subject</mat-hint>
+          <mat-error *ngIf="teacherForm.controls['subject']?.invalid && teacherForm.controls['subject']?.touched">
+            Subject is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- DOB Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Date of Birth</mat-label>
+          <input 
+            matInput 
+            type="date" 
+            [(ngModel)]="teacher.dob" 
+            name="dob" 
+            required
+          >
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-hint>Teacher's date of birth</mat-hint>
+          <mat-error *ngIf="teacherForm.controls['dob']?.invalid && teacherForm.controls['dob']?.touched">
+            Date of birth is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          mat-stroked-button 
+          type="button" 
+          (click)="resetForm()"
+          class="reset-btn"
+        >
+          Reset Changes
+        </button>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          [disabled]="teacherForm.invalid"
+          class="update-btn"
+        >
+          <mat-icon>save</mat-icon> 
+          Update Teacher
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

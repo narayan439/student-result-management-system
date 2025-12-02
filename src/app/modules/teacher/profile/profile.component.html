@@ -1,19 +1,176 @@
-<div class="container">
+<div class="profile-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Teacher Profile</h1>
+      <p class="page-subtitle">View and manage teacher information</p>
+    </div>
+  </div>
 
-  <h2>Teacher Profile</h2>
+  <!-- Main Profile Content -->
+  <div class="profile-content">
+    
+    <!-- Left Column: Profile Card -->
+    <div class="profile-card">
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <div class="profile-avatar">
+          {{ teacher.name.charAt(0) }}
+        </div>
+        <h1>{{ teacher.name }}</h1>
+        <p class="profile-title">{{ teacher.subject }} Teacher</p>
+        <div class="status-badge">
+          <mat-icon>circle</mat-icon>
+          Active
+        </div>
+      </div>
 
-  <mat-card class="profile-card">
-    <mat-card-title>{{ teacher.name }}</mat-card-title>
+      <!-- Profile Info -->
+      <div class="profile-info">
+        <h3 class="section-title">
+          <mat-icon>person</mat-icon>
+          Personal Information
+        </h3>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>email</mat-icon>
+              Email
+            </div>
+            <div class="info-value">{{ teacher.email }}</div>
+          </div>
 
-    <mat-card-content>
-      <p><b>Email:</b> {{ teacher.email }}</p>
-      <p><b>Subject:</b> {{ teacher.subject }}</p>
-      <p><b>Date of Birth:</b> {{ teacher.dob }}</p>
-      <p><b>Experience:</b> {{ teacher.experience }} years</p>
-      <p><b>Phone:</b> {{ teacher.phone }}</p>
-      <p><b>Address:</b> {{ teacher.address }}</p>
-    </mat-card-content>
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>subject</mat-icon>
+              Subject
+            </div>
+            <div class="subject-badge">
+              <mat-icon>book</mat-icon>
+              {{ teacher.subject }}
+            </div>
+          </div>
 
-  </mat-card>
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>calendar_today</mat-icon>
+              Date of Birth
+            </div>
+            <div class="info-value">{{ teacher.dob }}</div>
+          </div>
 
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>work</mat-icon>
+              Experience
+            </div>
+            <div class="experience-badge">
+              <mat-icon>schedule</mat-icon>
+              {{ teacher.experience }} years
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>phone</mat-icon>
+              Phone
+            </div>
+            <div class="info-value">{{ teacher.phone }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>location_on</mat-icon>
+              Address
+            </div>
+            <div class="info-value">{{ teacher.address }}</div>
+          </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+          <h3 class="section-title">
+            <mat-icon>analytics</mat-icon>
+            Quick Stats
+          </h3>
+          
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">95%</div>
+              <div class="stat-label">Attendance</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">4.8</div>
+              <div class="stat-label">Avg. Rating</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">156</div>
+              <div class="stat-label">Students</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">24</div>
+              <div class="stat-label">Classes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Sidebar -->
+    <div class="profile-sidebar">
+      <!-- Quick Actions Card -->
+      <div class="action-card">
+        <h3>
+          <mat-icon>settings</mat-icon>
+          Quick Actions
+        </h3>
+        <div class="action-buttons">
+          <button mat-stroked-button class="action-btn">
+            <mat-icon>edit</mat-icon>
+            Edit Profile
+          </button>
+          <button mat-stroked-button class="action-btn">
+            <mat-icon>password</mat-icon>
+            Change Password
+          </button>
+          <button mat-stroked-button class="action-btn">
+            <mat-icon>notifications</mat-icon>
+            Notification Settings
+          </button>
+          <button mat-stroked-button class="action-btn delete">
+            <mat-icon>logout</mat-icon>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Info Card -->
+      <div class="quick-info">
+        <h3>
+          <mat-icon>info</mat-icon>
+          Quick Info
+        </h3>
+        <div class="info-list">
+          <div class="info-list-item">
+            <mat-icon>event</mat-icon>
+            <span>Joined: 2018</span>
+          </div>
+          <div class="info-list-item">
+            <mat-icon>school</mat-icon>
+            <span>Qualification: M.Tech</span>
+          </div>
+          <div class="info-list-item">
+            <mat-icon>verified</mat-icon>
+            <span>Account Verified</span>
+          </div>
+          <div class="info-list-item">
+            <mat-icon>schedule</mat-icon>
+            <span>Last Login: Today</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
 </div>

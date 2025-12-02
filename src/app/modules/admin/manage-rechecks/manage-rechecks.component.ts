@@ -27,4 +27,17 @@ export class ManageRechecksComponent {
     item.status = status;
     // later: call backend API here
   }
+
+  // Helper methods for stats
+  getPendingCount(): number {
+    return this.rechecks.filter(r => r.status === 'PENDING').length;
+  }
+
+  getApprovedCount(): number {
+    return this.rechecks.filter(r => r.status === 'APPROVED').length;
+  }
+
+  getRejectedCount(): number {
+    return this.rechecks.filter(r => r.status === 'REJECTED').length;
+  }
 }

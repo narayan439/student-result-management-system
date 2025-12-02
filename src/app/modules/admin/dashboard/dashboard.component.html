@@ -1,29 +1,179 @@
 <div class="dashboard-container">
+  
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome to the admin panel. Manage your school's students, teachers, subjects, and recheck requests from here.</p>
+  </div>
 
-  <h2>Admin Dashboard</h2>
+  <!-- Welcome Card -->
+  <div class="welcome-card">
+    <div class="welcome-content">
+      <h2>Welcome, Administrator!</h2>
+      <p>You have {{ totalStudents }} students, {{ totalTeachers }} teachers, and {{ totalRechecks }} pending recheck requests to manage.</p>
+    </div>
+    <div class="welcome-icon">
+      <mat-icon>dashboard</mat-icon>
+    </div>
+  </div>
 
+  <!-- Stats Overview -->
+  <h3 class="stats-title">Quick Overview</h3>
+
+  <!-- Card Container -->
   <div class="card-container">
 
+    <!-- Students Card -->
     <mat-card class="dash-card" routerLink="/admin/manage-students">
-      <h3>Manage Students</h3>
-      <p>Total: {{ totalStudents }}</p>
+      <div class="card-header">
+        <div class="card-icon">
+          <mat-icon>people</mat-icon>
+        </div>
+        <div class="card-title">
+          <h3>Manage Students</h3>
+          <p class="card-desc">View and manage all student records</p>
+        </div>
+      </div>
+      <div class="card-content">
+        <p class="total-count">{{ totalStudents }}</p>
+        <p class="count-label">Total Students</p>
+      </div>
+      <div class="card-footer">
+        <a class="view-link">
+          View Students
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <div class="quick-stats">
+          <mat-icon>trending_up</mat-icon>
+          <span>+{{ totalStudents }} total</span>
+        </div>
+      </div>
     </mat-card>
 
+    <!-- Teachers Card -->
     <mat-card class="dash-card" routerLink="/admin/manage-teachers">
-      <h3>Manage Teachers</h3>
-      <p>Total: {{ totalTeachers }}</p>
+      <div class="card-header">
+        <div class="card-icon">
+          <mat-icon>school</mat-icon>
+        </div>
+        <div class="card-title">
+          <h3>Manage Teachers</h3>
+          <p class="card-desc">Manage faculty and teaching staff</p>
+        </div>
+      </div>
+      <div class="card-content">
+        <p class="total-count">{{ totalTeachers }}</p>
+        <p class="count-label">Total Teachers</p>
+      </div>
+      <div class="card-footer">
+        <a class="view-link">
+          View Teachers
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <div class="quick-stats">
+          <mat-icon>groups</mat-icon>
+          <span>+{{ totalTeachers }} staff</span>
+        </div>
+      </div>
     </mat-card>
 
+    <!-- Subjects Card -->
     <mat-card class="dash-card" routerLink="/admin/manage-subjects">
-      <h3>Manage Subjects</h3>
-      <p>Total: {{ totalSubjects }}</p>
+      <div class="card-header">
+        <div class="card-icon">
+          <mat-icon>menu_book</mat-icon>
+        </div>
+        <div class="card-title">
+          <h3>Manage Subjects</h3>
+          <p class="card-desc">Add and manage curriculum subjects</p>
+        </div>
+      </div>
+      <div class="card-content">
+        <p class="total-count">{{ totalSubjects }}</p>
+        <p class="count-label">Total Subjects</p>
+      </div>
+      <div class="card-footer">
+        <a class="view-link">
+          View Subjects
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <div class="quick-stats">
+          <mat-icon>book</mat-icon>
+          <span>{{ totalSubjects }} courses</span>
+        </div>
+      </div>
     </mat-card>
 
+    <!-- Rechecks Card -->
     <mat-card class="dash-card" routerLink="/admin/manage-rechecks">
-      <h3>Recheck Requests</h3>
-      <p>Total: {{ totalRechecks }}</p>
+      <div class="card-header">
+        <div class="card-icon">
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <div class="card-title">
+          <h3>Recheck Requests</h3>
+          <p class="card-desc">Handle student re-evaluation requests</p>
+        </div>
+      </div>
+      <div class="card-content">
+        <p class="total-count">{{ totalRechecks }}</p>
+        <p class="count-label">Total Requests</p>
+      </div>
+      <div class="card-footer">
+        <a class="view-link">
+          View Requests
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <div class="quick-stats">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ totalRechecks }} pending</span>
+        </div>
+      </div>
     </mat-card>
 
+  </div>
+
+  <!-- Recent Activity Section -->
+  <div class="activity-section">
+    <div class="activity-header">
+      <h3>Recent Activity</h3>
+      <a class="view-all" routerLink="/admin/activity">
+        View All
+        <mat-icon>arrow_forward</mat-icon>
+      </a>
+    </div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="activity-icon student">
+          <mat-icon>person_add</mat-icon>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">New Student Added</div>
+          <p class="activity-desc">Narayan joined Class 10</p>
+          <div class="activity-time">2 hours ago</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon teacher">
+          <mat-icon>school</mat-icon>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">Teacher Updated</div>
+          <p class="activity-desc">Rahul's subject changed to Maths</p>
+          <div class="activity-time">5 hours ago</div>
+        </div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon recheck">
+          <mat-icon>assignment_turned_in</mat-icon>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">Recheck Approved</div>
+          <p class="activity-desc">Roll No: 21 - Maths recheck approved</p>
+          <div class="activity-time">Yesterday</div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>

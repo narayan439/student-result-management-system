@@ -1,18 +1,272 @@
-.container {
-  padding: 20px;
+/* Main Container */
+.manage-subjects-container {
+  padding: 24px;
+  background: #f8fafc;
+  min-height: 100vh;
 }
 
-.add-form {
+/* Header Styles */
+.page-header {
   display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
 }
 
-.full-width {
-  width: 300px;
+.header-left .page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a237e;
+  margin: 0 0 8px 0;
+}
+
+.header-left .page-subtitle {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Main Card */
+.subjects-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Card Header */
+.card-header {
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a237e;
+  margin: 0;
+}
+
+/* Add Subject Form */
+.add-form {
+  padding: 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.add-form .full-width {
+  flex: 1;
+}
+
+.add-form button {
+  height: 56px;
+  padding: 0 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #1a237e, #304ffe);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
+  transition: all 0.3s ease;
+}
+
+.add-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 35, 126, 0.3);
+}
+
+/* Custom Form Field Styles */
+::ng-deep .mat-form-field-outline {
+  background: white;
+  border-radius: 8px !important;
+}
+
+::ng-deep .mat-form-field-outline-thick {
+  color: #1a237e !important;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+  color: #1a237e;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+  color: #1a237e !important;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-outline-thick {
+  color: #1a237e !important;
+}
+
+/* Table Styles */
+.table-container {
+  padding: 0;
+  overflow: hidden;
 }
 
 table {
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.mat-elevation-z8 {
+  box-shadow: none !important;
+}
+
+.mat-header-row {
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.mat-header-cell {
+  font-weight: 600;
+  color: #4a5568;
+  padding: 20px 24px;
+  font-size: 14px;
+}
+
+.mat-cell {
+  padding: 20px 24px;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 15px;
+}
+
+/* Subject Name Cell */
+.mat-cell:first-child {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+/* Subject Badge Styling */
+.subject-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.subject-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Actions Cell */
+.mat-column-actions {
+  text-align: right;
+  width: 150px;
+}
+
+.mat-column-actions .mat-cell {
+  text-align: right;
+}
+
+button[color="warn"] {
+  background: #ffebee;
+  color: #d32f2f;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+button[color="warn"]:hover {
+  background: #ffcdd2;
+  transform: translateY(-1px);
+}
+
+/* Table Rows Hover Effect */
+.mat-row:hover {
+  background: #f7fafc;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #718096;
+}
+
+.empty-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #cbd5e0;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #4a5568;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .manage-subjects-container {
+    padding: 16px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .add-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .add-form button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .mat-header-cell,
+  .mat-cell {
+    padding: 16px;
+  }
+  
+  .mat-column-actions {
+    width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header .page-title {
+    font-size: 24px;
+  }
+  
+  .card-header h2 {
+    font-size: 18px;
+  }
+  
+  .add-form {
+    padding: 20px;
+  }
 }

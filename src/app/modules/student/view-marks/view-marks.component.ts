@@ -6,33 +6,58 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./view-marks.component.css']
 })
 export class ViewMarksComponent implements OnInit {
-
-  displayedColumns: string[] = ['subject', 'marks', 'status'];
-
+  
+  // Student Info
+  studentName = 'Narayan Sharma';
+  studentClass = '10';
+  studentRollNo = '23';
+  
+  // Displayed columns for the table
+  displayedColumns: string[] = ['subject', 'score', 'status'];
+  
+  // Marks data
   marks = [
-    { subject: 'Maths', score: 80 },
-    { subject: 'Science', score: 72 },
-    { subject: 'English', score: 90 },
-    { subject: 'Geography', score: 45 }
-  ]
+    { subject: 'Mathematics', score: 85 },
+    { subject: 'Science', score: 92 },
+    { subject: 'English', score: 78 },
+    { subject: 'History', score: 65 },
+    { subject: 'Geography', score: 88 },
+    { subject: 'Computer', score: 95 }
+  ];
+  
+  // Calculated values
+  total: number = 0;
+  percentage: number = 0;
+  grade: string = '';
+  average: number = 0;
 
-  total = 0;
-  percentage = 0;
-  grade = '';
-
-  ngOnInit(): void {
-    this.calculateResult();
+  ngOnInit() {
+    this.calculatePerformance();
   }
 
-  calculateResult() {
-    this.total = this.marks.reduce((sum, m) => sum + m.score, 0);
-    this.percentage = Math.round(this.total / this.marks.length);
-
-    if (this.percentage >= 90) this.grade = 'A+';
-    else if (this.percentage >= 80) this.grade = 'A';
-    else if (this.percentage >= 70) this.grade = 'B';
-    else if (this.percentage >= 60) this.grade = 'C';
-    else if (this.percentage >= 33) this.grade = 'D';
-    else this.grade = 'F';
+  calculatePerformance() {
+    // Calculate total
+    this.total = this.marks.reduce((sum, mark) => sum + mark.score, 0);
+    
+    // Calculate percentage
+    this.percentage = Math.round((this.total / (this.marks.length * 100)) * 100);
+    
+    // Calculate average
+    this.average = this.total / this.marks.length;
+    
+    // Determine grade
+    if (this.percentage >= 90) {
+      this.grade = 'A+';
+    } else if (this.percentage >= 80) {
+      this.grade = 'A';
+    } else if (this.percentage >= 70) {
+      this.grade = 'B';
+    } else if (this.percentage >= 60) {
+      this.grade = 'C';
+    } else if (this.percentage >= 33) {
+      this.grade = 'D';
+    } else {
+      this.grade = 'F';
+    }
   }
 }

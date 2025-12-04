@@ -37,7 +37,7 @@
   margin: 0 auto;
 }
 
-/* Recheck Header Section - Updated to Blue */
+/* Recheck Header Section */
 .recheck-header-section {
   background: linear-gradient(135deg, #1a237e, #304ffe);
   padding: 25px 30px;
@@ -53,9 +53,11 @@
   gap: 12px;
 }
 
-.recheck-header-section h3 i {
-  color: #ffeb3b;
+.recheck-header-section h3 .header-icon {
+  color: #ffffff;
   font-size: 28px;
+  width: 28px;
+  height: 28px;
 }
 
 .recheck-header-section p {
@@ -64,9 +66,30 @@
   margin: 0;
 }
 
-/* Recheck Content */
+/* Recheck Content with Scrollbar */
 .recheck-content {
   padding: 40px;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+/* Custom Scrollbar for recheck-content */
+.recheck-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.recheck-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.recheck-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.recheck-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* Form Container */
@@ -89,51 +112,58 @@
   padding-left: 5px;
 }
 
-.form-control {
+/* Full Width for Material Fields */
+.full-width {
   width: 100%;
-  padding: 16px 20px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  font-size: 16px;
-  color: #333;
+}
+
+/* Material Form Field Customization */
+::ng-deep .mat-form-field-outline {
   background: white;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-  font-family: inherit;
+  border-radius: 10px !important;
 }
 
-.form-control:focus {
-  outline: none;
-  border-color: #304ffe;
-  box-shadow: 0 0 0 3px rgba(48, 79, 254, 0.1);
+::ng-deep .mat-form-field-outline-thick {
+  color: #304ffe !important;
 }
 
-.form-control::placeholder {
-  color: #888;
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+  color: #1a237e;
 }
 
-select.form-control {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231a237e' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 20px center;
-  background-size: 16px;
-  padding-right: 50px;
-  cursor: pointer;
+::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+  color: #1a237e !important;
 }
 
-textarea.form-control {
-  min-height: 120px;
-  resize: vertical;
+::ng-deep .mat-form-field.mat-focused .mat-form-field-outline-thick {
+  color: #1a237e !important;
 }
 
-/* Submit Button - Updated to Blue */
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-prefix {
+  color: #a0aec0;
+  margin-right: 8px;
+}
+
+/* Subject Option Styling */
+.subject-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.subject-option mat-icon {
+  color: #1a237e;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Submit Button */
 .submit-btn {
   width: 100%;
-  padding: 18px;
+  height: 56px;
   background: linear-gradient(135deg, #1a237e, #304ffe);
   color: white;
-  border: none;
   border-radius: 10px;
   font-size: 18px;
   font-weight: 600;
@@ -142,24 +172,28 @@ textarea.form-control {
   margin-top: 20px;
   letter-spacing: 0.5px;
   box-shadow: 0 4px 15px rgba(48, 79, 254, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.submit-btn:hover:not(:disabled) {
+.submit-btn:hover:not([disabled]) {
   background: linear-gradient(135deg, #283593, #1a237e);
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(48, 79, 254, 0.4);
 }
 
-.submit-btn:active:not(:disabled) {
+.submit-btn:active:not([disabled]) {
   transform: translateY(-1px);
 }
 
-.submit-btn:disabled {
+.submit-btn[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Important Notes - Updated to Blue theme */
+/* Important Notes */
 .notes-section {
   margin-top: 40px;
   padding: 25px;
@@ -175,6 +209,13 @@ textarea.form-control {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.notes-section h4 mat-icon {
+  color: #304ffe;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 .notes-section ul {
@@ -193,12 +234,7 @@ textarea.form-control {
   color: #1a237e;
 }
 
-.notes-section li i {
-  color: #304ffe;
-  margin-right: 8px;
-}
-
-/* Recheck Status - Updated to Blue theme */
+/* Recheck Status */
 .status-section {
   margin-top: 30px;
   padding: 20px;
@@ -216,8 +252,11 @@ textarea.form-control {
   gap: 10px;
 }
 
-.status-section h4 i {
+.status-section h4 mat-icon {
   color: #304ffe;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 .status-item {
@@ -235,11 +274,24 @@ textarea.form-control {
 .status-label {
   color: #666;
   font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #a0aec0;
 }
 
 .status-value {
   font-size: 15px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .status-value.pending {
@@ -248,6 +300,12 @@ textarea.form-control {
 
 .status-value.completed {
   color: #4caf50;
+}
+
+.status-value mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Footer */
@@ -274,6 +332,7 @@ textarea.form-control {
   
   .recheck-content {
     padding: 30px 25px;
+    max-height: 500px;
   }
   
   .recheck-header-section {
@@ -284,13 +343,10 @@ textarea.form-control {
     font-size: 22px;
   }
   
-  .form-control {
-    padding: 14px 18px;
-  }
-  
   .submit-btn {
     padding: 16px;
     font-size: 17px;
+    height: 52px;
   }
 }
 
@@ -309,6 +365,7 @@ textarea.form-control {
   
   .recheck-content {
     padding: 25px 20px;
+    max-height: 450px;
   }
   
   .recheck-header-section h3 {
@@ -319,21 +376,27 @@ textarea.form-control {
     font-size: 15px;
   }
   
-  .form-control {
-    padding: 12px 16px;
-    font-size: 15px;
-  }
-  
-  select.form-control {
-    background-position: right 16px center;
-  }
-  
   .notes-section {
     padding: 20px;
+  }
+  
+  .status-section {
+    padding: 16px;
   }
   
   .submit-btn {
     padding: 15px;
     font-size: 16px;
+    height: 48px;
+  }
+  
+  .status-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .status-value {
+    align-self: flex-end;
   }
 }

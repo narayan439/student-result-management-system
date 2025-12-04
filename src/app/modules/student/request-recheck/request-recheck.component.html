@@ -12,13 +12,13 @@
     <!-- Recheck Header Section -->
     <div class="recheck-header-section">
       <h3>
-        <i class="fas fa-redo-alt"></i> Submit Recheck Request
+        <mat-icon class="header-icon">redo</mat-icon> Submit Recheck Request
       </h3>
       <p>Fill out the form below to request re-evaluation of your marks</p>
     </div>
 
-    <!-- Recheck Content -->
-    <div class="recheck-content">
+    <!-- Recheck Content with Scrollbar -->
+    <div class="recheck-content" style="overflow-y: auto; max-height: 600px;">
       
       <!-- Form -->
       <form (ngSubmit)="submitRecheck()" #reForm="ngForm" class="form-container">
@@ -26,39 +26,59 @@
         <!-- Subject Selection -->
         <div class="form-group">
           <label for="subject">Select Subject</label>
-          <select 
-            id="subject"
-            class="form-control"
-            [(ngModel)]="recheck.subject"
-            name="subject"
-            required
-          >
-            <option value="" disabled selected>Choose a subject</option>
-            <option *ngFor="let s of subjects" [value]="s">{{ s }}</option>
-          </select>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Choose a subject</mat-label>
+            <mat-select 
+              id="subject"
+              [(ngModel)]="recheck.subject"
+              name="subject"
+              required
+            >
+              <mat-option *ngFor="let s of subjects" [value]="s">
+                <div class="subject-option">
+                  <mat-icon>book</mat-icon>
+                  {{ s }}
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>subject</mat-icon>
+            <mat-error *ngIf="reForm.controls['subject']?.invalid && reForm.controls['subject']?.touched">
+              Please select a subject
+            </mat-error>
+          </mat-form-field>
         </div>
 
         <!-- Reason -->
         <div class="form-group">
           <label for="reason">Reason for Recheck</label>
-          <textarea 
-            id="reason"
-            class="form-control"
-            rows="4"
-            [(ngModel)]="recheck.reason"
-            name="reason"
-            required
-            placeholder="Please explain why you believe a recheck is necessary..."
-          ></textarea>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Explain</mat-label>
+            <textarea 
+              matInput 
+              id="reason"
+              rows="4"
+              [(ngModel)]="recheck.reason"
+              name="reason"
+              required
+              placeholder="Please explain why you believe a recheck is necessary..."
+            ></textarea>
+            <mat-icon matPrefix>description</mat-icon>
+            <mat-hint>Be specific about your concerns</mat-hint>
+            <mat-error *ngIf="reForm.controls['reason']?.invalid && reForm.controls['reason']?.touched">
+              Please provide a reason for recheck
+            </mat-error>
+          </mat-form-field>
         </div>
 
         <!-- Submit Button -->
         <button 
+          mat-raised-button 
+          color="primary" 
           type="submit" 
           class="submit-btn"
           [disabled]="reForm.invalid"
         >
-          Submit Recheck Request
+          <mat-icon>send</mat-icon> Submit Recheck Request
         </button>
 
       </form>
@@ -66,7 +86,7 @@
       <!-- Important Notes -->
       <div class="notes-section">
         <h4>
-          <i class="fas fa-exclamation-circle"></i> Important Information
+          <mat-icon>info</mat-icon> Important Information
         </h4>
         <ul>
           <li><strong>Processing Time:</strong> Recheck requests typically take 7-10 working days to process</li>
@@ -80,19 +100,34 @@
       <!-- Recent Requests Status -->
       <div class="status-section">
         <h4>
-          <i class="fas fa-history"></i> Recent Request Status
+          <mat-icon>history</mat-icon> Recent Request Status
         </h4>
         <div class="status-item">
-          <span class="status-label">Mathematics</span>
-          <span class="status-value pending">Pending</span>
+          <span class="status-label">
+            <mat-icon class="status-icon">calculate</mat-icon>
+            Mathematics
+          </span>
+          <span class="status-value pending">
+            <mat-icon>pending</mat-icon> Pending
+          </span>
         </div>
         <div class="status-item">
-          <span class="status-label">Science</span>
-          <span class="status-value completed">Completed</span>
+          <span class="status-label">
+            <mat-icon class="status-icon">science</mat-icon>
+            Science
+          </span>
+          <span class="status-value completed">
+            <mat-icon>check_circle</mat-icon> Completed
+          </span>
         </div>
         <div class="status-item">
-          <span class="status-label">English</span>
-          <span class="status-value completed">Completed</span>
+          <span class="status-label">
+            <mat-icon class="status-icon">menu_book</mat-icon>
+            English
+          </span>
+          <span class="status-value completed">
+            <mat-icon>check_circle</mat-icon> Completed
+          </span>
         </div>
       </div>
 

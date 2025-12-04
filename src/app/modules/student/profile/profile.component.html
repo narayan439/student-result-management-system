@@ -3,18 +3,18 @@
   <!-- Header -->
   <div class="profile-header">
     <h2>
-      <i class="fas fa-user-circle"></i> My Profile
+      <mat-icon class="header-icon">account_circle</mat-icon> My Profile
     </h2>
     <p>View your basic information</p>
   </div>
 
   <!-- Profile Card -->
-  <div class="profile-card">
+  <mat-card class="profile-card">
     
     <!-- Profile Top Section -->
     <div class="profile-top">
       <div class="profile-avatar">
-        <i class="fas fa-user-graduate"></i>
+        <mat-icon class="avatar-icon">school</mat-icon>
       </div>
       <h3 class="profile-name">{{ student.name }}</h3>
       <p class="profile-class">Class {{ student.className }}</p>
@@ -27,7 +27,7 @@
         <!-- Name -->
         <div class="info-item">
           <div class="info-icon">
-            <i class="fas fa-signature"></i>
+            <mat-icon>badge</mat-icon>
           </div>
           <div class="info-content">
             <span class="info-label">Full Name</span>
@@ -38,7 +38,7 @@
         <!-- Email -->
         <div class="info-item">
           <div class="info-icon">
-            <i class="fas fa-envelope"></i>
+            <mat-icon>email</mat-icon>
           </div>
           <div class="info-content">
             <span class="info-label">Email Address</span>
@@ -49,7 +49,7 @@
         <!-- Roll Number -->
         <div class="info-item">
           <div class="info-icon">
-            <i class="fas fa-hashtag"></i>
+            <mat-icon>numbers</mat-icon>
           </div>
           <div class="info-content">
             <span class="info-label">Roll Number</span>
@@ -60,7 +60,7 @@
         <!-- Class -->
         <div class="info-item">
           <div class="info-icon">
-            <i class="fas fa-school"></i>
+            <mat-icon>class</mat-icon>
           </div>
           <div class="info-content">
             <span class="info-label">Class</span>
@@ -71,7 +71,7 @@
         <!-- Date of Birth -->
         <div class="info-item">
           <div class="info-icon">
-            <i class="fas fa-calendar-alt"></i>
+            <mat-icon>calendar_today</mat-icon>
           </div>
           <div class="info-content">
             <span class="info-label">Date of Birth</span>
@@ -79,9 +79,50 @@
           </div>
         </div>
 
+        <!-- Additional Information -->
+        <div class="info-item">
+          <div class="info-icon">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Father's Name</span>
+            <p class="info-value">{{ student.fatherName }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <mat-icon>person_outline</mat-icon>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Mother's Name</span>
+            <p class="info-value">{{ student.motherName }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <mat-icon>location_on</mat-icon>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Address</span>
+            <p class="info-value">{{ student.address }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <mat-icon>phone</mat-icon>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Phone</span>
+            <p class="info-value">{{ student.phone }}</p>
+          </div>
+        </div>
+
       </div>
     </div>
-  </div>
+  </mat-card>
 
   <!-- Footer -->
   <div class="profile-footer">

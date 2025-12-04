@@ -15,7 +15,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { ProfileComponent } from './profile/profile.component';
 import { MatCardModule } from '@angular/material/card';
-import{ MatIconModule } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
+
+// MINIMAL NEW IMPORTS for RecheckRequestsComponent
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -29,13 +33,19 @@ import{ MatIconModule } from '@angular/material/icon';
     CommonModule,
     TeacherRoutingModule,
     FormsModule,
+    
+    // Material Modules
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
     MatTableModule,
     MatIconModule,
-    MatCardModule
+    MatCardModule,
+    
+    // MINIMAL: Only essential modules for RecheckRequestsComponent
+    MatPaginatorModule,  // Required for pagination
+    MatChipsModule       // Required for chips (subject/status badges)
   ]
 })
 export class TeacherModule { }

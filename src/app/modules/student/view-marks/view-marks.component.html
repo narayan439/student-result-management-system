@@ -7,15 +7,16 @@
   </div>
 
   <!-- Marks Card -->
-  <div class="marks-card">
+  <mat-card class="marks-card">
     
     <!-- Marks Header Section -->
     <div class="marks-header-section">
       <div class="student-info">
-        <h3>Narayan Sharma</h3>
-        <p>Class 10 | Roll No: 23</p>
+        <h3>{{ studentName }}</h3>
+        <p>Class {{ studentClass }} | Roll No: {{ studentRollNo }}</p>
       </div>
       <div class="exam-badge">
+        <mat-icon>school</mat-icon>
         Annual Examination 2023
       </div>
     </div>
@@ -23,109 +24,165 @@
     <!-- Marks Content -->
     <div class="marks-content">
       
-      <!-- Marks Table -->
+      <!-- Marks Table with Angular Material -->
       <div class="marks-table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th style="text-align: center;">Marks</th>
-              <th style="text-align: center;">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let m of marks">
-              <td class="subject-cell">
+        <table mat-table [dataSource]="marks" class="mat-elevation-z1">
+          
+          <!-- Subject Column -->
+          <ng-container matColumnDef="subject">
+            <th mat-header-cell *matHeaderCellDef>Subject</th>
+            <td mat-cell *matCellDef="let m" class="subject-cell">
+              <div class="subject-info">
+                <mat-icon class="subject-icon">book</mat-icon>
                 {{ m.subject }}
-              </td>
-              <td class="marks-cell">
-                {{ m.score }}/100
-              </td>
-              <td class="status-cell">
-                <span class="status-badge" [ngClass]="m.score >= 33 ? 'pass' : 'fail'">
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Marks Column -->
+          <ng-container matColumnDef="score">
+            <th mat-header-cell *matHeaderCellDef class="marks-header">Marks</th>
+            <td mat-cell *matCellDef="let m" class="marks-cell">
+              <div class="marks-display">
+                <span class="score-number">{{ m.score }}</span>
+                <span class="score-total">/100</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="status-header">Status</th>
+            <td mat-cell *matCellDef="let m" class="status-cell">
+              <mat-chip-listbox>
+                <mat-chip 
+                  [class]="m.score >= 33 ? 'pass-chip' : 'fail-chip'"
+                  [ngClass]="m.score >= 33 ? 'pass-chip' : 'fail-chip'"
+                >
+                  <mat-icon class="chip-icon">
+                    {{ m.score >= 33 ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
                   {{ m.score >= 33 ? 'Pass' : 'Fail' }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
+                </mat-chip>
+              </mat-chip-listbox>
+            </td>
+          </ng-container>
+
+          <!-- Header Row -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          
+          <!-- Data Rows -->
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
         </table>
       </div>
 
     </div>
-  </div>
+  </mat-card>
 
   <!-- Summary Section -->
-  <div class="summary-section">
+  <mat-card class="summary-section">
     
-    <h3 class="summary-header">Performance Summary</h3>
+    <h3 class="summary-header">
+      <mat-icon>analytics</mat-icon>
+      Performance Summary
+    </h3>
     
     <div class="summary-grid">
       
       <!-- Total Marks -->
-      <div class="summary-card">
-        <h4 class="summary-value">{{ total }}</h4>
-        <p class="summary-label">Total Marks</p>
-      </div>
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <h4 class="summary-value">{{ total }}</h4>
+          <p class="summary-label">
+            <mat-icon>summarize</mat-icon>
+            Total Marks
+          </p>
+        </mat-card-content>
+      </mat-card>
       
       <!-- Percentage -->
-      <div class="summary-card">
-        <h4 class="summary-value">{{ percentage }}%</h4>
-        <p class="summary-label">Percentage</p>
-      </div>
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <h4 class="summary-value">{{ percentage }}%</h4>
+          <p class="summary-label">
+            <mat-icon>percent</mat-icon>
+            Percentage
+          </p>
+        </mat-card-content>
+      </mat-card>
       
       <!-- Grade -->
-      <div class="summary-card">
-        <h4 class="summary-value">{{ grade }}</h4>
-        <p class="summary-label">Grade</p>
-      </div>
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <h4 class="summary-value">{{ grade }}</h4>
+          <p class="summary-label">
+            <mat-icon>grade</mat-icon>
+            Grade
+          </p>
+        </mat-card-content>
+      </mat-card>
       
       <!-- Average -->
-      <div class="summary-card">
-        <h4 class="summary-value">{{ total/marks.length | number:'1.0-0' }}</h4>
-        <p class="summary-label">Average per Subject</p>
-      </div>
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <h4 class="summary-value">{{ average | number:'1.0-0' }}</h4>
+          <p class="summary-label">
+            <mat-icon>average</mat-icon>
+            Average per Subject
+          </p>
+        </mat-card-content>
+      </mat-card>
       
     </div>
     
     <!-- Overall Grade Badge -->
-    <div style="text-align: center; margin-top: 20px;">
-      <span class="grade-badge">
+    <div class="overall-grade">
+      <mat-chip class="grade-badge">
+        <mat-icon>verified</mat-icon>
         Overall Grade: {{ grade }}
-      </span>
+      </mat-chip>
     </div>
     
     <!-- Grade Legend -->
-    <div class="grade-legend">
-      <h4>Grade System</h4>
-      <div class="grade-grid">
-        <div class="grade-item">
-          <div class="grade-color a-plus"></div>
-          <span>A+ (90-100%)</span>
+    <mat-card class="grade-legend">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>legend_toggle</mat-icon>
+          Grade System
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grade-grid">
+          <mat-chip class="grade-item a-plus">
+            <div class="grade-color"></div>
+            A+ (90-100%)
+          </mat-chip>
+          <mat-chip class="grade-item a">
+            <div class="grade-color"></div>
+            A (80-89%)
+          </mat-chip>
+          <mat-chip class="grade-item b">
+            <div class="grade-color"></div>
+            B (70-79%)
+          </mat-chip>
+          <mat-chip class="grade-item c">
+            <div class="grade-color"></div>
+            C (60-69%)
+          </mat-chip>
+          <mat-chip class="grade-item d">
+            <div class="grade-color"></div>
+            D (33-59%)
+          </mat-chip>
+          <mat-chip class="grade-item f">
+            <div class="grade-color"></div>
+            F (Below 33%)
+          </mat-chip>
         </div>
-        <div class="grade-item">
-          <div class="grade-color a"></div>
-          <span>A (80-89%)</span>
-        </div>
-        <div class="grade-item">
-          <div class="grade-color b"></div>
-          <span>B (70-79%)</span>
-        </div>
-        <div class="grade-item">
-          <div class="grade-color c"></div>
-          <span>C (60-69%)</span>
-        </div>
-        <div class="grade-item">
-          <div class="grade-color d"></div>
-          <span>D (33-59%)</span>
-        </div>
-        <div class="grade-item">
-          <div class="grade-color f"></div>
-          <span>F (Below 33%)</span>
-        </div>
-      </div>
-    </div>
+      </mat-card-content>
+    </mat-card>
     
-  </div>
+  </mat-card>
 
   <!-- Footer -->
   <div class="marks-footer">

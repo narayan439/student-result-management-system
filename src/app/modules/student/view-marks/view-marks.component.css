@@ -27,12 +27,12 @@
 
 /* Marks Card */
 .marks-card {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  background: white !important;
+  border-radius: 15px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
   overflow: hidden;
   max-width: 800px;
-  margin: 0 auto 30px;
+  margin: 0 auto 30px !important;
 }
 
 /* Marks Header Section */
@@ -66,6 +66,9 @@
   font-weight: 600;
   font-size: 14px;
   backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Marks Content */
@@ -73,95 +76,133 @@
   padding: 30px;
 }
 
-/* Marks Table */
+/* Marks Table Container */
 .marks-table-container {
   overflow-x: auto;
   border-radius: 10px;
   border: 1px solid #e8eaf6;
-  margin-bottom: 30px;
 }
 
-table {
+/* Material Table Styling */
+.marks-table-container table {
   width: 100%;
-  border-collapse: collapse;
   min-width: 500px;
 }
 
-thead {
-  background: linear-gradient(135deg, #304ffe, #3d5afe);
+::ng-deep .mat-mdc-header-row {
+  background: linear-gradient(135deg, #304ffe, #3d5afe) !important;
+  height: 60px !important;
 }
 
-th {
-  padding: 16px;
-  text-align: left;
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  border-bottom: 2px solid #283593;
+::ng-deep .mat-mdc-header-cell {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  border-bottom: 2px solid #283593 !important;
 }
 
-tbody tr {
-  border-bottom: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
+::ng-deep .mat-mdc-row {
+  height: 56px !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+  transition: all 0.3s ease !important;
 }
 
-tbody tr:hover {
-  background-color: #f8f9ff;
+::ng-deep .mat-mdc-row:hover {
+  background-color: #f8f9ff !important;
 }
 
-td {
-  padding: 16px;
-  color: #333;
-  font-size: 15px;
-  vertical-align: middle;
+::ng-deep .mat-mdc-cell {
+  font-size: 15px !important;
+  color: #333 !important;
 }
 
+/* Subject Cell */
 .subject-cell {
   font-weight: 500;
   color: #1a237e;
 }
 
+.subject-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.subject-icon {
+  color: #1a237e;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Marks Cell */
 .marks-cell {
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
+  text-align: center !important;
 }
 
-.status-cell {
-  text-align: center;
+.marks-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 8px 20px;
-  border-radius: 20px;
+.score-number {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a237e;
+}
+
+.score-total {
   font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-width: 80px;
+  color: #666;
 }
 
-.status-badge.pass {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 2px solid #4caf50;
+/* Status Cell */
+.status-cell {
+  text-align: center !important;
 }
 
-.status-badge.fail {
-  background: #ffebee;
-  color: #c62828;
-  border: 2px solid #f44336;
+/* Chip Styling */
+::ng-deep .mat-mdc-chip-set {
+  justify-content: center !important;
+}
+
+::ng-deep .pass-chip.mat-mdc-chip {
+  background: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  border: 2px solid #4caf50 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  padding: 8px 16px !important;
+  height: 36px !important;
+}
+
+::ng-deep .fail-chip.mat-mdc-chip {
+  background: #ffebee !important;
+  color: #c62828 !important;
+  border: 2px solid #f44336 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  padding: 8px 16px !important;
+  height: 36px !important;
+}
+
+.chip-icon {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 6px !important;
 }
 
 /* Summary Section */
 .summary-section {
-  background: white;
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  background: white !important;
+  border-radius: 15px !important;
+  padding: 30px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
   max-width: 800px;
-  margin: 0 auto;
+  margin: 0 auto !important;
 }
 
 .summary-header {
@@ -170,6 +211,10 @@ td {
   font-weight: 600;
   margin: 0 0 25px 0;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .summary-grid {
@@ -180,18 +225,21 @@ td {
 }
 
 .summary-card {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  border: 2px solid #e8eaf6;
-  transition: all 0.3s ease;
+  background: #f8f9fa !important;
+  border: 2px solid #e8eaf6 !important;
+  transition: all 0.3s ease !important;
 }
 
 .summary-card:hover {
-  border-color: #304ffe;
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #304ffe !important;
+  transform: translateY(-5px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+::ng-deep .summary-card .mat-mdc-card-content {
+  text-align: center;
+  padding: 20px !important;
+  margin: 0 !important;
 }
 
 .summary-value {
@@ -207,34 +255,49 @@ td {
   font-size: 15px;
   margin: 0;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Overall Grade */
+.overall-grade {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 .grade-badge {
-  display: inline-block;
-  padding: 10px 25px;
-  background: linear-gradient(135deg, #304ffe, #3d5afe);
-  color: white;
-  border-radius: 25px;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(48, 79, 254, 0.3);
-  margin-top: 10px;
+  background: linear-gradient(135deg, #304ffe, #3d5afe) !important;
+  color: white !important;
+  border-radius: 25px !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  box-shadow: 0 4px 15px rgba(48, 79, 254, 0.3) !important;
+  padding: 12px 30px !important;
+  height: auto !important;
 }
 
 /* Grade Legend */
 .grade-legend {
-  margin-top: 30px;
-  padding-top: 25px;
-  border-top: 1px solid #e8eaf6;
+  background: white !important;
+  border: 1px solid #e8eaf6 !important;
 }
 
-.grade-legend h4 {
+::ng-deep .grade-legend .mat-mdc-card-header {
+  padding: 20px 20px 10px 20px !important;
+}
+
+::ng-deep .grade-legend .mat-mdc-card-title {
   color: #1a237e;
-  margin: 0 0 15px 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
 }
 
 .grade-grid {
@@ -242,30 +305,36 @@ td {
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
+  margin-top: 15px;
 }
 
 .grade-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f8f9fa;
-  padding: 8px 15px;
-  border-radius: 6px;
-  font-size: 14px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #f8f9fa !important;
+  padding: 8px 15px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  height: auto !important;
+  cursor: default !important;
+  border: none !important;
 }
 
 .grade-color {
   width: 20px;
   height: 20px;
   border-radius: 4px;
+  flex-shrink: 0;
 }
 
-.grade-color.a-plus { background: #4caf50; }
-.grade-color.a { background: #8bc34a; }
-.grade-color.b { background: #ffc107; }
-.grade-color.c { background: #ff9800; }
-.grade-color.d { background: #ff5722; }
-.grade-color.f { background: #f44336; }
+/* Grade Colors */
+.a-plus .grade-color { background: #4caf50; }
+.a .grade-color { background: #8bc34a; }
+.b .grade-color { background: #ffc107; }
+.c .grade-color { background: #ff9800; }
+.d .grade-color { background: #ff5722; }
+.f .grade-color { background: #f44336; }
 
 /* Footer */
 .marks-footer {
@@ -295,12 +364,8 @@ td {
     padding: 20px;
   }
   
-  table {
+  .marks-table-container table {
     min-width: 400px;
-  }
-  
-  th, td {
-    padding: 14px 12px;
   }
   
   .summary-grid {
@@ -309,6 +374,10 @@ td {
   
   .grade-grid {
     justify-content: center;
+  }
+  
+  .summary-value {
+    font-size: 32px;
   }
 }
 
@@ -326,19 +395,8 @@ td {
     font-size: 13px;
   }
   
-  th, td {
-    padding: 12px 10px;
-    font-size: 14px;
-  }
-  
-  .marks-cell {
-    font-size: 16px;
-  }
-  
-  .status-badge {
-    padding: 6px 15px;
-    min-width: 70px;
-    font-size: 12px;
+  .score-number {
+    font-size: 18px;
   }
   
   .summary-grid {
@@ -350,11 +408,16 @@ td {
   }
   
   .summary-value {
-    font-size: 32px;
+    font-size: 30px;
   }
   
   .grade-badge {
-    padding: 8px 20px;
+    padding: 10px 20px;
     font-size: 16px;
+  }
+  
+  .grade-item {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
   }
 }

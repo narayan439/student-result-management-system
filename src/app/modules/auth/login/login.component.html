@@ -1,99 +1,172 @@
-<div class="login-container">
-  <div class="login-card">
-    
-    <!-- Header -->
-    <div class="login-header">
-      <div class="logo">
-        <i class="fas fa-graduation-cap"></i>
-        <h1 class="school-name">DELHI PUBLIC SCHOOL</h1>
+<div class="login-page">
+  
+  <!-- Left Section - Branding -->
+  <div class="login-left">
+    <div class="brand-section">
+      <div class="brand-logo">
+        <mat-icon class="logo-icon">school</mat-icon>
+        <h1 class="school-name">Delhi Public School</h1>
       </div>
-      <h2 class="login-title">
-        <i class="fas fa-sign-in-alt"></i> Login Portal
-      </h2>
-      <p class="login-subtitle">Access your account securely</p>
+      <div class="brand-slogan">
+        <h2>Excellence in Education Since 1949</h2>
+        <p>Welcome to the student portal. Please login to continue.</p>
+      </div>
+      <div class="features-list">
+        <div class="feature-item">
+          <mat-icon>verified</mat-icon>
+          <span>Secure & Encrypted Login</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>speed</mat-icon>
+          <span>Fast & Reliable Access</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>support_agent</mat-icon>
+          <span>24/7 Support Available</span>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Login Form -->
-    <form #loginForm="ngForm" (ngSubmit)="onLogin()" class="login-form">
+  <!-- Right Section - Login Form -->
+  <div class="login-right">
+    <div class="login-form-container">
       
-      <!-- Email Input -->
-      <div class="input-group">
-        <label for="email">Email Address</label>
-        <div class="input-container">
-          <i class="fas fa-envelope"></i>
+      <!-- Form Header -->
+      <div class="form-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to your account</p>
+      </div>
+
+      <!-- Login Form -->
+      <form #loginForm="ngForm" (ngSubmit)="onLogin()" class="login-form">
+        
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email Address</mat-label>
           <input
+            matInput
             type="email"
-            id="email"
             [(ngModel)]="loginData.email"
             name="email"
             required
             email
-            placeholder="Enter your email address"
+            placeholder="Enter your registered email"
             [disabled]="isLoading"
           >
-        </div>
-      </div>
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="loginForm.controls['email']?.invalid && loginForm.controls['email']?.touched">
+            Please enter a valid email address
+          </mat-error>
+        </mat-form-field>
 
-      <!-- Password Input -->
-      <div class="input-group">
-        <label for="password">Password</label>
-        <div class="input-container">
-          <i class="fas fa-lock"></i>
+        <!-- Password Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Password</mat-label>
           <input
+            matInput
             [type]="showPassword ? 'text' : 'password'"
-            id="password"
             [(ngModel)]="loginData.password"
             name="password"
             required
             placeholder="Enter your password"
             [disabled]="isLoading"
           >
-          <span class="input-icon" (click)="togglePasswordVisibility()">
-            <i class="fas" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-          </span>
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+          >
+            <mat-icon>{{showPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.controls['password']?.invalid && loginForm.controls['password']?.touched">
+            Password is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Remember Me -->
+        <div class="form-options">
+          <mat-checkbox color="primary">Remember me</mat-checkbox>
         </div>
-      </div>
 
-      <!-- Login Button -->
-      <button
-        class="login-btn"
-        type="submit"
-        [disabled]="loginForm.invalid || isLoading"
-      >
-        <span *ngIf="!isLoading">
-          <i class="fas fa-sign-in-alt"></i> Login
-        </span>
-        <span *ngIf="isLoading" class="spinner"></span>
-      </button>
-
-    </form>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <button class="back-btn" (click)="goBack()">
-        <i class="fas fa-arrow-left"></i> Back to Home
-      </button>
-    </div>
-
-    <!-- Additional Options -->
-    <div class="login-options">
-      
-      <p class="register-link">
-        Need an account?
-        <a href="#">Contact Administration</a>
-      </p>
-    </div>
-
-    <!-- Demo Credentials -->
-    <div class="demo-credentials">
-      <h4><i class="fas fa-info-circle"></i> Demo Credentials</h4>
-      <ul>
-        <li><strong>Admin:</strong> admin@school.com / admin123</li>
-        <li><strong>Teacher:</strong> teacher1@school.com / teacher123</li>
-        <li><strong>Student:</strong> student1@school.com / student123</li>
-      </ul>
-    </div>
-
-    
+        <!-- Submit Button -->
+<button
+  mat-raised-button
+  color="primary"
+  class="submit-btn"
+  type="submit"
+  [disabled]="loginForm.invalid || isLoading"
+>
+  <span *ngIf="!isLoading" class="btn-content">
+    <mat-icon>login</mat-icon> Sign In
+  </span>
+  <div *ngIf="isLoading" class="spinner-container">
+    <div class="spinner"></div>
+    <span>Signing in...</span>
   </div>
+</button>
+
+
+        <!-- Back to Home Button -->
+        <button
+          mat-stroked-button
+          type="button"
+          class="back-btn"
+          (click)="goBack()"
+          [disabled]="isLoading"
+        >
+          <mat-icon>arrow_back</mat-icon> Back to Home
+        </button>
+
+
+        <!-- Demo Credentials -->
+        <mat-card class="demo-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>info</mat-icon>
+            <mat-card-title>Demo Accounts</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="demo-grid">
+              <div class="demo-item admin">
+                <mat-icon>admin_panel_settings</mat-icon>
+                <div>
+                  <strong>Admin</strong>
+                  <small>admin@school.com</small>
+                  <small>admin123</small>
+                </div>
+              </div>
+              <div class="demo-item teacher">
+                <mat-icon>person</mat-icon>
+                <div>
+                  <strong>Teacher</strong>
+                  <small>teacher@school.com</small>
+                  <small>teacher123</small>
+                </div>
+              </div>
+              <div class="demo-item student">
+                <mat-icon>school</mat-icon>
+                <div>
+                  <strong>Student</strong>
+                  <small>student@school.com</small>
+                  <small>student123</small>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Footer Links -->
+        <div class="form-footer">
+          <p>Don't have an account? <a mat-button color="primary">Contact Administration</a></p>
+          <p class="copyright">© 2023 DPS Portal System. Version 2.1.4</p>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
 </div>

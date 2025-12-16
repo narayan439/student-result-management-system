@@ -104,6 +104,33 @@
       </div>
     </mat-card>
 
+    <!-- Classes Card -->
+    <mat-card class="dash-card" routerLink="/admin/manage-classes">
+      <div class="card-header">
+        <div class="card-icon">
+          <mat-icon>class</mat-icon>
+        </div>
+        <div class="card-title">
+          <h3>Manage Classes</h3>
+          <p class="card-desc">Create and manage class sections</p>
+        </div>
+      </div>
+      <div class="card-content">
+        <p class="total-count">{{ totalClasses || 4 }}</p>
+        <p class="count-label">Total Classes</p>
+      </div>
+      <div class="card-footer">
+        <a class="view-link">
+          View Classes
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <div class="quick-stats">
+          <mat-icon>layers</mat-icon>
+          <span>Multiple semesters</span>
+        </div>
+      </div>
+    </mat-card>
+
     <!-- Rechecks Card -->
     <mat-card class="dash-card" routerLink="/admin/manage-rechecks">
       <div class="card-header">

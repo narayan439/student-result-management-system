@@ -1,0 +1,224 @@
+<div class="manage-classes-container">
+  
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Manage Classes & Sections</h1>
+      <p class="page-subtitle">Add, view, and manage all classes and sections in the system</p>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="classes-card">
+    
+    <!-- Card Header -->
+    <div class="card-header">
+      <h2>All Classes</h2>
+      <div class="header-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="toggleAddForm()"
+          class="add-btn"
+        >
+          <mat-icon>add</mat-icon> Add Class
+        </button>
+      </div>
+    </div>
+
+    <!-- Add Class Form (Collapsible) -->
+    <div class="add-form" *ngIf="showAddForm">
+      <div class="form-title">
+        <mat-icon>add_circle</mat-icon>
+        <h3>Add New Class</h3>
+      </div>
+      
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Class Name</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="newClassName" 
+            name="className"
+            placeholder="e.g., Class 5 - A"
+          >
+          <mat-icon matPrefix>class</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Class (1-10)</mat-label>
+          <mat-select [(ngModel)]="newClassNumber" name="classNumber">
+            <mat-option *ngFor="let classNum of classNumbers" [value]="classNum">
+              Class {{ classNum }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>school</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Section (A-E)</mat-label>
+          <mat-select [(ngModel)]="newSection" name="section">
+            <mat-option *ngFor="let sec of sections" [value]="sec">
+              Section {{ sec }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>apps</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="save()"
+          class="save-btn"
+        >
+          <mat-icon>save</mat-icon> Save Class
+        </button>
+        <button 
+          mat-stroked-button 
+          color="warn" 
+          (click)="toggleAddForm()"
+          class="cancel-btn"
+        >
+          <mat-icon>close</mat-icon> Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search by name</mat-label>
+        <input 
+          matInput 
+          [(ngModel)]="searchTerm" 
+          (keyup)="filterClasses()"
+          placeholder="Type to search..."
+        >
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter by Class</mat-label>
+        <mat-select [(ngModel)]="selectedClass" (selectionChange)="filterClasses()" name="filterClass">
+          <mat-option value="">All Classes</mat-option>
+          <mat-option *ngFor="let classNum of classNumbers" [value]="classNum.toString()">
+            Class {{ classNum }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>filter_list</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter by Section</mat-label>
+        <mat-select [(ngModel)]="selectedSection" (selectionChange)="filterClasses()" name="filterSection">
+          <mat-option value="">All Sections</mat-option>
+          <mat-option *ngFor="let sec of sections" [value]="sec">
+            Section {{ sec }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>filter_list</mat-icon>
+      </mat-form-field>
+
+      <div class="count-badge">
+        {{ filteredClasses.length }} Classes
+      </div>
+    </div>
+
+    <!-- Classes Table -->
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        
+        <!-- Class Name Column -->
+        <ng-container matColumnDef="className">
+          <th mat-header-cell *matHeaderCellDef> Class Name </th>
+          <td mat-cell *matCellDef="let schoolClass">
+            <div class="class-badge">
+              <mat-icon class="class-icon">class</mat-icon>
+              <strong>{{ schoolClass.className }}</strong>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Class Column -->
+        <ng-container matColumnDef="classNumber">
+          <th mat-header-cell *matHeaderCellDef> Class </th>
+          <td mat-cell *matCellDef="let schoolClass">
+            <mat-chip class="class-chip">Class {{ schoolClass.classNumber }}</mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Section Column -->
+        <ng-container matColumnDef="section">
+          <th mat-header-cell *matHeaderCellDef> Section </th>
+          <td mat-cell *matCellDef="let schoolClass">
+            <mat-chip class="section-chip">{{ schoolClass.section }}</mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef> Status </th>
+          <td mat-cell *matCellDef="let schoolClass">
+            <div class="status-container">
+              <mat-slide-toggle 
+                [checked]="schoolClass.isActive"
+                (change)="toggleStatus(schoolClass)"
+                color="accent"
+              ></mat-slide-toggle>
+              <span [ngClass]="schoolClass.isActive ? 'status-active' : 'status-inactive'">
+                {{ getStatusText(schoolClass.isActive) }}
+              </span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-header"> Actions </th>
+          <td mat-cell *matCellDef="let schoolClass">
+            <div class="action-buttons">
+              <button 
+                mat-icon-button 
+                color="primary"
+                matTooltip="Edit Class"
+                (click)="toggleEditForm(schoolClass)"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="warn"
+                matTooltip="Delete Class"
+                (click)="deleteClass(schoolClass)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Header Row -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        
+        <!-- Data Rows -->
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="filteredClasses.length === 0" class="empty-row">
+          <td [attr.colspan]="displayedColumns.length">
+            <div class="empty-state">
+              <mat-icon>class</mat-icon>
+              <h3>No Classes Found</h3>
+              <p>Add your first class using the form above or adjust your filters</p>
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </div>
+
+  </div>
+
+</div>

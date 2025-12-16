@@ -14,6 +14,7 @@ import { AddTeacherComponent } from './manage-teachers/add-teacher/add-teacher.c
 import { EditTeacherComponent } from './manage-teachers/edit-teacher/edit-teacher.component';
 import { ManageSubjectsComponent } from './manage-subjects/manage-subjects.component';
 import { ManageRechecksComponent } from './manage-rechecks/manage-rechecks.component';
+import { ManageClassesComponent } from './manage-classes/manage-classes.component';
 
 // Angular Material
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,6 +28,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatChipsModule } from '@angular/material/chips';
 
 
 @NgModule({
@@ -39,6 +42,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     AddTeacherComponent,
     EditTeacherComponent,
     ManageSubjectsComponent,
+    ManageClassesComponent,
     ManageRechecksComponent,
     AdminComponent
   ],
@@ -55,9 +59,11 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatCardModule,
     MatTooltipModule,
     MatPaginatorModule,
-     MatDatepickerModule,
-  MatNativeDateModule,
-    MatIconModule
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatIconModule,
+    MatSlideToggleModule,
+    MatChipsModule
   ]
 })
 export class AdminModule { }

@@ -13,6 +13,7 @@ import { AddTeacherComponent } from './manage-teachers/add-teacher/add-teacher.c
 import { EditTeacherComponent } from './manage-teachers/edit-teacher/edit-teacher.component';
 
 import { ManageSubjectsComponent } from './manage-subjects/manage-subjects.component';
+import { ManageClassesComponent } from './manage-classes/manage-classes.component';
 
 import { ManageRechecksComponent } from './manage-rechecks/manage-rechecks.component';
 
@@ -32,6 +33,7 @@ const routes: Routes = [
       { path: 'manage-teachers/edit/:email', component: EditTeacherComponent },
 
       { path: 'manage-subjects', component: ManageSubjectsComponent },
+      { path: 'manage-classes', component: ManageClassesComponent },
 
       { path: 'manage-rechecks', component: ManageRechecksComponent }
     ]

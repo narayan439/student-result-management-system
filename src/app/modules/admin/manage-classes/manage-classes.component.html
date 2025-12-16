@@ -1,3 +1,7 @@
+
+
+
+
 <div class="manage-classes-container">
   
   <!-- Header Section -->
@@ -40,14 +44,15 @@
             matInput 
             [(ngModel)]="newClassName" 
             name="className"
-            placeholder="e.g., Class 5 - A"
+            placeholder="Auto-generated"
+            readonly
           >
           <mat-icon matPrefix>class</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Class (1-10)</mat-label>
-          <mat-select [(ngModel)]="newClassNumber" name="classNumber">
+          <mat-select [(ngModel)]="newClassNumber" (selectionChange)="updateClassName()" name="classNumber">
             <mat-option *ngFor="let classNum of classNumbers" [value]="classNum">
               Class {{ classNum }}
             </mat-option>
@@ -57,7 +62,7 @@
 
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Section (A-E)</mat-label>
-          <mat-select [(ngModel)]="newSection" name="section">
+          <mat-select [(ngModel)]="newSection" (selectionChange)="updateClassName()" name="section">
             <mat-option *ngFor="let sec of sections" [value]="sec">
               Section {{ sec }}
             </mat-option>
@@ -79,6 +84,67 @@
           mat-stroked-button 
           color="warn" 
           (click)="toggleAddForm()"
+          class="cancel-btn"
+        >
+          <mat-icon>close</mat-icon> Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Edit Class Form (Collapsible) -->
+    <div class="add-form" *ngIf="showEditForm">
+      <div class="form-title">
+        <mat-icon>edit</mat-icon>
+        <h3>Edit Class</h3>
+      </div>
+      
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Class Name</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="newClassName" 
+            name="className"
+            placeholder="Auto-generated"
+            readonly
+          >
+          <mat-icon matPrefix>class</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Class (1-10)</mat-label>
+          <mat-select [(ngModel)]="newClassNumber" (selectionChange)="updateClassName()" name="classNumber">
+            <mat-option *ngFor="let classNum of classNumbers" [value]="classNum">
+              Class {{ classNum }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>school</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Section (A-E)</mat-label>
+          <mat-select [(ngModel)]="newSection" (selectionChange)="updateClassName()" name="section">
+            <mat-option *ngFor="let sec of sections" [value]="sec">
+              Section {{ sec }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>apps</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="save()"
+          class="save-btn"
+        >
+          <mat-icon>save</mat-icon> Update Class
+        </button>
+        <button 
+          mat-stroked-button 
+          color="warn" 
+          (click)="toggleEditForm()"
           class="cancel-btn"
         >
           <mat-icon>close</mat-icon> Cancel

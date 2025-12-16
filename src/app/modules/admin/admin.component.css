@@ -149,11 +149,7 @@
 }
 /* IMPORTANT: Don't apply active styles to dropdown parent links */
 .dropdown > a.active {
-  /* Remove or comment out this block */
-  /* background: white; */
-  /* color: #304ffe;  */
-  /* font-weight: 600; */
-  /* box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3); */
+  color: white !important;
 }
 
 /* Logout button */

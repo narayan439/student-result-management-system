@@ -1,15 +1,17 @@
-import { Component } from '@angular/core';
-import { AdminService } from '../../../../core/services/admin.service';
+import { Component, OnInit } from '@angular/core';
+import { StudentService } from '../../../../core/services/student.service';
+import { ClassesService } from '../../../../core/services/classes.service';
 import { Router } from '@angular/router';
+import { Student } from '../../../../core/models/student.model';
 
 @Component({
   selector: 'app-add-student',
   templateUrl: './add-student.component.html',
   styleUrls: ['./add-student.component.css']
 })
-export class AddStudentComponent {
+export class AddStudentComponent implements OnInit {
 
-  student = {
+  student: Student = {
     name: '',
     email: '',
     className: '',
@@ -19,20 +21,46 @@ export class AddStudentComponent {
     address: ''
   };
 
+  classes: any[] = [];
+  isLoading = false;
+  errorMessage = '';
+
   constructor(
-    private adminService: AdminService,
+    private studentService: StudentService,
+    private classesService: ClassesService,
     private router: Router
   ) {}
 
+  ngOnInit(): void {
+    this.loadClasses();
+  }
+
+  loadClasses(): void {
+    // Get classes from the ClassesService
+    this.classes = this.classesService.getClassesArray();
+  }
+
   createStudent() {
+    // Clear previous error message
+    this.errorMessage = '';
+
     if (this.validateStudentData()) {
-      this.adminService.addStudent(this.student).subscribe({
-        next: (res: any) => {
+      this.isLoading = true;
+      
+      this.studentService.saveStudent(this.student).subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
           alert("🎉 Student Added Successfully!");
           this.router.navigate(['/admin/manage-students']);
         },
-        error: (err) => {
-          alert("❌ Error: " + (err.error?.message || 'Something went wrong!'));
+        error: (err: any) => {
+          this.isLoading = false;
+          const errorMsg = err.error?.message || 
+                          err.message || 
+                          (typeof err === 'string' ? err : 'Failed to add student');
+          this.errorMessage = errorMsg;
+          alert("❌ Error: " + errorMsg);
+          console.error('Error adding student:', err);
         }
       });
     }
@@ -41,32 +69,38 @@ export class AddStudentComponent {
   private validateStudentData(): boolean {
     // Basic validation
     if (!this.student.name.trim()) {
-      alert('Please enter student name');
+      this.errorMessage = 'Please enter student name';
+      alert(this.errorMessage);
       return false;
     }
     
     if (!this.student.email.trim()) {
-      alert('Please enter email address');
+      this.errorMessage = 'Please enter email address';
+      alert(this.errorMessage);
       return false;
     }
     
     if (!this.isValidEmail(this.student.email)) {
-      alert('Please enter a valid email address');
+      this.errorMessage = 'Please enter a valid email address';
+      alert(this.errorMessage);
       return false;
     }
     
     if (!this.student.className) {
-      alert('Please select class');
+      this.errorMessage = 'Please select class';
+      alert(this.errorMessage);
       return false;
     }
     
     if (!this.student.rollNo.trim()) {
-      alert('Please enter roll number');
+      this.errorMessage = 'Please enter roll number';
+      alert(this.errorMessage);
       return false;
     }
     
     if (!this.student.dob) {
-      alert('Please select date of birth');
+      this.errorMessage = 'Please select date of birth';
+      alert(this.errorMessage);
       return false;
     }
     

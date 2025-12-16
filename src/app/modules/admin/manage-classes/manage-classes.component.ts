@@ -1,13 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-
-export interface SchoolClass {
-  classId: number;
-  className: string;
-  classNumber: number;
-  section: string;
-  isActive: boolean;
-}
+import { ClassesService, SchoolClass } from '../../../core/services/classes.service';
 
 @Component({
   selector: 'app-manage-classes',
@@ -40,20 +33,21 @@ export class ManageClassesComponent implements OnInit {
   classNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   sections = ['A', 'B', 'C', 'D', 'E'];
 
-  constructor() {
-    // Mock data - replace with service call
-    this.classes = [
-      { classId: 1, className: 'Class 1 - A', classNumber: 1, section: 'A', isActive: true },
-      { classId: 2, className: 'Class 1 - B', classNumber: 1, section: 'B', isActive: true },
-      { classId: 3, className: 'Class 5 - A', classNumber: 5, section: 'A', isActive: true },
-      { classId: 4, className: 'Class 10 - B', classNumber: 10, section: 'B', isActive: true },
-      { classId: 5, className: 'Class 6 - C', classNumber: 6, section: 'C', isActive: true }
-    ];
+  constructor(private classesService: ClassesService) {
+    // Load initial data from service
+    this.classes = this.classesService.getClassesArray();
     this.dataSource = new MatTableDataSource(this.classes);
   }
 
   ngOnInit(): void {
     this.filterClasses();
+  }
+
+  // Update class name based on class number and section
+  updateClassName(): void {
+    if (this.newClassNumber && this.newSection) {
+      this.newClassName = `Class ${this.newClassNumber} - ${this.newSection}`;
+    }
   }
 
   // Toggle add form
@@ -100,6 +94,7 @@ export class ManageClassesComponent implements OnInit {
     };
 
     this.classes.push(newClass);
+    this.classesService.setClasses(this.classes);
     this.filterClasses();
     this.resetForm();
     this.showAddForm = false;
@@ -129,6 +124,7 @@ export class ManageClassesComponent implements OnInit {
         classNumber: this.newClassNumber!,
         section: this.newSection
       };
+      this.classesService.setClasses(this.classes);
       this.filterClasses();
       this.resetForm();
       this.showEditForm = false;
@@ -140,6 +136,7 @@ export class ManageClassesComponent implements OnInit {
   deleteClass(schoolClass: SchoolClass): void {
     if (confirm(`Delete class ${schoolClass.className}?`)) {
       this.classes = this.classes.filter(c => c.classId !== schoolClass.classId);
+      this.classesService.setClasses(this.classes);
       this.filterClasses();
       alert('Class deleted successfully!');
     }

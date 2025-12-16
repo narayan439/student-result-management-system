@@ -14,7 +14,8 @@
     <!-- Center Section: Desktop Navigation -->
     <div class="nav-center">
       <ul class="nav-links">
-        <!-- <li><a routerLink="/admin" routerLinkActive="active">Dashboard</a></li> -->
+        <!-- Dashboard -->
+        <li><a routerLink="/admin" routerLinkActive="active">Dashboard</a></li>
 
         <!-- Students Dropdown -->
         <li class="dropdown">
@@ -36,6 +37,9 @@
 
         <!-- Subjects -->
         <li><a routerLink="/admin/manage-subjects" routerLinkActive="active">Subjects</a></li>
+
+        <!-- Classes -->
+        <li><a routerLink="/admin/manage-classes" routerLinkActive="active">Classes</a></li>
 
         <!-- Rechecks -->
         <li><a routerLink="/admin/manage-rechecks" routerLinkActive="active">Rechecks</a></li>
@@ -80,12 +84,12 @@
     </div>
 
     <ul>
-      <!-- <li>
+      <li>
         <a routerLink="/admin" routerLinkActive="active" (click)="closeMobileMenu()">
           <i class="fas fa-tachometer-alt"></i> 
           <span>Dashboard</span>
         </a>
-      </li> -->
+      </li>
 
       <li>
         <a class="mobile-toggle" (click)="toggleMobileDropdown('students')" [class.active]="mobileDropdowns.students">
@@ -123,6 +127,13 @@
         <a routerLink="/admin/manage-subjects" routerLinkActive="active" (click)="closeMobileMenu()">
           <i class="fas fa-book"></i>
           <span>Subjects</span>
+        </a>
+      </li>
+
+      <li>
+        <a routerLink="/admin/manage-classes" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="fas fa-school"></i>
+          <span>Classes</span>
         </a>
       </li>
 

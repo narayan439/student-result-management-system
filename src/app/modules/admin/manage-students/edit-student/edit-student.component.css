@@ -1,10 +1,162 @@
-.container {
-  max-width: 450px;
-  margin: 50px auto;
-  padding: 20px;
+.edit-student-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.full-width {
+.back-nav {
+  margin-bottom: 2rem;
+}
+
+.back-button {
+  color: #666;
+  text-transform: none;
+  font-size: 14px;
+  padding-left: 0;
+}
+
+.back-button:hover {
+  color: #1976d2;
+}
+
+.form-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  display: flex;
+  gap: 2rem;
+}
+
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+}
+
+.header-icon mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.header-text h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.header-text p {
+  margin: 0.5rem 0 0 0;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.student-form {
+  padding: 2rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-field {
   width: 100%;
-  margin-bottom: 15px;
+}
+
+.form-field-full {
+  grid-column: 1 / -1;
+}
+
+.form-field mat-icon {
+  color: #667eea;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+.submit-btn,
+.cancel-btn {
+  min-width: 150px;
+  height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  border-radius: 8px;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.submit-btn:hover {
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.cancel-btn {
+  border: 1.5px solid #ddd;
+  color: #666;
+}
+
+.cancel-btn:hover {
+  border-color: #999;
+  background-color: #f5f5f5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .edit-student-container {
+    padding: 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+  }
 }

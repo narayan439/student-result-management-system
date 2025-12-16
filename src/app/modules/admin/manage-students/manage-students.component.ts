@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from '../../../core/services/admin.service';
+import { ClassesService } from '../../../core/services/classes.service';
 import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
@@ -11,21 +12,33 @@ export class ManageStudentsComponent implements OnInit {
 
   displayedColumns: string[] = ['name', 'email', 'className', 'rollNo', 'actions'];
   students = [
-    { name: 'Narayan', email: 'narayan@student.com', className: '10', rollNo: '23' },
-    { name: 'Rakesh', email: 'rakesh@student.com', className: '9', rollNo: '19' }
+    { name: 'Narayan', email: 'narayan@student.com', className: 'Class 1 - A', rollNo: '23' },
+    { name: 'Rakesh', email: 'rakesh@student.com', className: 'Class 1 - B', rollNo: '19' }
   ];
   
   // Optional: Use MatTableDataSource for additional features
   dataSource = new MatTableDataSource(this.students);
 
-  constructor(private adminService: AdminService) {}
+  // Classes count
+  totalClasses: number = 0;
+
+  constructor(
+    private adminService: AdminService,
+    private classesService: ClassesService
+  ) {}
 
   ngOnInit(): void {
+    this.loadClasses();
     // TODO: Fetch from backend later
     // this.adminService.getAllStudents().subscribe(res => {
     //   this.students = res;
     //   this.dataSource.data = this.students;
     // });
+  }
+
+  loadClasses(): void {
+    // Get total number of classes from ClassesService
+    this.totalClasses = this.classesService.getClassesArray().length;
   }
 
   deleteStudent(rollNo: any) {

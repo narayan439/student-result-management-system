@@ -6,7 +6,6 @@ export interface Student {
   rollNo: string;
   dob: string;
   phone?: string;
-  address?: string;
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;

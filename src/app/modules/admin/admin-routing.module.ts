@@ -26,7 +26,7 @@ const routes: Routes = [
 
       { path: 'manage-students', component: ManageStudentsComponent },
       { path: 'manage-students/add', component: AddStudentComponent },
-      { path: 'manage-students/edit/:rollNo', component: EditStudentComponent },
+      { path: 'manage-students/edit/:id', component: EditStudentComponent },
 
       { path: 'manage-teachers', component: ManageTeachersComponent },
       { path: 'manage-teachers/add', component: AddTeacherComponent },

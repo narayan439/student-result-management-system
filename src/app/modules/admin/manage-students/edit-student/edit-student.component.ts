@@ -16,13 +16,13 @@ export class EditStudentComponent implements OnInit {
   errorMessage = '';
 
   student: Student = {
+    studentId: undefined,
     name: '',
     email: '',
     className: '',
     rollNo: '',
     dob: '',
-    phone: '',
-    address: ''
+    phone: ''
   };
 
   classes: any[] = [];
@@ -59,21 +59,21 @@ export class EditStudentComponent implements OnInit {
       // Try to load from backend
       this.studentService.getStudentById(parseInt(this.studentId)).subscribe({
         next: (student: Student) => {
-          this.student = student;
+          this.student = { ...student, studentId: parseInt(this.studentId) };
           this.isLoading = false;
         },
         error: (err) => {
           this.isLoading = false;
           // Fallback: use dummy data
+          const id = parseInt(this.studentId);
           this.student = {
-            studentId: parseInt(this.studentId),
+            studentId: id,
             name: 'Narayan',
             email: 'narayan@student.com',
             className: 'Class 1 - A',
             rollNo: '23',
             dob: '2005-02-20',
-            phone: '9876543210',
-            address: '123 Main Street, City'
+            phone: '9876543210'
           };
           console.warn('Could not load student, using dummy data:', err);
         }
@@ -84,10 +84,20 @@ export class EditStudentComponent implements OnInit {
   updateStudent() {
     this.errorMessage = '';
     
+    // Ensure studentId is set on the student object
+    const id = parseInt(this.studentId);
+    if (!id && id !== 0) {
+      this.errorMessage = 'Student ID is invalid';
+      alert("❌ Error: " + this.errorMessage);
+      return;
+    }
+    
+    this.student.studentId = id;
+
     if (this.validateStudentData()) {
       this.isLoading = true;
       
-      this.studentService.updateStudent(this.student).subscribe({
+      this.studentService.updateStudent(id, this.student).subscribe({
         next: (response: any) => {
           this.isLoading = false;
           alert('🎉 Student Updated Successfully!');

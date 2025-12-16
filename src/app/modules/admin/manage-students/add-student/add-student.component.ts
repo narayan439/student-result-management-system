@@ -17,8 +17,7 @@ export class AddStudentComponent implements OnInit {
     className: '',
     rollNo: '',
     dob: '',
-    phone: '',
-    address: ''
+    phone: ''
   };
 
   classes: any[] = [];

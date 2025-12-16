@@ -31,6 +31,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
 
 
 @NgModule({
@@ -65,7 +67,9 @@ import { MatChipsModule } from '@angular/material/chips';
     MatNativeDateModule,
     MatIconModule,
     MatSlideToggleModule,
-    MatChipsModule
+    MatChipsModule,
+    MatProgressSpinnerModule,
+    MatDividerModule
   ]
 })
 export class AdminModule { }

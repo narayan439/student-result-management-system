@@ -1,57 +1,128 @@
-import { Component, OnInit } from '@angular/core';
-import { AdminService } from '../../../core/services/admin.service';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { StudentService } from '../../../core/services/student.service';
 import { ClassesService } from '../../../core/services/classes.service';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { Student } from '../../../core/models/student.model';
 
 @Component({
   selector: 'app-manage-students',
   templateUrl: './manage-students.component.html',
   styleUrls: ['./manage-students.component.css']
 })
-export class ManageStudentsComponent implements OnInit {
+export class ManageStudentsComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['name', 'email', 'className', 'rollNo', 'actions'];
-  students = [
-    { name: 'Narayan', email: 'narayan@student.com', className: 'Class 1 - A', rollNo: '23' },
-    { name: 'Rakesh', email: 'rakesh@student.com', className: 'Class 1 - B', rollNo: '19' }
-  ];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  displayedColumns: string[] = ['studentId', 'name', 'email', 'className', 'rollNo', 'actions'];
+  students: Student[] = [];
+  filteredStudents: Student[] = [];
   
-  // Optional: Use MatTableDataSource for additional features
+  // Use MatTableDataSource for additional features
   dataSource = new MatTableDataSource(this.students);
 
-  // Classes count
+  // Classes count and list
   totalClasses: number = 0;
+  classes: any[] = [];
+  selectedClass: string = 'all';
+  
+  // Search term
+  searchTerm: string = '';
+  
+  isLoading = false;
 
   constructor(
-    private adminService: AdminService,
+    private studentService: StudentService,
     private classesService: ClassesService
   ) {}
 
   ngOnInit(): void {
     this.loadClasses();
-    // TODO: Fetch from backend later
-    // this.adminService.getAllStudents().subscribe(res => {
-    //   this.students = res;
-    //   this.dataSource.data = this.students;
-    // });
+    this.loadStudents();
   }
 
-  loadClasses(): void {
-    // Get total number of classes from ClassesService
-    this.totalClasses = this.classesService.getClassesArray().length;
-  }
-
-  deleteStudent(rollNo: any) {
-    if (confirm("Are you sure you want to delete this student?")) {
-      this.students = this.students.filter(s => s.rollNo !== rollNo);
-      this.dataSource.data = this.students; // Update data source
-      alert("Student Deleted Successfully!");
+  ngAfterViewInit(): void {
+    // Set up paginator after view initialization
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
     }
   }
 
-  // Optional: Add filtering functionality
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  loadClasses(): void {
+    // Get classes from ClassesService
+    this.classes = this.classesService.getClassesArray();
+    this.totalClasses = this.classes.length;
+  }
+
+  loadStudents(): void {
+    this.isLoading = true;
+    
+    // Get students from local data first
+    this.students = this.studentService.getStudentsFromLocal();
+    this.applyFilters();
+    this.isLoading = false;
+
+    // Try to load from backend
+    this.studentService.getAllStudents().subscribe({
+      next: (students: Student[]) => {
+        this.students = students;
+        this.applyFilters();
+      },
+      error: (err) => {
+        console.error('Error loading students:', err);
+      }
+    });
+  }
+
+  deleteStudent(studentId: any) {
+    if (confirm("Are you sure you want to delete this student?")) {
+      this.studentService.deleteStudent(studentId).subscribe({
+        next: (response: any) => {
+          this.students = this.students.filter(s => s.studentId !== studentId);
+          this.applyFilters();
+          alert("🎉 Student Deleted Successfully!");
+        },
+        error: (err) => {
+          const errorMsg = err.error?.message || 'Failed to delete student';
+          alert("❌ Error: " + errorMsg);
+          console.error('Error deleting student:', err);
+        }
+      });
+    }
+  }
+
+  // Search functionality
+  onSearch(searchValue: any): void {
+    this.searchTerm = (searchValue || '').toLowerCase();
+    this.applyFilters();
+  }
+
+  // Class filter functionality
+  onClassFilter(className: string): void {
+    this.selectedClass = className;
+    this.applyFilters();
+  }
+
+  // Apply all filters
+  private applyFilters(): void {
+    let filtered = [...this.students];
+
+    // Filter by class
+    if (this.selectedClass !== 'all') {
+      filtered = filtered.filter(s => s.className === this.selectedClass);
+    }
+
+    // Filter by search term
+    if (this.searchTerm) {
+      filtered = filtered.filter(s =>
+        s.name.toLowerCase().includes(this.searchTerm) ||
+        s.email.toLowerCase().includes(this.searchTerm) ||
+        s.rollNo.toLowerCase().includes(this.searchTerm) ||
+        (s.studentId ? s.studentId.toString().includes(this.searchTerm) : false)
+      );
+    }
+
+    this.filteredStudents = filtered;
+    this.dataSource.data = this.filteredStudents;
   }
 }

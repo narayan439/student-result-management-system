@@ -116,6 +116,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .search-field {
@@ -123,6 +124,14 @@
 }
 
 .search-field .mat-form-field-wrapper {
+  margin: 0;
+}
+
+.class-filter-field {
+  width: 280px;
+}
+
+.class-filter-field .mat-form-field-wrapper {
   margin: 0;
 }
 

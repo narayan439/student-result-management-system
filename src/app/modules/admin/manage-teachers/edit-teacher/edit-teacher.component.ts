@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdminService } from '../../../../core/services/admin.service';
+import { TeacherService } from '../../../../core/services/teacher.service';
+import { SubjectService } from '../../../../core/services/subject.service';
+import { Teacher } from '../../../../core/models/teacher.model';
+import { Subject } from '../../../../core/models/subject.model';
 
 @Component({
   selector: 'app-edit-teacher',
@@ -9,64 +12,113 @@ import { AdminService } from '../../../../core/services/admin.service';
 })
 export class EditTeacherComponent implements OnInit {
 
-  teacherId: string = '';
+  teacherEmail: string = '';
   
-  subjects: string[] = ['Maths', 'Science', 'English', 'Computer', 'History', 'Physics', 'Chemistry', 'Biology', 'Geography', 'Economics'];
+  availableSubjects: string[] = [];
+  subjectObjects: Subject[] = [];
 
-  teacher: any = {
+  teacher: Teacher = {
     name: '',
     email: '',
-    subject: '',
+    subjects: [],
     dob: '',
     phone: '',
-    qualification: '',
-    experience: '',
-    address: '',
-    joiningDate: '',
-    notes: ''
+    experience: 0,
+    isActive: true
   };
 
-  originalTeacher: any = {};
+  originalTeacher: Teacher | null = null;
+  isLoading = true;
+  isSaving = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private adminService: AdminService
+    private teacherService: TeacherService,
+    private subjectService: SubjectService
   ) {}
 
   ngOnInit(): void {
-    this.teacherId = this.route.snapshot.paramMap.get('id') || '';
-    
-    // TODO: Load teacher data from backend
-    // For now, use mock data
-    this.originalTeacher = {
-      name: 'Rahul Sen',
-      email: 'rahul@school.com',
-      subject: 'Maths',
-      dob: '1985-06-12',
-      phone: '+91 9876543210',
-      qualification: 'M.Tech',
-      experience: 15,
-      address: '123 Teacher Street, Kolkata, West Bengal',
-      joiningDate: '2010-06-01',
-      notes: 'Excellent mathematics teacher with strong analytical skills'
-    };
-    
-    this.teacher = { ...this.originalTeacher };
+    this.teacherEmail = this.route.snapshot.paramMap.get('email') || '';
+    this.loadSubjects();
+    if (this.teacherEmail) {
+      this.loadTeacher();
+    }
+  }
+
+  loadSubjects(): void {
+    this.subjectService.getAllSubjects().subscribe({
+      next: (subjects: Subject[]) => {
+        this.subjectObjects = subjects;
+        this.availableSubjects = subjects.map(s => s.subjectName);
+      },
+      error: (err) => {
+        console.error('Error loading subjects:', err);
+      }
+    });
+  }
+
+  toggleSubject(subject: string): void {
+    if (this.teacher.subjects.includes(subject)) {
+      this.teacher.subjects = this.teacher.subjects.filter(s => s !== subject);
+    } else {
+      this.teacher.subjects.push(subject);
+    }
+  }
+
+  isSubjectSelected(subject: string): boolean {
+    return this.teacher.subjects.includes(subject);
+  }
+
+  loadTeacher(): void {
+    this.isLoading = true;
+    this.teacherService.getAllTeachers().subscribe({
+      next: (teachers: Teacher[]) => {
+        console.log('Teachers loaded:', teachers.length);
+        console.log('Looking for email:', this.teacherEmail);
+        
+        const found = teachers.find(t => t.email === this.teacherEmail);
+        if (found) {
+          this.teacher = JSON.parse(JSON.stringify(found));
+          this.originalTeacher = JSON.parse(JSON.stringify(found));
+          this.isLoading = false;
+          console.log('Teacher found:', this.teacher);
+        } else {
+          console.warn('Teacher not found in list');
+          alert('Teacher not found');
+          this.router.navigate(['/admin/manage-teachers']);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading teachers:', err);
+        // Try to load from local storage as fallback
+        const localTeachers = this.teacherService.getTeachersFromLocal();
+        const found = localTeachers.find(t => t.email === this.teacherEmail);
+        if (found) {
+          this.teacher = JSON.parse(JSON.stringify(found));
+          this.originalTeacher = JSON.parse(JSON.stringify(found));
+          this.isLoading = false;
+          console.log('Teacher found from local storage:', this.teacher);
+        } else {
+          alert('Error loading teacher data');
+          this.router.navigate(['/admin/manage-teachers']);
+        }
+      }
+    });
   }
 
   updateTeacher() {
     if (this.validateTeacherData()) {
-      // TODO: Call backend API to update teacher
-      // If AdminService does not declare updateTeacher, cast to any or implement the method in the service.
-      (this.adminService as any).updateTeacher(this.teacherId, this.teacher).subscribe({
+      this.isSaving = true;
+      this.teacherService.updateTeacher(this.teacher.email!, this.teacher).subscribe({
         next: (res: any) => {
           alert('🎉 Teacher Updated Successfully!');
           this.router.navigate(['/admin/manage-teachers']);
         },
         error: (err: any) => {
+          this.isSaving = false;
           console.error(err);
-          alert('❌ Error: ' + (err.error?.message || 'Something went wrong!'));
+          alert('❌ Error: ' + (err.error?.message || 'Failed to update teacher'));
         }
       });
     }
@@ -74,31 +126,7 @@ export class EditTeacherComponent implements OnInit {
 
   resetForm() {
     if (confirm('Are you sure you want to reset all changes?')) {
-      this.teacher = { ...this.originalTeacher };
-    }
-  }
-
-  sendCredentials() {
-    if (confirm('Send login credentials to ' + this.teacher.email + '?')) {
-      // TODO: Implement send credentials functionality
-      alert('Login credentials sent to ' + this.teacher.email);
-    }
-  }
-
-  changePassword() {
-    const newPassword = prompt('Enter new password for ' + this.teacher.name + ':');
-    if (newPassword && newPassword.length >= 6) {
-      // TODO: Implement password change functionality
-      alert('Password has been reset successfully');
-    } else if (newPassword) {
-      alert('Password must be at least 6 characters long');
-    }
-  }
-
-  deactivateTeacher() {
-    if (confirm('Are you sure you want to deactivate ' + this.teacher.name + '\'s account?')) {
-      // TODO: Implement deactivate functionality
-      alert('Teacher account has been deactivated');
+      this.teacher = JSON.parse(JSON.stringify(this.originalTeacher));
     }
   }
 
@@ -118,8 +146,8 @@ export class EditTeacherComponent implements OnInit {
       return false;
     }
     
-    if (!this.teacher.subject) {
-      alert('Please select subject');
+    if (!this.teacher.subjects || this.teacher.subjects.length === 0) {
+      alert('Please select at least one subject');
       return false;
     }
     

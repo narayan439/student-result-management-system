@@ -58,23 +58,34 @@
           </mat-error>
         </mat-form-field>
 
-        <!-- Subject Field -->
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Teaching Subject</mat-label>
-          <mat-select [(ngModel)]="teacher.subject" name="subject" required>
-            <mat-option *ngFor="let sub of subjects" [value]="sub">
-              <div class="subject-option">
-                <mat-icon class="subject-icon">book</mat-icon>
-                <span>{{ sub }}</span>
-              </div>
-            </mat-option>
-          </mat-select>
-          <mat-icon matPrefix>subject</mat-icon>
-          <mat-hint>Select primary teaching subject</mat-hint>
-          <mat-error *ngIf="teacherForm.controls['subject']?.invalid && teacherForm.controls['subject']?.touched">
-            Subject is required
-          </mat-error>
-        </mat-form-field>
+        <!-- Subjects Field - Multiple Selection -->
+        <div class="form-field full-width">
+          <label class="subjects-label">
+            <mat-icon>book</mat-icon>
+            Teaching Subjects (Select at least one)
+          </label>
+          <div class="subjects-grid">
+            <mat-checkbox 
+              *ngFor="let subject of availableSubjects"
+              (change)="toggleSubject(subject)"
+              [checked]="isSubjectSelected(subject)"
+              class="subject-checkbox"
+            >
+              {{ subject }}
+            </mat-checkbox>
+          </div>
+          <mat-hint *ngIf="teacher.subjects.length === 0" class="error-hint">
+            Please select at least one subject
+          </mat-hint>
+          <div *ngIf="teacher.subjects.length > 0" class="selected-subjects">
+            <mat-chip-set aria-label="Selected Subjects">
+              <mat-chip *ngFor="let subject of teacher.subjects" removable (removed)="toggleSubject(subject)">
+                {{ subject }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
 
         <!-- Date of Birth Field -->
         <mat-form-field appearance="outline" class="form-field">
@@ -96,7 +107,7 @@
           </mat-error>
         </mat-form-field>
 
-        <!-- Additional Fields -->
+        <!-- Phone Number Field -->
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Phone Number</mat-label>
           <input 
@@ -107,19 +118,6 @@
           >
           <mat-icon matPrefix>phone</mat-icon>
           <mat-hint>Contact number (optional)</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Qualification</mat-label>
-          <mat-select [(ngModel)]="teacher.qualification" name="qualification">
-            <mat-option value="M.Tech">M.Tech</mat-option>
-            <mat-option value="M.Sc">M.Sc</mat-option>
-            <mat-option value="B.Ed">B.Ed</mat-option>
-            <mat-option value="Ph.D">Ph.D</mat-option>
-            <mat-option value="Other">Other</mat-option>
-          </mat-select>
-          <mat-icon matPrefix>school</mat-icon>
-          <mat-hint>Highest qualification (optional)</mat-hint>
         </mat-form-field>
 
         <!-- Experience Field -->
@@ -135,20 +133,6 @@
           >
           <mat-icon matPrefix>work</mat-icon>
           <mat-hint>Teaching experience in years (optional)</mat-hint>
-        </mat-form-field>
-
-        <!-- Address Field -->
-        <mat-form-field appearance="outline" class="form-field full-width">
-          <mat-label>Address</mat-label>
-          <textarea 
-            matInput 
-            [(ngModel)]="teacher.address" 
-            name="address"
-            placeholder="Enter teacher's address"
-            rows="2"
-          ></textarea>
-          <mat-icon matPrefix>location_on</mat-icon>
-          <mat-hint>Residential address (optional)</mat-hint>
         </mat-form-field>
       </div>
 
@@ -167,7 +151,7 @@
           mat-raised-button 
           color="primary" 
           type="submit"
-          [disabled]="teacherForm.invalid"
+          [disabled]="teacherForm.invalid || teacher.subjects.length === 0"
           class="submit-btn"
         >
           <mat-icon>person_add</mat-icon> 
@@ -186,10 +170,10 @@
       <h3>Teacher Information Guidelines</h3>
       <ul>
         <li>Use official school email address for communication</li>
-        <li>Select the primary subject the teacher will be teaching</li>
+        <li>Select the subjects the teacher will be teaching</li>
         <li>Ensure date of birth is accurate for age verification</li>
         <li>Teacher will receive login credentials via email</li>
-        <li>Additional information helps in better profile management</li>
+        <li>Teachers can teach multiple subjects</li>
       </ul>
     </div>
   </div>

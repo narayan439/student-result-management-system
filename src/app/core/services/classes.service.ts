@@ -14,17 +14,32 @@ export interface SchoolClass {
 })
 export class ClassesService {
   
-  private classesSubject = new BehaviorSubject<SchoolClass[]>([
-    { classId: 1, className: 'Class 1 - A', classNumber: 1, section: 'A', isActive: true },
-    { classId: 2, className: 'Class 1 - B', classNumber: 1, section: 'B', isActive: true },
-    { classId: 3, className: 'Class 5 - A', classNumber: 5, section: 'A', isActive: true },
-    { classId: 4, className: 'Class 10 - B', classNumber: 10, section: 'B', isActive: true },
-    { classId: 5, className: 'Class 6 - C', classNumber: 6, section: 'C', isActive: true }
-  ]);
+  private classesSubject = new BehaviorSubject<SchoolClass[]>(this.generateAllClasses());
 
   classes$ = this.classesSubject.asObservable();
 
   constructor() {}
+
+  // Generate all classes (1-10) with all sections (A-E) = 50 classes
+  private generateAllClasses(): SchoolClass[] {
+    const classes: SchoolClass[] = [];
+    let classId = 1;
+
+    for (let classNum = 1; classNum <= 10; classNum++) {
+      for (const section of ['A', 'B', 'C', 'D', 'E']) {
+        classes.push({
+          classId,
+          className: `Class ${classNum} - ${section}`,
+          classNumber: classNum,
+          section,
+          isActive: true
+        });
+        classId++;
+      }
+    }
+
+    return classes;
+  }
 
   // Get all classes
   getClasses(): Observable<SchoolClass[]> {

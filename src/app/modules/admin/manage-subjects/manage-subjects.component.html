@@ -56,7 +56,7 @@
 
     <!-- Subjects Table -->
     <div class="table-container">
-      <table mat-table [dataSource]="subjects" class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
         
         <!-- Subject Code Column -->
         <ng-container matColumnDef="code">
@@ -101,7 +101,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
         <!-- Empty State -->
-        <tr *ngIf="subjects.length === 0" class="empty-row">
+        <tr *ngIf="dataSource.data.length === 0" class="empty-row">
           <td colspan="3">
             <div class="empty-state">
               <mat-icon>book</mat-icon>
@@ -112,6 +112,11 @@
         </tr>
 
       </table>
+      <mat-paginator 
+        [pageSizeOptions]="[5, 10, 15, 20]" 
+        showFirstLastButtons
+        (page)="onPageChange($event)">
+      </mat-paginator>
     </div>
   </div>
 </div>

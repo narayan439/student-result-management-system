@@ -15,6 +15,9 @@ export class ManageClassesComponent implements OnInit {
   classes: SchoolClass[] = [];
   filteredClasses: SchoolClass[] = [];
   
+  // View mode
+  viewMode: 'table' | 'cards' = 'table';
+  
   // Form state
   showAddForm = false;
   showEditForm = false;
@@ -44,10 +47,16 @@ export class ManageClassesComponent implements OnInit {
   }
 
   // Update class name based on class number and section
+  // Update class name based on class number and section
   updateClassName(): void {
     if (this.newClassNumber && this.newSection) {
       this.newClassName = `Class ${this.newClassNumber} - ${this.newSection}`;
     }
+  }
+
+  // Toggle view mode
+  toggleViewMode(mode: 'table' | 'cards'): void {
+    this.viewMode = mode;
   }
 
   // Toggle add form

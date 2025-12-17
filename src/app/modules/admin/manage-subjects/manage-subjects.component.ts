@@ -1,32 +1,49 @@
-import { Component } from '@angular/core';
-
-export interface Subject {
-  subjectId?: number;
-  subjectCode: string;
-  subjectName: string;
-  isActive?: boolean;
-}
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
+import { SubjectService } from '../../../core/services/subject.service';
+import { Subject } from '../../../core/models/subject.model';
 
 @Component({
   selector: 'app-manage-subjects',
   templateUrl: './manage-subjects.component.html',
   styleUrls: ['./manage-subjects.component.css']
 })
-export class ManageSubjectsComponent {
+export class ManageSubjectsComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   displayedColumns: string[] = ['code', 'name', 'actions'];
 
-  subjects: Subject[] = [
-    { subjectId: 1, subjectCode: 'MTH', subjectName: 'Maths', isActive: true },
-    { subjectId: 2, subjectCode: 'SCI', subjectName: 'Science', isActive: true },
-    { subjectId: 3, subjectCode: 'ENG', subjectName: 'English', isActive: true },
-    { subjectId: 4, subjectCode: 'HIS', subjectName: 'History', isActive: true }
-  ];
-
+  subjects: Subject[] = [];
+  dataSource: MatTableDataSource<Subject> = new MatTableDataSource();
   newSubjectCode = '';
   newSubjectName = '';
 
-  addSubject() {
+  constructor(private subjectService: SubjectService) {}
+
+  ngOnInit(): void {
+    this.loadSubjects();
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+  }
+
+  loadSubjects(): void {
+    this.subjectService.getAllSubjects().subscribe({
+      next: (subjects: Subject[]) => {
+        this.subjects = subjects;
+        this.dataSource.data = subjects;
+        console.log('Loaded subjects:', subjects.length);
+      },
+      error: (err: any) => {
+        console.error('Error loading subjects:', err);
+      }
+    });
+  }
+
+  addSubject(): void {
     const code = this.newSubjectCode.trim().toUpperCase();
     const name = this.newSubjectName.trim();
 
@@ -51,20 +68,43 @@ export class ManageSubjectsComponent {
     }
 
     const newSubject: Subject = {
-      subjectId: Math.max(...this.subjects.map(s => s.subjectId || 0)) + 1,
       subjectCode: code,
       subjectName: name,
       isActive: true
     };
 
-    this.subjects.push(newSubject);
-    this.newSubjectCode = '';
-    this.newSubjectName = '';
+    this.subjectService.addSubject(newSubject).subscribe({
+      next: () => {
+        alert('✅ Subject added successfully!');
+        this.newSubjectCode = '';
+        this.newSubjectName = '';
+        this.loadSubjects();
+      },
+      error: (err: any) => {
+        console.error('Error adding subject:', err);
+        alert('❌ Error adding subject');
+      }
+    });
   }
 
-  deleteSubject(subject: Subject) {
+  deleteSubject(subject: Subject): void {
     if (confirm(`Delete subject ${subject.subjectName} (${subject.subjectCode})?`)) {
-      this.subjects = this.subjects.filter(s => s.subjectId !== subject.subjectId);
+      if (subject.subjectId) {
+        this.subjectService.deleteSubject(subject.subjectId).subscribe({
+          next: () => {
+            alert('✅ Subject deleted successfully!');
+            this.loadSubjects();
+          },
+          error: (err: any) => {
+            console.error('Error deleting subject:', err);
+            alert('❌ Error deleting subject');
+          }
+        });
+      }
     }
+  }
+
+  onPageChange(event: any): void {
+    // Paginator change event handled automatically by MatTableDataSource
   }
 }

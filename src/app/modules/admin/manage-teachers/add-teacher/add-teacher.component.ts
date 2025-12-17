@@ -1,49 +1,80 @@
-import { Component } from '@angular/core';
-import { AdminService } from '../../../../core/services/admin.service';
+import { Component, OnInit } from '@angular/core';
+import { TeacherService } from '../../../../core/services/teacher.service';
+import { SubjectService } from '../../../../core/services/subject.service';
 import { Router } from '@angular/router';
+import { Teacher } from '../../../../core/models/teacher.model';
+import { Subject } from '../../../../core/models/subject.model';
 
 @Component({
   selector: 'app-add-teacher',
   templateUrl: './add-teacher.component.html',
   styleUrls: ['./add-teacher.component.css']
 })
-export class AddTeacherComponent {
+export class AddTeacherComponent implements OnInit {
 
-  teacher = {
+  teacher: Teacher = {
     name: '',
     email: '',
-    subject: '',
+    subjects: [],
     dob: '',
     phone: '',
-    qualification: '',
-    experience: '',
-    address: ''
+    experience: 0,
+    isActive: true
   };
 
-  subjects: string[] = ['Maths', 'Science', 'English', 'Computer', 'History', 'Physics', 'Chemistry', 'Biology', 'Geography', 'Economics'];
+  availableSubjects: string[] = [];
+  subjectObjects: Subject[] = [];
 
   constructor(
-    private adminService: AdminService,
+    private teacherService: TeacherService,
+    private subjectService: SubjectService,
     private router: Router
   ) {}
 
+  ngOnInit(): void {
+    this.loadSubjects();
+  }
+
+  loadSubjects(): void {
+    this.subjectService.getAllSubjects().subscribe({
+      next: (subjects: Subject[]) => {
+        this.subjectObjects = subjects;
+        this.availableSubjects = subjects.map(s => s.subjectName);
+      },
+      error: (err) => {
+        console.error('Error loading subjects:', err);
+      }
+    });
+  }
+
+  toggleSubject(subject: string): void {
+    if (this.teacher.subjects.includes(subject)) {
+      this.teacher.subjects = this.teacher.subjects.filter(s => s !== subject);
+    } else {
+      this.teacher.subjects.push(subject);
+    }
+  }
+
+  isSubjectSelected(subject: string): boolean {
+    return this.teacher.subjects.includes(subject);
+  }
+
   createTeacher() {
     if (this.validateTeacherData()) {
-      this.adminService.addTeacher(this.teacher).subscribe({
+      this.teacherService.addTeacher(this.teacher).subscribe({
         next: (res: any) => {
           alert('🎉 Teacher Added Successfully!');
           this.router.navigate(['/admin/manage-teachers']);
         },
         error: (err: any) => {
           console.error(err);
-          alert('❌ Error: ' + (err.error?.message || 'Something went wrong!'));
+          alert('❌ Error: ' + (err.error?.message || 'Failed to add teacher'));
         }
       });
     }
   }
 
   private validateTeacherData(): boolean {
-    // Basic validation
     if (!this.teacher.name.trim()) {
       alert('Please enter teacher name');
       return false;
@@ -59,8 +90,8 @@ export class AddTeacherComponent {
       return false;
     }
     
-    if (!this.teacher.subject) {
-      alert('Please select subject');
+    if (!this.teacher.subjects || this.teacher.subjects.length === 0) {
+      alert('Please select at least one subject');
       return false;
     }
     
@@ -69,7 +100,6 @@ export class AddTeacherComponent {
       return false;
     }
     
-    // Validate age (must be at least 21 years old)
     if (!this.isValidAge(this.teacher.dob)) {
       alert('Teacher must be at least 21 years old');
       return false;

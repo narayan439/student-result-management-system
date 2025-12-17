@@ -6,8 +6,14 @@
     </button>
   </div>
 
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading teacher details...</p>
+  </div>
+
   <!-- Main Card -->
-  <div class="form-card">
+  <div class="form-card" *ngIf="!isLoading">
     <!-- Form Header -->
     <div class="form-header">
       <div class="header-icon">
@@ -15,7 +21,7 @@
       </div>
       <div class="header-text">
         <h1>Edit Teacher</h1>
-        <p>Update teacher information</p>
+        <p>Update teacher information and subjects</p>
       </div>
     </div>
 
@@ -24,7 +30,7 @@
       <div class="form-grid">
         <!-- Name Field -->
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Name</mat-label>
+          <mat-label>Full Name</mat-label>
           <input 
             matInput 
             [(ngModel)]="teacher.name" 
@@ -39,55 +45,96 @@
           </mat-error>
         </mat-form-field>
 
-        <!-- Email Field -->
+        <!-- Email Field (Read-only) -->
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Email</mat-label>
+          <mat-label>Email Address</mat-label>
           <input 
             matInput 
             [(ngModel)]="teacher.email" 
             name="email" 
-            required
-            email
+            readonly
             placeholder="teacher@school.com"
             type="email"
           >
           <mat-icon matPrefix>email</mat-icon>
-          <mat-hint>Official email address</mat-hint>
-          <mat-error *ngIf="teacherForm.controls['email']?.invalid && teacherForm.controls['email']?.touched">
-            Please enter a valid email address
-          </mat-error>
+          <mat-hint>Email cannot be changed</mat-hint>
         </mat-form-field>
 
-        <!-- Subject Field -->
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Subject</mat-label>
-          <mat-select [(ngModel)]="teacher.subject" name="subject" required>
-            <mat-option *ngFor="let sub of subjects" [value]="sub">
-              {{ sub }}
-            </mat-option>
-          </mat-select>
-          <mat-icon matPrefix>subject</mat-icon>
-          <mat-hint>Primary teaching subject</mat-hint>
-          <mat-error *ngIf="teacherForm.controls['subject']?.invalid && teacherForm.controls['subject']?.touched">
-            Subject is required
-          </mat-error>
-        </mat-form-field>
+        <!-- Subjects Field - Multiple Selection -->
+        <div class="form-field full-width">
+          <label class="subjects-label">
+            <mat-icon>book</mat-icon>
+            Teaching Subjects (Select at least one)
+          </label>
+          <div class="subjects-grid">
+            <mat-checkbox 
+              *ngFor="let subject of availableSubjects"
+              (change)="toggleSubject(subject)"
+              [checked]="isSubjectSelected(subject)"
+              class="subject-checkbox"
+            >
+              {{ subject }}
+            </mat-checkbox>
+          </div>
+          <mat-hint *ngIf="teacher.subjects.length === 0" class="error-hint">
+            Please select at least one subject
+          </mat-hint>
+          <div *ngIf="teacher.subjects.length > 0" class="selected-subjects">
+            <mat-chip-set aria-label="Selected Subjects">
+              <mat-chip *ngFor="let subject of teacher.subjects" removable (removed)="toggleSubject(subject)">
+                {{ subject }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
 
-        <!-- DOB Field -->
+        <!-- Date of Birth Field -->
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Date of Birth</mat-label>
           <input 
             matInput 
-            type="date" 
+            [matDatepicker]="picker" 
             [(ngModel)]="teacher.dob" 
             name="dob" 
             required
+            placeholder="MM/DD/YYYY"
           >
           <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
           <mat-hint>Teacher's date of birth</mat-hint>
           <mat-error *ngIf="teacherForm.controls['dob']?.invalid && teacherForm.controls['dob']?.touched">
             Date of birth is required
           </mat-error>
+        </mat-form-field>
+
+        <!-- Phone Number Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Phone Number</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="teacher.phone" 
+            name="phone"
+            placeholder="+91 9876543210"
+          >
+          <mat-icon matPrefix>phone</mat-icon>
+          <mat-hint>Contact number (optional)</mat-hint>
+        </mat-form-field>
+
+        <!-- Experience Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Experience (Years)</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="teacher.experience" 
+            name="experience"
+            type="number"
+            min="0"
+            placeholder="e.g., 5"
+          >
+          <mat-icon matPrefix>work</mat-icon>
+          <mat-hint>Teaching experience in years (optional)</mat-hint>
         </mat-form-field>
       </div>
 
@@ -106,13 +153,30 @@
           mat-raised-button 
           color="primary" 
           type="submit"
-          [disabled]="teacherForm.invalid"
-          class="update-btn"
+          [disabled]="teacherForm.invalid || teacher.subjects.length === 0 || isSaving"
+          class="submit-btn"
         >
-          <mat-icon>save</mat-icon> 
-          Update Teacher
+          <mat-icon *ngIf="!isSaving">save</mat-icon>
+          {{ isSaving ? 'Updating...' : 'Update Teacher' }}
         </button>
       </div>
     </form>
+  </div>
+
+  <!-- Info Card -->
+  <div class="info-card" *ngIf="!isLoading">
+    <div class="info-icon">
+      <mat-icon>info</mat-icon>
+    </div>
+    <div class="info-content">
+      <h3>Update Guidelines</h3>
+      <ul>
+        <li>Email address cannot be changed</li>
+        <li>Update teaching subjects as needed</li>
+        <li>Ensure date of birth is accurate</li>
+        <li>Add experience information to maintain records</li>
+        <li>Teachers can teach multiple subjects</li>
+      </ul>
+    </div>
   </div>
 </div>

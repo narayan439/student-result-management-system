@@ -201,6 +201,71 @@
   }
 }
 
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  gap: 20px;
+  color: #4a5568;
+}
+
+.loading-container p {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Subject Selection */
+.subjects-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a237e;
+  margin-bottom: 12px;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 12px;
+}
+
+.subject-checkbox {
+  padding: 8px 0;
+}
+
+.subject-checkbox ::ng-deep .mdc-checkbox {
+  margin-right: 8px;
+}
+
+.selected-subjects {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f0f7ff;
+  border-radius: 8px;
+  border: 1px solid #c5d9f1;
+}
+
+.error-hint {
+  color: #d32f2f !important;
+  font-size: 12px;
+  margin-top: 8px;
+  display: block;
+}
+
+.button-spinner {
+  margin-right: 8px;
+}
+
 @media (max-width: 480px) {
   .form-header {
     padding: 20px;
@@ -212,5 +277,9 @@
   
   .form-actions {
     gap: 12px;
+  }
+
+  .subjects-grid {
+    grid-template-columns: 1fr;
   }
 }

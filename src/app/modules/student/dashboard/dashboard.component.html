@@ -1,57 +1,150 @@
-<div class="dashboard">
+<div class="dashboard-container">
 
-  <h2>Student Dashboard</h2>
-
-  <!-- Navigation Buttons -->
-  <div class="nav-buttons">
-    <button routerLink="/student/view-marks" class="btn blue">View Marks</button>
-    <button routerLink="/student/request-recheck" class="btn pink">Request Recheck</button>
-    <button routerLink="/student/track-recheck" class="btn orange">Track Recheck</button>
-    <button routerLink="/student/profile" class="btn purple">Profile</button>
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h2>
+      <mat-icon>school</mat-icon> Student Dashboard
+    </h2>
+    <p>Welcome, {{ student?.name }}! Class {{ studentClassNumber }}</p>
   </div>
 
-  <hr>
-
-  <h3>Your Result Summary</h3>
-
-  <div class="summary">
-
-    <div class="card">
-      <h4>Total Marks</h4>
-      <p>{{ total }}</p>
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="card total-card">
+      <div class="card-header">
+        <mat-icon>calculate</mat-icon>
+        <span>Total Marks</span>
+      </div>
+      <div class="card-value">{{ total }}</div>
+      <div class="card-info">Out of {{ marks.length * 100 }}</div>
     </div>
 
-    <div class="card">
-      <h4>Percentage</h4>
-      <p>{{ percentage }}%</p>
+    <div class="card percentage-card">
+      <div class="card-header">
+        <mat-icon>trending_up</mat-icon>
+        <span>Percentage</span>
+      </div>
+      <div class="card-value">{{ percentage }}%</div>
+      <div class="card-info">Overall Performance</div>
     </div>
 
-    <div class="card" [ngClass]="resultStatus == 'PASS' ? 'pass' : 'fail'">
-      <h4>Status</h4>
-      <p>{{ resultStatus }}</p>
+    <div class="card" [ngClass]="resultStatus === 'PASS' ? 'pass-card' : 'fail-card'">
+      <div class="card-header">
+        <mat-icon>{{ resultStatus === 'PASS' ? 'check_circle' : 'cancel' }}</mat-icon>
+        <span>Status</span>
+      </div>
+      <div class="card-value">{{ resultStatus }}</div>
+      <div class="card-info">Result Status</div>
     </div>
 
-    <div class="card">
-      <h4>Grade</h4>
-      <p>{{ grade }}</p>
+    <div class="card grade-card">
+      <div class="card-header">
+        <mat-icon>grade</mat-icon>
+        <span>Grade</span>
+      </div>
+      <div class="card-value grade-badge">{{ grade }}</div>
+      <div class="card-info">Letter Grade</div>
     </div>
-
   </div>
 
-  <h3>Latest Exam Marks</h3>
+  <!-- Marks Table -->
+  <mat-card class="marks-card" *ngIf="marks.length > 0">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>book</mat-icon> Your Marks
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table class="marks-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Marks</th>
+            <th>Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mark of marks">
+            <td class="subject-cell">{{ mark.subject }}</td>
+            <td class="marks-cell">{{ mark.marks }}/{{ mark.maxMarks }}</td>
+            <td class="percentage-cell">
+              <span [class]="'percentage-badge ' + (mark.percentage >= 60 ? 'pass' : 'fail')">
+                {{ mark.percentage }}%
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </mat-card-content>
+  </mat-card>
 
-  <div class="marks-box">
-    <table>
-      <tr>
-        <th>Subject</th>
-        <th>Marks</th>
-      </tr>
+  <!-- Empty State -->
+  <div *ngIf="marks.length === 0" class="empty-state">
+    <mat-icon>assignment</mat-icon>
+    <p>No marks data available yet</p>
+    <button mat-raised-button color="primary" routerLink="/student/view-marks">
+      View Marks
+    </button>
+  </div>
 
-      <tr *ngFor="let m of marks">
-        <td>{{ m.subject }}</td>
-        <td>{{ m.score }}</td>
-      </tr>
-    </table>
+  <!-- Important Information -->
+  <mat-card class="important-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>info</mat-icon> Important Information
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="important-grid">
+        <div class="important-item">
+          <mat-icon>calendar_today</mat-icon>
+          <div>
+            <strong>Academic Year</strong>
+            <p>2024-2025</p>
+          </div>
+        </div>
+        <div class="important-item">
+          <mat-icon>schedule</mat-icon>
+          <div>
+            <strong>Next Exam</strong>
+            <p>January 2025</p>
+          </div>
+        </div>
+        <div class="important-item">
+          <mat-icon>event_note</mat-icon>
+          <div>
+            <strong>Recheck Deadline</strong>
+            <p>15 days from result</p>
+          </div>
+        </div>
+        <div class="important-item">
+          <mat-icon>attach_money</mat-icon>
+          <div>
+            <strong>Recheck Fee</strong>
+            <p>₹500/subject</p>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Quick Links -->
+  <div class="quick-links">
+    <h3>Quick Links</h3>
+    <div class="links-grid">
+      <button mat-raised-button color="primary" routerLink="/student/view-marks">
+        <mat-icon>visibility</mat-icon> View Marks
+      </button>
+      <button mat-raised-button color="accent" routerLink="/student/request-recheck">
+        <mat-icon>edit</mat-icon> Request Recheck
+      </button>
+      <button mat-raised-button color="warn" routerLink="/student/track-recheck">
+        <mat-icon>track_changes</mat-icon> Track Recheck
+      </button>
+      <button mat-raised-button routerLink="/student/profile">
+        <mat-icon>account_circle</mat-icon> My Profile
+      </button>
+    </div>
   </div>
 
 </div>

@@ -172,6 +172,94 @@ button[mat-raised-button]:disabled {
   line-height: 1.5;
 }
 
+/* Subjects Grid */
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.subject-marks-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Submitted Marks Summary */
+.submitted-summary {
+  margin: 24px 0;
+  padding: 16px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border-left: 4px solid #2196f3;
+}
+
+.submitted-summary h4 {
+  color: #1a237e;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.submitted-summary ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.submitted-summary li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.subject-name {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.status-success {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.status-failed {
+  color: #f44336;
+  font-weight: 600;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.button-group button {
+  flex: 1;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #1a237e, #304ffe);
+}
+
+.reset-btn {
+  border: 2px solid #cbd5e0;
+  color: #4a5568;
+}
+
+.reset-btn:hover {
+  background: #f7fafc;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .add-marks-container {

@@ -1,89 +1,155 @@
 <div class="add-marks-container">
-  <div class="marks-card">
-    
-    <!-- Card Header -->
-    <div class="card-header">
-      <div class="header-icon">
-        <mat-icon>score</mat-icon>
-      </div>
-      <h1>Add Marks</h1>
-      <p>Enter student marks for specific subjects</p>
-    </div>
+  
+  <!-- Header -->
+  <div class="marks-header">
+    <h2>Add Student Marks</h2>
+    <p>Enter roll number to search student and add marks for their class subjects</p>
+  </div>
 
-    <!-- Form Container -->
-    <div class="form-container">
-      <form (ngSubmit)="submitMarks()">
-        
-        <!-- Roll Number Field -->
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Student Roll No</mat-label>
-          <input 
-            matInput 
-            [(ngModel)]="marks.rollNo" 
-            name="rollNo" 
-            required
-            placeholder="Enter student roll number"
-          >
-          <mat-icon matPrefix>badge</mat-icon>
-          <mat-hint>Enter the student's roll number</mat-hint>
-        </mat-form-field>
-
-        <!-- Subject Field -->
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Subject</mat-label>
-          <mat-select [(ngModel)]="marks.subject" name="subject" required>
-            <mat-option *ngFor="let s of subjects" [value]="s">
-              <div class="subject-option">
-                <mat-icon class="subject-icon">book</mat-icon>
-                {{ s }}
-              </div>
-            </mat-option>
-          </mat-select>
-          <mat-icon matPrefix>subject</mat-icon>
-          <mat-hint>Select the subject</mat-hint>
-        </mat-form-field>
-
-        <!-- Marks Field -->
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Marks</mat-label>
-          <input 
-            matInput 
-            type="number" 
-            [(ngModel)]="marks.score" 
-            name="score" 
-            required
-            placeholder="Enter marks scored"
-            min="0"
-            max="100"
-          >
-          <mat-icon matPrefix>grade</mat-icon>
-          <mat-hint>Enter marks (0-100)</mat-hint>
-        </mat-form-field>
-
-        <!-- Submit Button -->
-        <button 
-          mat-raised-button 
-          color="primary" 
-          class="full-width"
-          [disabled]="!marks.rollNo || !marks.subject || !marks.score"
-        >
-          <mat-icon>save</mat-icon> Save Marks
-        </button>
-
-      </form>
-
-      <!-- Info Section -->
-      <div class="info-section">
-        <h3>
-          <mat-icon>info</mat-icon>
-          Important Notes
-        </h3>
-        <p>
-          • Ensure roll number is correct<br>
-          • Marks should be between 0-100<br>
-          • Changes can be updated later
-        </p>
-      </div>
+  <!-- Success Message -->
+  <div *ngIf="submitSuccess" class="success-message">
+    <mat-icon>check_circle</mat-icon>
+    <div>
+      <strong>Success!</strong>
+      <p>Marks added successfully for {{ student?.name }}</p>
     </div>
   </div>
+
+  <!-- Error Message -->
+  <div *ngIf="submitError" class="error-message">
+    <mat-icon>error</mat-icon>
+    <div>
+      <strong>Error!</strong>
+      <p>{{ submitError }}</p>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <mat-card class="marks-card">
+    
+    <!-- Search Section -->
+    <div class="search-section">
+      <h3>Search Student</h3>
+      <div class="search-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Student Roll Number</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="rollNo" 
+            name="rollNo"
+            placeholder="e.g., 1A01, 2A05"
+            (keyup.enter)="searchStudent()"
+          >
+          <mat-icon matPrefix>badge</mat-icon>
+        </mat-form-field>
+        <button 
+          mat-raised-button 
+          color="primary"
+          type="button"
+          (click)="searchStudent()"
+          class="search-btn"
+        >
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+      </div>
+    </div>
+
+    <!-- Student Details Display -->
+    <div *ngIf="student" class="student-details">
+      <h4>Student Information</h4>
+      <div class="details-grid">
+        <div class="detail-item">
+          <strong>Name:</strong>
+          <span>{{ student.name }}</span>
+        </div>
+        <div class="detail-item">
+          <strong>Class:</strong>
+          <span>Class {{ studentClassNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <strong>Roll No:</strong>
+          <span>{{ student.rollNo }}</span>
+        </div>
+        <div class="detail-item">
+          <strong>Date of Birth:</strong>
+          <span>{{ student.dob }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Marks Entry Form -->
+    <div *ngIf="student && subjects.length > 0" class="form-section">
+      <h3>Add Marks for All Subjects</h3>
+      <form class="form-container">
+        
+        <!-- Subjects Grid -->
+        <div class="subjects-grid">
+          <div *ngFor="let subject of subjects" class="subject-marks-item">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ subject.subjectName }}</mat-label>
+              <input 
+                matInput 
+                [(ngModel)]="marksData[subject.subjectName]"
+                [name]="'marks_' + subject.subjectId"
+                type="number"
+                min="0"
+                max="100"
+                placeholder="0-100"
+              >
+              <mat-icon matPrefix>grade</mat-icon>
+              <mat-hint align="end">Max: 100</mat-hint>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Submitted Marks Summary -->
+        <div *ngIf="submittedMarks.length > 0" class="submitted-summary">
+          <h4>Submitted Marks</h4>
+          <ul>
+            <li *ngFor="let mark of submittedMarks">
+              <span class="subject-name">{{ mark.subject }}: {{ mark.marks }} / 100</span>
+              <span [class]="mark.status === 'success' ? 'status-success' : 'status-failed'">
+                {{ mark.status === 'success' ? '✓ Success' : '✗ Failed' }}
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-group">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="button"
+            (click)="submitAllMarks()"
+            [disabled]="isSubmitting"
+            class="submit-btn"
+          >
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+            {{ isSubmitting ? 'Submitting...' : 'Submit All Marks' }}
+          </button>
+          <button 
+            mat-stroked-button 
+            type="button"
+            (click)="resetForm()"
+            [disabled]="isSubmitting"
+            class="reset-btn"
+          >
+            <mat-icon>refresh</mat-icon>
+            Reset
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Empty State Message -->
+    <div *ngIf="!student" class="empty-state">
+      <mat-icon>person_search</mat-icon>
+      <p>Enter a student roll number and click search to begin adding marks</p>
+    </div>
+
+  </mat-card>
+
 </div>

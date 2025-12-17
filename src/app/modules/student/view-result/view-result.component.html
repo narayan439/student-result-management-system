@@ -64,42 +64,23 @@
           <th class="subject-col">Subject Name</th>
           <th class="marks-col">Maximum Marks</th>
           <th class="marks-col">Marks Obtained</th>
+          <th class="marks-col">Grade</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Mathematics</td>
-          <td>100</td>
-          <td class="obtained">92</td>
-        </tr>
-        <tr>
-          <td>Science</td>
-          <td>100</td>
-          <td class="obtained">85</td>
-        </tr>
-        <tr>
-          <td>English</td>
-          <td>100</td>
-          <td class="obtained">88</td>
-        </tr>
-        <tr>
-          <td>Hindi</td>
-
-          
-          <td>100</td>
-          <td class="obtained">90</td>
-        </tr>
-        <tr>
-          <td>Social Science</td>
-          <td>100</td>
-          <td class="obtained">78</td>
+        <tr *ngFor="let mark of result.marks">
+          <td>{{ mark.subject }}</td>
+          <td>{{ mark.maxMarks }}</td>
+          <td class="obtained">{{ mark.marksObtained }}</td>
+          <td>{{ getGrade(mark.marksObtained) }}</td>
         </tr>
       </tbody>
       <tfoot>
         <tr class="total-row">
           <td class="total-label">GRAND TOTAL</td>
-          <td class="total-value">500</td>
-          <td class="total-value obtained">433</td>
+          <td class="total-value">{{ result.maxTotal }}</td>
+          <td class="total-value obtained">{{ result.total }}</td>
+          <td class="total-value">{{ result.percentage }}%</td>
         </tr>
       </tfoot>
     </table>
@@ -117,7 +98,7 @@
         </div>
         <div class="card-content">
           <h4>Total Marks</h4>
-          <p class="big-number">{{ result.total }}/{{result.marks.length * 100}}</p>
+          <p class="big-number">{{ result.total }}/{{ result.maxTotal }}</p>
         </div>
       </div>
       

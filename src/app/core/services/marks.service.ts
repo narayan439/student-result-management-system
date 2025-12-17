@@ -14,77 +14,112 @@ export class MarksService {
   private marksSubject = new BehaviorSubject<Mark[]>([]);
   public marks$ = this.marksSubject.asObservable();
 
-  // sample marks data
+  // Class-specific subjects mapping
+  private classSubjectsMap: { [key: number]: number[] } = {
+    1: [1, 2, 3, 4, 5, 6], // Class 1: Math, Science, English, MIL Odia, Music, Drawing
+    2: [1, 2, 3, 4, 5, 6], // Class 2: Math, Science, English, MIL Odia, Music, Drawing
+    3: [1, 2, 3, 4, 7, 8], // Class 3: Math, Science, English, MIL Odia, History, Geography
+    4: [1, 2, 3, 4, 7, 8], // Class 4: Math, Science, English, MIL Odia, History, Geography
+    5: [1, 2, 3, 4, 7, 8], // Class 5: Math, Science, English, MIL Odia, History, Geography
+    6: [1, 2, 3, 9, 7, 8], // Class 6: Math, Science, English, Hindi, History, Geography
+    7: [1, 2, 3, 9, 7, 8], // Class 7: Math, Science, English, Hindi, History, Geography
+    8: [1, 2, 3, 9, 7, 8], // Class 8: Math, Science, English, Hindi, History, Geography
+    9: [1, 2, 3, 9, 7, 8], // Class 9: Math, Science, English, Hindi, History, Geography
+    10: [1, 2, 3, 9, 7, 8] // Class 10: Math, Science, English, Hindi, History, Geography
+  };
+
+  // Sample subjects for filtering
+  private sampleSubjects = [
+    { subjectId: 1, subjectName: 'Mathematics', subjectCode: 'MATH', isActive: true },
+    { subjectId: 2, subjectName: 'Science', subjectCode: 'SCI', isActive: true },
+    { subjectId: 3, subjectName: 'English', subjectCode: 'ENG', isActive: true },
+    { subjectId: 4, subjectName: 'MIL Odia', subjectCode: 'MIL', isActive: true },
+    { subjectId: 5, subjectName: 'Music', subjectCode: 'MUS', isActive: true },
+    { subjectId: 6, subjectName: 'Drawing', subjectCode: 'ART', isActive: true },
+    { subjectId: 7, subjectName: 'History', subjectCode: 'HIS', isActive: true },
+    { subjectId: 8, subjectName: 'Geography', subjectCode: 'GEO', isActive: true },
+    { subjectId: 9, subjectName: 'Hindi', subjectCode: 'HINDI', isActive: true }
+  ];
   private sampleMarks: Mark[] = [
-    // Student 1 - Arjun Kumar
+    // Student 1 - Class 1 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M1', studentId: '1', subject: 'Mathematics', marksObtained: 85, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M2', studentId: '1', subject: 'Science', marksObtained: 88, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M3', studentId: '1', subject: 'English', marksObtained: 78, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M4', studentId: '1', subject: 'History', marksObtained: 82, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M5', studentId: '1', subject: 'Geography', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M4', studentId: '1', subject: 'MIL Odia', marksObtained: 82, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M5', studentId: '1', subject: 'Music', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M5b', studentId: '1', subject: 'Drawing', marksObtained: 85, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 2 - Priya Singh
+    // Student 2 - Class 1 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M6', studentId: '2', subject: 'Mathematics', marksObtained: 92, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M7', studentId: '2', subject: 'Science', marksObtained: 95, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M8', studentId: '2', subject: 'English', marksObtained: 88, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M9', studentId: '2', subject: 'History', marksObtained: 85, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M10', studentId: '2', subject: 'Geography', marksObtained: 90, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M9', studentId: '2', subject: 'MIL Odia', marksObtained: 85, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M10', studentId: '2', subject: 'Music', marksObtained: 90, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M10b', studentId: '2', subject: 'Drawing', marksObtained: 92, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 3 - Rahul Patel
+    // Student 3 - Class 1 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M11', studentId: '3', subject: 'Mathematics', marksObtained: 75, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M12', studentId: '3', subject: 'Science', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M13', studentId: '3', subject: 'English', marksObtained: 72, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M14', studentId: '3', subject: 'History', marksObtained: 76, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M15', studentId: '3', subject: 'Geography', marksObtained: 78, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M14', studentId: '3', subject: 'MIL Odia', marksObtained: 76, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M15', studentId: '3', subject: 'Music', marksObtained: 78, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M15b', studentId: '3', subject: 'Drawing', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 4 - Anjali Sharma
+    // Student 4 - Class 1 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M16', studentId: '4', subject: 'Mathematics', marksObtained: 88, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M17', studentId: '4', subject: 'Science', marksObtained: 85, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M18', studentId: '4', subject: 'English', marksObtained: 82, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M19', studentId: '4', subject: 'History', marksObtained: 84, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M20', studentId: '4', subject: 'Geography', marksObtained: 86, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M19', studentId: '4', subject: 'MIL Odia', marksObtained: 84, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M20', studentId: '4', subject: 'Music', marksObtained: 86, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M20b', studentId: '4', subject: 'Drawing', marksObtained: 88, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 5 - Vikram Verma
+    // Student 5 - Class 1 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M21', studentId: '5', subject: 'Mathematics', marksObtained: 78, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M22', studentId: '5', subject: 'Science', marksObtained: 82, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M23', studentId: '5', subject: 'English', marksObtained: 75, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M24', studentId: '5', subject: 'History', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M25', studentId: '5', subject: 'Geography', marksObtained: 79, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M24', studentId: '5', subject: 'MIL Odia', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M25', studentId: '5', subject: 'Music', marksObtained: 79, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M25b', studentId: '5', subject: 'Drawing', marksObtained: 81, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 6 - Sneha Gupta
+    // Student 6 - Class 2 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M26', studentId: '6', subject: 'Mathematics', marksObtained: 90, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M27', studentId: '6', subject: 'Science', marksObtained: 92, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M28', studentId: '6', subject: 'English', marksObtained: 86, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M29', studentId: '6', subject: 'History', marksObtained: 88, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M30', studentId: '6', subject: 'Geography', marksObtained: 89, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M29', studentId: '6', subject: 'MIL Odia', marksObtained: 88, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M30', studentId: '6', subject: 'Music', marksObtained: 89, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M30b', studentId: '6', subject: 'Drawing', marksObtained: 91, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 7 - Aditya Kumar
+    // Student 7 - Class 2 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M31', studentId: '7', subject: 'Mathematics', marksObtained: 65, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M32', studentId: '7', subject: 'Science', marksObtained: 68, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M33', studentId: '7', subject: 'English', marksObtained: 70, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M34', studentId: '7', subject: 'History', marksObtained: 72, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M35', studentId: '7', subject: 'Geography', marksObtained: 71, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M34', studentId: '7', subject: 'MIL Odia', marksObtained: 72, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M35', studentId: '7', subject: 'Music', marksObtained: 71, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M35b', studentId: '7', subject: 'Drawing', marksObtained: 73, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 8 - Neha Desai
+    // Student 8 - Class 2 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M36', studentId: '8', subject: 'Mathematics', marksObtained: 84, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M37', studentId: '8', subject: 'Science', marksObtained: 86, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M38', studentId: '8', subject: 'English', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M39', studentId: '8', subject: 'History', marksObtained: 82, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M40', studentId: '8', subject: 'Geography', marksObtained: 83, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M39', studentId: '8', subject: 'MIL Odia', marksObtained: 82, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M40', studentId: '8', subject: 'Music', marksObtained: 83, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M40b', studentId: '8', subject: 'Drawing', marksObtained: 85, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 9 - Rohan Rao
+    // Student 9 - Class 2 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M41', studentId: '9', subject: 'Mathematics', marksObtained: 79, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M42', studentId: '9', subject: 'Science', marksObtained: 81, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M43', studentId: '9', subject: 'English', marksObtained: 77, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M44', studentId: '9', subject: 'History', marksObtained: 79, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M45', studentId: '9', subject: 'Geography', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M44', studentId: '9', subject: 'MIL Odia', marksObtained: 79, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M45', studentId: '9', subject: 'Music', marksObtained: 80, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M45b', studentId: '9', subject: 'Drawing', marksObtained: 82, maxMarks: 100, term: 'Term 1', year: 2024 },
     
-    // Student 10 - Divya Nair
+    // Student 10 - Class 2 (Math, Science, English, MIL Odia, Music, Drawing)
     { marksId: 'M46', studentId: '10', subject: 'Mathematics', marksObtained: 87, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M47', studentId: '10', subject: 'Science', marksObtained: 89, maxMarks: 100, term: 'Term 1', year: 2024 },
     { marksId: 'M48', studentId: '10', subject: 'English', marksObtained: 84, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M49', studentId: '10', subject: 'History', marksObtained: 86, maxMarks: 100, term: 'Term 1', year: 2024 },
-    { marksId: 'M50', studentId: '10', subject: 'Geography', marksObtained: 88, maxMarks: 100, term: 'Term 1', year: 2024 }
+    { marksId: 'M49', studentId: '10', subject: 'MIL Odia', marksObtained: 86, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M50', studentId: '10', subject: 'Music', marksObtained: 88, maxMarks: 100, term: 'Term 1', year: 2024 },
+    { marksId: 'M50b', studentId: '10', subject: 'Drawing', marksObtained: 90, maxMarks: 100, term: 'Term 1', year: 2024 }
   ];
 
   constructor(private http: HttpClient) {
@@ -210,6 +245,18 @@ export class MarksService {
   // Helper: get marks for a specific student
   getMarksByStudent(studentId: string): Mark[] {
     return this.getMarksFromLocal().filter(m => m.studentId === studentId);
+  }
+
+  // Helper: get marks for a specific student and class
+  getMarksByStudentAndClass(studentId: string, classNumber: number): Mark[] {
+    const allSubjects = this.sampleSubjects;
+    const subjectIds = this.classSubjectsMap[classNumber] || [];
+    const allowedSubjectNames = allSubjects
+      .filter(s => subjectIds.includes(s.subjectId || 0))
+      .map(s => s.subjectName);
+    
+    return this.getMarksByStudent(studentId)
+      .filter(m => allowedSubjectNames.includes(m.subject));
   }
 
   // Helper: calculate average marks for a student

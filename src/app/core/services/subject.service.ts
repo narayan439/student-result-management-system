@@ -18,19 +18,27 @@ export class SubjectService {
     { subjectId: 1, subjectName: 'Mathematics', subjectCode: 'MATH', isActive: true },
     { subjectId: 2, subjectName: 'Science', subjectCode: 'SCI', isActive: true },
     { subjectId: 3, subjectName: 'English', subjectCode: 'ENG', isActive: true },
-    { subjectId: 4, subjectName: 'Physics', subjectCode: 'PHY', isActive: true },
-    { subjectId: 5, subjectName: 'Chemistry', subjectCode: 'CHM', isActive: true },
-    { subjectId: 6, subjectName: 'Biology', subjectCode: 'BIO', isActive: true },
+    { subjectId: 4, subjectName: 'MIL Odia', subjectCode: 'MIL', isActive: true },
+    { subjectId: 5, subjectName: 'Music', subjectCode: 'MUS', isActive: true },
+    { subjectId: 6, subjectName: 'Drawing', subjectCode: 'ART', isActive: true },
     { subjectId: 7, subjectName: 'History', subjectCode: 'HIS', isActive: true },
     { subjectId: 8, subjectName: 'Geography', subjectCode: 'GEO', isActive: true },
-    { subjectId: 9, subjectName: 'Computer Science', subjectCode: 'CS', isActive: true },
-    { subjectId: 10, subjectName: 'Economics', subjectCode: 'ECO', isActive: true },
-    { subjectId: 11, subjectName: 'Literature', subjectCode: 'LIT', isActive: true },
-    { subjectId: 12, subjectName: 'Physical Education', subjectCode: 'PE', isActive: true },
-    { subjectId: 13, subjectName: 'Civics', subjectCode: 'CIV', isActive: true },
-    { subjectId: 14, subjectName: 'Art & Design', subjectCode: 'ART', isActive: true },
-    { subjectId: 15, subjectName: 'Music', subjectCode: 'MUS', isActive: true }
+    { subjectId: 9, subjectName: 'Hindi', subjectCode: 'HINDI', isActive: true }
   ];
+
+  // Class-specific subjects mapping
+  private classSubjectsMap: { [key: number]: number[] } = {
+    1: [1, 2, 3, 4, 5, 6], // Class 1: Math, Science, English, MIL Odia, Music, Drawing
+    2: [1, 2, 3, 4, 5, 6], // Class 2: Math, Science, English, MIL Odia, Music, Drawing
+    3: [1, 2, 3, 4, 7, 8], // Class 3: Math, Science, English, MIL Odia, History, Geography
+    4: [1, 2, 3, 4, 7, 8], // Class 4: Math, Science, English, MIL Odia, History, Geography
+    5: [1, 2, 3, 4, 7, 8], // Class 5: Math, Science, English, MIL Odia, History, Geography
+    6: [1, 2, 3, 9, 7, 8], // Class 6: Math, Science, English, Hindi, History, Geography
+    7: [1, 2, 3, 9, 7, 8], // Class 7: Math, Science, English, Hindi, History, Geography
+    8: [1, 2, 3, 9, 7, 8], // Class 8: Math, Science, English, Hindi, History, Geography
+    9: [1, 2, 3, 9, 7, 8], // Class 9: Math, Science, English, Hindi, History, Geography
+    10: [1, 2, 3, 9, 7, 8] // Class 10: Math, Science, English, Hindi, History, Geography
+  };
 
   constructor(private http: HttpClient) {
     // Clear old data and initialize with fresh sample subjects
@@ -63,6 +71,23 @@ export class SubjectService {
         return of(local);
       })
     );
+  }
+
+  /**
+   * Get subjects for a specific class
+   */
+  getSubjectsByClass(classNumber: number): Subject[] {
+    const allSubjects = this.getSubjectsFromLocal();
+    const subjectIds = this.classSubjectsMap[classNumber] || [];
+    return allSubjects.filter(s => subjectIds.includes(s.subjectId || 0));
+  }
+
+  /**
+   * Get all subjects for a specific class as Observable
+   */
+  getSubjectsByClassObservable(classNumber: number): Observable<Subject[]> {
+    const subjects = this.getSubjectsByClass(classNumber);
+    return of(subjects);
   }
 
   addSubject(subject: Subject): Observable<Subject> {

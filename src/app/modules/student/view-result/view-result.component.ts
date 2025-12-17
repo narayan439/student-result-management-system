@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { StudentService } from '../../../core/services/student.service';
+import { MarksService } from '../../../core/services/marks.service';
+import { SubjectService } from '../../../core/services/subject.service';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -12,67 +15,85 @@ export class ViewResultComponent implements OnInit {
 
   result: any = {};
   qrData: string = '';
+  student: any = null;
+  classNumber: number = 0;
+  marks: any[] = [];
+  classSubjects: any[] = [];
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute, 
+    private router: Router,
+    private studentService: StudentService,
+    private marksService: MarksService,
+    private subjectService: SubjectService
+  ) {}
 
   ngOnInit() {
-    let roll = this.route.snapshot.paramMap.get('rollNo');
-    let dob = this.route.snapshot.paramMap.get('dob');
+    let rollNo = this.route.snapshot.paramMap.get('rollNo');
+    let studentEmail = this.route.snapshot.paramMap.get('email');
 
-    this.qrData = `ROLL:${roll},DOB:${dob},RESULT:VERIFIED`;
-
-    // Dynamic data based on roll number
-    const studentData: any = {
-      '101': {
-        name: "Rahul Kumar",
-        className: "10th A",
-        marks: [
-          { subject: "Mathematics", score: 92 },
-          { subject: "Science", score: 85 },
-          { subject: "English", score: 88 },
-          { subject: "Hindi", score: 90 },
-          { subject: "Social Science", score: 78 }
-        ]
-      },
-      '102': {
-        name: "Priya Sharma",
-        className: "10th B",
-        marks: [
-          { subject: "Mathematics", score: 78 },
-          { subject: "Science", score: 81 },
-          { subject: "English", score: 74 },
-          { subject: "Hindi", score: 88 },
-          { subject: "Social Science", score: 85 }
-        ]
-      },
-      '103': {
-        name: "Amit Patel",
-        className: "10th C",
-        marks: [
-          { subject: "Mathematics", score: 65 },
-          { subject: "Science", score: 58 },
-          { subject: "English", score: 72 },
-          { subject: "Hindi", score: 68 },
-          { subject: "Social Science", score: 70 }
-        ]
-      }
-    };
-
-    const student = studentData[roll || '101'] || studentData['101'];
+    // Try to find student by roll no or email
+    const students = this.studentService.getAllStudentsSync();
     
-    const totalMarks = student.marks.reduce((sum: number, mark: any) => sum + mark.score, 0);
-    const percentage = (totalMarks / (student.marks.length * 100) * 100).toFixed(2);
+    if (studentEmail) {
+      this.student = students.find(s => s.email === studentEmail);
+    } else if (rollNo) {
+      this.student = students.find(s => s.rollNo === rollNo);
+    }
+
+    if (!this.student && students.length > 0) {
+      // Default to first student if not found
+      this.student = students[0];
+    }
+
+    if (this.student) {
+      // Extract class number
+      const classMatch = this.student.className.match(/Class\s(\d+)/);
+      this.classNumber = classMatch ? parseInt(classMatch[1]) : 1;
+
+      // Load class-specific subjects
+      this.classSubjects = this.subjectService.getSubjectsByClass(this.classNumber);
+
+      // Load marks for this student
+      this.marksService.getAllMarks().subscribe({
+        next: (allMarks: any) => {
+          const marksArray = Array.isArray(allMarks) ? allMarks : [];
+          const studentIdStr = String(this.student.studentId);
+          this.marks = marksArray.filter(m => m.studentId === studentIdStr) || [];
+          this.processResult();
+        },
+        error: () => {
+          console.warn('Error loading marks');
+          this.processResult();
+        }
+      });
+
+      this.qrData = `ROLL:${this.student.rollNo},EMAIL:${this.student.email},CLASS:${this.student.className}`;
+    }
+  }
+
+  private processResult() {
+    const totalMarks = this.marks.reduce((sum, mark) => sum + (mark.marksObtained || 0), 0);
+    const percentage = this.marks.length > 0 
+      ? (totalMarks / (this.marks.length * 100) * 100).toFixed(2)
+      : '0.00';
     
     this.result = {
-      name: student.name,
-      rollNo: roll,
-      dob: dob,
-      className: student.className,
-      marks: student.marks,
+      name: this.student.name,
+      rollNo: this.student.rollNo,
+      email: this.student.email,
+      dob: this.student.dob,
+      phone: this.student.phone,
+      className: this.student.className,
+      marks: this.marks,
+      subjects: this.classSubjects,
       total: totalMarks,
+      maxTotal: this.marks.length * 100,
       percentage: percentage,
       status: parseFloat(percentage) >= 33 ? "PASS" : "FAIL"
     };
+
+    console.log('Result processed:', this.result);
   }
 
   goToLoginForRecheck() {
@@ -98,23 +119,32 @@ export class ViewResultComponent implements OnInit {
       scale: 2,
       useCORS: true,
       logging: false,
-      backgroundColor: '#ffffff'
-    }).then(canvas => {
-      const imgWidth = 208; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const position = 0;
-      
-      pdf.addImage(canvas.toDataURL('image/png', 1.0), 'PNG', 0, position, imgWidth, imgHeight);
-      pdf.setProperties({
-        title: `Marksheet - ${this.result.name}`,
-        subject: 'Student Result',
-        author: 'School Management System'
+      allowTaint: true
+    }).then((canvas: HTMLCanvasElement) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
       });
-      
-      pdf.save(`${this.result.name}_${this.result.rollNo}_Marksheet.pdf`);
-    }).catch(error => {
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= 297;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= 297;
+      }
+
+      pdf.save(`Result_${this.result.rollNo}.pdf`);
+    }).catch((error: any) => {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
     });
@@ -147,11 +177,6 @@ export class ViewResultComponent implements OnInit {
         alert('Result details copied to clipboard!');
       });
     }
-  }
-
-  // Helper method to parse float in template
-  parseFloat(value: string): number {
-    return parseFloat(value);
   }
 
   // Method to get performance category

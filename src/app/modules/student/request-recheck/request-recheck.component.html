@@ -6,38 +6,68 @@
     <p>Submit a request for re-evaluation of your marks. Please provide clear reasoning for your request.</p>
   </div>
 
+  <!-- Success Message -->
+  <div *ngIf="submitSuccess" class="success-message">
+    <mat-icon>check_circle</mat-icon>
+    <div>
+      <strong>Success!</strong>
+      <p>Your recheck request has been submitted successfully. You will receive updates via email.</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="submitError" class="error-message">
+    <mat-icon>error</mat-icon>
+    <div>
+      <strong>Error!</strong>
+      <p>{{ submitError }}</p>
+    </div>
+  </div>
+
   <!-- Recheck Card -->
-  <div class="recheck-card">
+  <mat-card class="recheck-card">
     
-    <!-- Recheck Header Section -->
-    <div class="recheck-header-section">
-      <h3>
-        <mat-icon class="header-icon">redo</mat-icon> Submit Recheck Request
-      </h3>
-      <p>Fill out the form below to request re-evaluation of your marks</p>
+    <!-- Student Info Section -->
+    <div class="student-info-section">
+      <div class="info-item">
+        <strong>Student Name:</strong>
+        <span>{{ student?.name }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Roll No:</strong>
+        <span>{{ recheck.rollNo }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Class:</strong>
+        <span>Class {{ studentClassNumber }}</span>
+      </div>
     </div>
 
-    <!-- Recheck Content with Scrollbar -->
-    <div class="recheck-content" style="overflow-y: auto; max-height: 600px;">
+    <!-- Form Section -->
+    <div class="recheck-content">
       
       <!-- Form -->
       <form (ngSubmit)="submitRecheck()" #reForm="ngForm" class="form-container">
         
         <!-- Subject Selection -->
         <div class="form-group">
-          <label for="subject">Select Subject</label>
+          <label for="subject">Select Subject *</label>
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Choose a subject</mat-label>
+            <mat-label>Choose a subject for recheck</mat-label>
             <mat-select 
               id="subject"
               [(ngModel)]="recheck.subject"
+              (change)="onSubjectChange()"
               name="subject"
               required
             >
-              <mat-option *ngFor="let s of subjects" [value]="s">
+              <mat-option *ngFor="let s of subjects" [value]="s.subjectName">
                 <div class="subject-option">
                   <mat-icon>book</mat-icon>
-                  {{ s }}
+                  <span>{{ s.subjectName }}</span>
+                  <span class="marks-hint" *ngIf="subjectMarks[s.subjectName]">
+                    ({{ subjectMarks[s.subjectName] }}/{{ recheck.maxMarks }})
+                  </span>
                 </div>
               </mat-option>
             </mat-select>
@@ -48,96 +78,107 @@
           </mat-form-field>
         </div>
 
+        <!-- Current Marks Display -->
+        <div *ngIf="recheck.subject && recheck.marksObtained" class="marks-display">
+          <div class="mark-card">
+            <mat-icon>grade</mat-icon>
+            <div>
+              <p class="mark-label">Current Marks</p>
+              <p class="mark-value">{{ recheck.marksObtained }}/{{ recheck.maxMarks }}</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Reason -->
         <div class="form-group">
-          <label for="reason">Reason for Recheck</label>
+          <label for="reason">Reason for Recheck *</label>
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Explain</mat-label>
+            <mat-label>Explain why you need a recheck</mat-label>
             <textarea 
               matInput 
               id="reason"
-              rows="4"
+              rows="5"
               [(ngModel)]="recheck.reason"
               name="reason"
               required
-              placeholder="Please explain why you believe a recheck is necessary..."
+              placeholder="Be specific about your concerns. For example: Question 5 calculation seems incorrect, or specific answer key reference..."
+              minlength="10"
             ></textarea>
             <mat-icon matPrefix>description</mat-icon>
-            <mat-hint>Be specific about your concerns</mat-hint>
-            <mat-error *ngIf="reForm.controls['reason']?.invalid && reForm.controls['reason']?.touched">
+            <mat-hint align="end">{{ recheck.reason.length }}/500</mat-hint>
+            <mat-error *ngIf="reForm.controls['reason']?.hasError('required') && reForm.controls['reason']?.touched">
               Please provide a reason for recheck
+            </mat-error>
+            <mat-error *ngIf="reForm.controls['reason']?.hasError('minlength') && reForm.controls['reason']?.touched">
+              Reason must be at least 10 characters
             </mat-error>
           </mat-form-field>
         </div>
 
-        <!-- Submit Button -->
-        <button 
-          mat-raised-button 
-          color="primary" 
-          type="submit" 
-          class="submit-btn"
-          [disabled]="reForm.invalid"
-        >
-          <mat-icon>send</mat-icon> Submit Recheck Request
-        </button>
+        <!-- Submit Button Group -->
+        <div class="button-group">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit" 
+            class="submit-btn"
+            [disabled]="reForm.invalid || isSubmitting"
+          >
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'send' }}</mat-icon>
+            {{ isSubmitting ? 'Submitting...' : 'Submit Recheck Request' }}
+          </button>
+          <button 
+            mat-stroked-button 
+            type="reset" 
+            class="reset-btn"
+            (click)="reForm.resetForm()"
+            [disabled]="isSubmitting"
+          >
+            <mat-icon>clear</mat-icon>
+            Clear
+          </button>
+        </div>
 
       </form>
-
-      <!-- Important Notes -->
-      <div class="notes-section">
-        <h4>
-          <mat-icon>info</mat-icon> Important Information
-        </h4>
-        <ul>
-          <li><strong>Processing Time:</strong> Recheck requests typically take 7-10 working days to process</li>
-          <li><strong>Fee:</strong> A fee of ₹500 per subject is applicable for re-evaluation</li>
-          <li><strong>Result:</strong> Marks may increase, decrease, or remain the same after recheck</li>
-          <li><strong>Last Date:</strong> Requests must be submitted within 15 days of result declaration</li>
-          <li><strong>Contact:</strong> For queries, email: recheck@dps.edu.in</li>
-        </ul>
-      </div>
-
-      <!-- Recent Requests Status -->
-      <div class="status-section">
-        <h4>
-          <mat-icon>history</mat-icon> Recent Request Status
-        </h4>
-        <div class="status-item">
-          <span class="status-label">
-            <mat-icon class="status-icon">calculate</mat-icon>
-            Mathematics
-          </span>
-          <span class="status-value pending">
-            <mat-icon>pending</mat-icon> Pending
-          </span>
-        </div>
-        <div class="status-item">
-          <span class="status-label">
-            <mat-icon class="status-icon">science</mat-icon>
-            Science
-          </span>
-          <span class="status-value completed">
-            <mat-icon>check_circle</mat-icon> Completed
-          </span>
-        </div>
-        <div class="status-item">
-          <span class="status-label">
-            <mat-icon class="status-icon">menu_book</mat-icon>
-            English
-          </span>
-          <span class="status-value completed">
-            <mat-icon>check_circle</mat-icon> Completed
-          </span>
-        </div>
-      </div>
-
     </div>
-  </div>
 
-  <!-- Footer -->
-  <div class="recheck-footer">
-    <p>© 2023 Delhi Public School. All rights reserved.</p>
-    <p>Recheck requests are processed by the Examination Department</p>
-  </div>
+    <!-- Important Notes -->
+    <div class="notes-section">
+      <h4>
+        <mat-icon>info</mat-icon> Important Information
+      </h4>
+      <div class="notes-grid">
+        <div class="note-item">
+          <mat-icon>schedule</mat-icon>
+          <div>
+            <strong>Processing Time</strong>
+            <p>7-10 working days</p>
+          </div>
+        </div>
+        <div class="note-item">
+          <mat-icon>currency_rupee</mat-icon>
+          <div>
+            <strong>Fee</strong>
+            <p>₹500 per subject</p>
+          </div>
+        </div>
+        <div class="note-item">
+          <mat-icon>trending_up</mat-icon>
+          <div>
+            <strong>Result</strong>
+            <p>Marks may increase/decrease</p>
+          </div>
+        </div>
+        <div class="note-item">
+          <mat-icon>event</mat-icon>
+          <div>
+            <strong>Last Date</strong>
+            <p>15 days after result</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </mat-card>
 
 </div>

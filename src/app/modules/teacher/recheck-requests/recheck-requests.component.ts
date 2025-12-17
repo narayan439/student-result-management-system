@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { RequestRecheckService } from '../../../core/services/request-recheck.service';
 
 @Component({
   selector: 'app-recheck-requests',
@@ -10,71 +11,180 @@ import { MatPaginator } from '@angular/material/paginator';
 export class RecheckRequestsComponent implements OnInit {
   
   // Table configuration
-  displayedColumns: string[] = ['rollNo', 'subject', 'reason', 'status', 'action'];
-  dataSource!: MatTableDataSource<any>; // Add ! to tell TypeScript it will be initialized
+  displayedColumns: string[] = ['rollNo', 'studentName', 'subject', 'reason', 'status', 'date', 'action'];
+  dataSource: any;
   pageSize = 10;
-  resolvedRequests = 2;
-  
-  // Sample data
-  requests = [
-    { rollNo: '21', subject: 'Maths', reason: 'Marks not correct as per calculation', status: 'pending', date: '2023-10-15' },
-    { rollNo: '34', subject: 'Science', reason: 'Please re-evaluate practical marks', status: 'in-review', date: '2023-10-14' },
-    { rollNo: '45', subject: 'English', reason: 'Essay marking seems inconsistent', status: 'completed', date: '2023-10-13' },
-    { rollNo: '56', subject: 'History', reason: 'Some answers were not considered', status: 'pending', date: '2023-10-12' },
-    { rollNo: '67', subject: 'Geography', reason: 'Map work needs rechecking', status: 'in-review', date: '2023-10-11' },
-    { rollNo: '78', subject: 'Maths', reason: 'Formula application issue', status: 'pending', date: '2023-10-10' },
-    { rollNo: '89', subject: 'Science', reason: 'Physics numerical incorrect', status: 'completed', date: '2023-10-09' },
-    { rollNo: '90', subject: 'English', reason: 'Grammar section needs review', status: 'pending', date: '2023-10-08' },
-    { rollNo: '101', subject: 'History', reason: 'Dates mentioned incorrectly', status: 'completed', date: '2023-10-07' },
-    { rollNo: '112', subject: 'Geography', reason: 'Climate graph interpretation', status: 'in-review', date: '2023-10-06' }
-  ];
+  resolvedRequests = 0;
+  pendingRequests = 0;
+  inReviewRequests = 0;
+  totalRequests = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  ngOnInit() {
-    this.dataSource = new MatTableDataSource(this.requests);
-    this.calculateResolvedRequests();
+  constructor(
+    private requestRecheckService: RequestRecheckService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadRecheckRequests();
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
-
-  // Helper methods
-  getSubjectClass(subject: string): string {
-    return subject.toLowerCase();
-  }
-
-  getStatusClass(status: string): string {
-    return status;
-  }
-
-  getStatusIcon(status: string): string {
-    switch(status) {
-      case 'pending': return 'pending';
-      case 'in-review': return 'hourglass_empty';
-      case 'completed': return 'check_circle';
-      default: return 'help';
+  ngAfterViewInit(): void {
+    if (this.dataSource && this.paginator) {
+      this.dataSource.paginator = this.paginator;
     }
   }
 
-  onPageSizeChange() {
+  /**
+   * Load all recheck requests
+   */
+  loadRecheckRequests(): void {
+    this.requestRecheckService.getAllRechecks().subscribe({
+      next: (requests: any) => {
+        const requestsArray = Array.isArray(requests) ? requests : [];
+        this.dataSource = new MatTableDataSource(requestsArray);
+        if (this.paginator) {
+          this.dataSource.paginator = this.paginator;
+        }
+        
+        this.calculateStatistics(requestsArray);
+        console.log('✓ Recheck requests loaded:', requestsArray);
+      },
+      error: (err) => {
+        console.error('Error loading recheck requests:', err);
+        this.dataSource = new MatTableDataSource([]);
+      }
+    });
+  }
+
+  /**
+   * Calculate request statistics
+   */
+  calculateStatistics(requests: any[]): void {
+    this.totalRequests = requests.length;
+    this.pendingRequests = requests.filter(r => r.status === 'pending').length;
+    this.inReviewRequests = requests.filter(r => r.status === 'completed' || r.status === 'approved').length;
+    this.resolvedRequests = requests.filter(r => r.status === 'completed').length;
+  }
+
+  /**
+   * Get status class for styling
+   */
+  getStatusClass(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'pending': 'status-pending',
+      'completed': 'status-completed',
+      'approved': 'status-approved',
+      'rejected': 'status-rejected'
+    };
+    return statusMap[status] || 'status-pending';
+  }
+
+  /**
+   * Get subject class for styling
+   */
+  getSubjectClass(subject: string): string {
+    return subject.toLowerCase().replace(/\s+/g, '-');
+  }
+
+  /**
+   * Get status icon
+   */
+  getStatusIcon(status: string): string {
+    const iconMap: { [key: string]: string } = {
+      'pending': 'schedule',
+      'completed': 'check_circle',
+      'approved': 'thumb_up',
+      'rejected': 'cancel'
+    };
+    return iconMap[status] || 'help';
+  }
+
+  /**
+   * Get status display text
+   */
+  getStatusText(status: string): string {
+    const textMap: { [key: string]: string } = {
+      'pending': 'Pending',
+      'completed': 'Completed',
+      'approved': 'Approved',
+      'rejected': 'Rejected'
+    };
+    return textMap[status] || status;
+  }
+
+  /**
+   * Update recheck status
+   */
+  updateStatus(recheckId: number, newStatus: string): void {
+    this.requestRecheckService.updateRecheckStatus(recheckId, newStatus).subscribe({
+      next: (response) => {
+        console.log('✓ Recheck status updated:', response);
+        this.loadRecheckRequests();
+      },
+      error: (err) => {
+        console.error('Error updating recheck status:', err);
+        alert('Failed to update status. Please try again.');
+      }
+    });
+  }
+
+  /**
+   * View request details
+   */
+  viewDetails(request: any): void {
+    alert(
+      `Recheck Request Details\n\n` +
+      `Student: ${request.studentName} (${request.rollNo})\n` +
+      `Subject: ${request.subject}\n` +
+      `Status: ${this.getStatusText(request.status)}\n` +
+      `Reason: ${request.reason}\n` +
+      `Marks: ${request.marksObtained}/${request.maxMarks}`
+    );
+  }
+
+  /**
+   * Approve request
+   */
+  approveRequest(request: any): void {
+    if (confirm(`Approve recheck request for ${request.studentName} in ${request.subject}?`)) {
+      this.updateStatus(request.recheckId, 'approved');
+    }
+  }
+
+  /**
+   * Reject request
+   */
+  rejectRequest(request: any): void {
+    if (confirm(`Reject recheck request for ${request.studentName} in ${request.subject}?`)) {
+      this.updateStatus(request.recheckId, 'rejected');
+    }
+  }
+
+  /**
+   * Complete request
+   */
+  completeRequest(request: any): void {
+    if (confirm(`Mark recheck request as completed for ${request.studentName} in ${request.subject}?`)) {
+      this.updateStatus(request.recheckId, 'completed');
+    }
+  }
+
+  /**
+   * Apply filter to table
+   */
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  /**
+   * Change page size
+   */
+  onPageSizeChange(): void {
     if (this.paginator) {
       this.paginator.pageSize = this.pageSize;
       this.paginator.firstPage();
     }
-  }
-
-  calculateResolvedRequests() {
-    this.resolvedRequests = this.requests.filter(req => req.status === 'completed').length;
-  }
-
-  viewDetails(request: any) {
-    alert(`Viewing details for Roll No: ${request.rollNo}\nSubject: ${request.subject}\nStatus: ${request.status}`);
-  }
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 }

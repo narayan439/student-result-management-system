@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar Backend/srms/target/*.jar
+web: java -Dserver.port=$PORT -Xmx512m -jar Backend/srms/target/*.jar

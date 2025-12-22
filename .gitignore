@@ -5,8 +5,8 @@
 .env.local
 .env.*.local
 !.env.example
-# Ignore application properties
-backend
+# Ignore entire backend
+backend/
 
 # Compiled output
 /dist

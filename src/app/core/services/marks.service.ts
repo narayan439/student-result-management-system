@@ -3,16 +3,18 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, tap, map, retry, timeout } from 'rxjs/operators';
 import { Mark, MarkResponse, MarkListResponse } from '../models/marks.model';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MarksService {
-  private baseUrl = 'https://srms-backend-production.up.railway.app/api/marks';
+  private baseUrl: string;
   private marksSubject = new BehaviorSubject<Mark[]>([]);
   public marks$ = this.marksSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private configService: ConfigService) {
+    this.baseUrl = `${this.configService.getApiUrl()}/marks`;
     console.log('✓ MarksService initialized');
     this.loadAllMarks();
   }

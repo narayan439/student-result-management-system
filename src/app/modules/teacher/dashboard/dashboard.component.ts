@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
       try {
         const userData = JSON.parse(currentUser);
         this.teacherEmail = userData.email || '';
-        console.log(`📋 Loaded teacher email: ${this.teacherEmail}`);
+        
         
         // Extract name from email (before @) for display
         if (this.teacherEmail) {

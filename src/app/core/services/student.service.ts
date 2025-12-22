@@ -3,13 +3,14 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { Student, StudentResponse, StudentListResponse } from '../models/student.model';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StudentService {
 
-  private baseUrl = 'https://srms-backend-production.up.railway.app/api/students';
+  private baseUrl: string;
   private studentsSubject = new BehaviorSubject<Student[]>([]);
   public students$ = this.studentsSubject.asObservable();
 
@@ -17,7 +18,8 @@ export class StudentService {
   private lastRefreshTime: number = 0;
   private refreshCacheTime: number = 5000; // 5 seconds cache
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private configService: ConfigService) {
+    this.baseUrl = `${this.configService.getApiUrl()}/students`;
   }
 
   /**

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { Recheck } from '../models/recheck.model';
+import { ConfigService } from './config.service';
 
 /**
  * RequestRecheckService - Service for handling student recheck requests
@@ -13,11 +14,12 @@ import { Recheck } from '../models/recheck.model';
 })
 export class RequestRecheckService {
 
-  private baseUrl = 'https://srms-backend-production.up.railway.app/api/rechecks';
+  private baseUrl: string;
   private recheckSubject = new BehaviorSubject<Recheck[]>([]);
   private localKey = 'app_request_rechecks_v1';
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private configService: ConfigService) {
+    this.baseUrl = `${this.configService.getApiUrl()}/rechecks`;
     this.initializeData();
   }
 

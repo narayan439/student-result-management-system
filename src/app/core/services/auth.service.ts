@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { StudentService } from './student.service';
 import { TeacherService } from './teacher.service';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,13 +11,16 @@ export class AuthService {
 
   private readonly ADMIN_EMAIL = 'admin@gmail.com';
   private readonly PASSWORD = '123456';
-  private readonly API_URL = 'https://srms-backend-production.up.railway.app/api/auth';
+  private apiAuthUrl: string;
 
   constructor(
     private studentService: StudentService,
     private teacherService: TeacherService,
-    private http: HttpClient
-  ) {}
+    private http: HttpClient,
+    private configService: ConfigService
+  ) {
+    this.apiAuthUrl = `${this.configService.getApiUrl()}/auth`;
+  }
 
   /**
    * Authenticate user with email and password
@@ -30,7 +34,7 @@ export class AuthService {
     // Try generic login first (checks User table for admin and Teacher table for teachers)
     try {
       console.log('🔄 Step 1: Trying generic /login endpoint...');
-      const response: any = await this.http.post(`${this.API_URL}/login`, {
+      const response: any = await this.http.post(`${this.apiAuthUrl}/login`, {
         email,
         password
       }).toPromise();
@@ -62,7 +66,7 @@ export class AuthService {
     // Try dedicated teacher login endpoint (optimized for teacher authentication)
     try {
       console.log('🔄 Step 2: Trying dedicated /teachers-login endpoint...');
-      const response: any = await this.http.post(`${this.API_URL}/teachers-login`, {
+      const response: any = await this.http.post(`${this.apiAuthUrl}/teachers-login`, {
         email,
         password
       }).toPromise();
@@ -100,7 +104,7 @@ export class AuthService {
       console.log(`   ✅ Refreshed ${refreshedStudents?.length} students`);
 
       // Now try backend student login endpoint
-      const response: any = await this.http.post(`${this.API_URL}/student-login`, {
+      const response: any = await this.http.post(`${this.apiAuthUrl}/student-login`, {
         email,
         password
       }).toPromise();

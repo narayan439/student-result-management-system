@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { ConfigService } from './config.service';
 
 export interface SchoolClass {
   classId: number;
@@ -19,11 +20,12 @@ export interface SchoolClass {
   providedIn: 'root'
 })
 export class ClassesService {
-  private baseUrl = 'https://srms-backend-production.up.railway.app/api/classes';
+  private baseUrl: string;
   private classesSubject = new BehaviorSubject<SchoolClass[]>([]);
   classes$ = this.classesSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private configService: ConfigService) {
+    this.baseUrl = `${this.configService.getApiUrl()}/classes`;
   }
 
   /**

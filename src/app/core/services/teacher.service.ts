@@ -3,40 +3,20 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { Teacher, TeacherResponse, TeacherListResponse } from '../models/teacher.model';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeacherService {
 
-  private baseUrl = 'https://srms-backend-production.up.railway.app/api/teachers';
+  private baseUrl: string;
   private teachersSubject = new BehaviorSubject<Teacher[]>([]);
   public teachers$ = this.teachersSubject.asObservable();
+  private sampleTeachers: Teacher[] = [];
 
-  // Sample teachers data
-  private sampleTeachers: Teacher[] = [
-    {
-      teacherId: '1',
-      name: 'Rahul Sen',
-      email: 'rahul@school.com',
-      subjects: ['Maths', 'Physics'],
-      phone: '+91 9876543210',
-      experience: 15,
-      isActive: true
-    },
-    {
-      teacherId: '2',
-      name: 'Ananya Patra',
-      email: 'ananya@school.com',
-      subjects: ['Science', 'Chemistry'],
-      phone: '+91 9876543211',
-      experience: 10,
-      isActive: true
-    }
-  ];
-
-  constructor(private http: HttpClient) {
-    this.teachersSubject.next(this.sampleTeachers);
+  constructor(private http: HttpClient, private configService: ConfigService) {
+    this.baseUrl = `${this.configService.getApiUrl()}/teachers`;
   }
 
   /**
@@ -47,7 +27,7 @@ export class TeacherService {
       .pipe(
         map((response: any) => response.data || []),
         tap((teachers: Teacher[]) => this.teachersSubject.next(teachers)),
-        catchError((err: any) => {
+        catchError(() => {
           console.warn('API call failed, returning sample data');
           this.teachersSubject.next(this.sampleTeachers);
           return of(this.sampleTeachers);
@@ -107,7 +87,7 @@ export class TeacherService {
             this.teachersSubject.next([...currentTeachers, response.data]);
           }
         }),
-        catchError((error) => {
+        catchError(() => {
           // Fallback to local storage
           const currentTeachers = this.teachersSubject.value;
           const nextId = (currentTeachers.length + 1).toString();
@@ -162,7 +142,7 @@ export class TeacherService {
             this.teachersSubject.next(updatedTeachers);
           }
         }),
-        catchError((error: any) => {
+        catchError(() => {
           // Fallback to local storage
           const currentTeachers = this.teachersSubject.value;
           const updatedTeachers = currentTeachers.map(t =>
@@ -196,7 +176,7 @@ export class TeacherService {
             this.teachersSubject.next(filteredTeachers);
           }
         }),
-        catchError((error: any) => {
+        catchError(() => {
           // Fallback to local storage
           const currentTeachers = this.teachersSubject.value;
           const filteredTeachers = currentTeachers.filter(t => t.teacherId !== teacherId);

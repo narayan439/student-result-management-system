@@ -3,17 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { Subject, SubjectResponse, SubjectListResponse } from '../models/subject.model';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SubjectService {
-  private baseUrl = 'https://srms-backend-production.up.railway.app/api/subjects';
+  private baseUrl: string;
 
   private subjectsSubject = new BehaviorSubject<Subject[]>([]);
   public subjects$ = this.subjectsSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private configService: ConfigService) {
+    this.baseUrl = `${this.configService.getApiUrl()}/subjects`;
     // Don't auto-load in constructor to avoid timing issues
   }
 

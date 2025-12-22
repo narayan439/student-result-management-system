@@ -25,6 +25,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Custom Pipes
 import { GetMarkForSubjectPipe } from '../../shared/pipes/get-mark-for-subject.pipe';
+import { MatDividerModule } from "@angular/material/divider";
 
 @NgModule({
   declarations: [
@@ -38,7 +39,6 @@ import { GetMarkForSubjectPipe } from '../../shared/pipes/get-mark-for-subject.p
     CommonModule,
     TeacherRoutingModule,
     FormsModule,
-    
     // Material Modules
     MatFormFieldModule,
     MatInputModule,
@@ -47,15 +47,14 @@ import { GetMarkForSubjectPipe } from '../../shared/pipes/get-mark-for-subject.p
     MatTableModule,
     MatIconModule,
     MatCardModule,
-    
     // MINIMAL: Only essential modules for RecheckRequestsComponent
-    MatPaginatorModule,      // Required for pagination
-    MatChipsModule,          // Required for chips (subject/status badges)
+    MatPaginatorModule, // Required for pagination
+    MatChipsModule, // Required for chips (subject/status badges)
     MatProgressSpinnerModule, // Required for loading spinner
-    MatTooltipModule,        // Required for tooltips
-    
+    MatTooltipModule, // Required for tooltips
     // Custom Pipes
-    GetMarkForSubjectPipe
-  ]
+    GetMarkForSubjectPipe,
+    MatDividerModule
+]
 })
 export class TeacherModule { }

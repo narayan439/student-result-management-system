@@ -1,0 +1,3 @@
+INDEX VERSION 1.134
+file:/C:/Users/naray_svbdnrk/Documents/GitHub/student-result-management-system/srms-backend/.metadata/.plugins/org.eclipse.jdt.core/1865797976.index
+meta_index

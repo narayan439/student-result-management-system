@@ -1,14 +1,21 @@
+/* Loading and Error States */
 
-
-
+/* Loading Container */
 .loading-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 400px;
+  animation: fadeIn 0.3s ease-in;
 }
 
+.spinner {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 20px;
+}
 
 .spinner .spin {
   width: 100%;
@@ -16,6 +23,13 @@
   border: 4px solid #e0e0e0;
   border-top-color: #2196F3;
   border-radius: 50%;
+  animation: spinRotate 1s linear infinite;
+}
+
+@keyframes spinRotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -25,13 +39,14 @@
   margin: 0;
 }
 
-
+/* Error Container */
 .error-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 400px;
   padding: 20px;
+  animation: fadeIn 0.3s ease-in;
 }
 
 .error-card {
@@ -81,7 +96,7 @@
 
 .retry-btn:hover {
   background: #e53935;
-  box-shadow: 0 2px 8px rgba(239,83,80,.3);
+  box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
 }
 
 .retry-btn mat-icon {
@@ -89,8 +104,22 @@
   width: 18px;
   height: 18px;
 }
+
+/* Content Section */
 .content-section {
+  animation: fadeIn 0.5s ease-in;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Main Container */
 .result-container {
   max-width: 900px;
   margin: 30px auto;
@@ -102,7 +131,7 @@
   border: 1px solid #e0e0e0;
 }
 
-
+/* Header Section */
 .header-section {
   text-align: center;
   margin-bottom: 25px;
@@ -159,7 +188,7 @@
   border-radius: 6px;
 }
 
-
+/* Student Information */
 .student-info {
   background: #f9f9f9;
   padding: 20px;
@@ -205,7 +234,7 @@
   color: #333;
 }
 
-
+/* Marks Section */
 .marks-section {
   margin: 30px 0;
 }
@@ -226,7 +255,7 @@
   color: #304ffe;
 }
 
-
+/* No Marks Message */
 .no-marks-message {
   background: #fff3e0;
   border: 2px solid #ff9800;
@@ -281,7 +310,7 @@
 
 .refresh-marks-btn:hover {
   background: #f57c00;
-  box-shadow: 0 2px 8px rgba(255,152,0,.3);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
   transform: translateY(-2px);
 }
 
@@ -308,7 +337,7 @@
   min-width: 500px;
 }
 
-
+/* Main header "Subject Name" */
 .marks-table thead tr:first-child th {
   background: #304ffe;
   color: white;
@@ -319,7 +348,7 @@
   text-align: center;
 }
 
-
+/* Column headers row */
 .marks-table thead tr:last-child {
   background: #3d5afe;
 }
@@ -390,7 +419,7 @@
   text-align: center;
 }
 
-
+/* Responsive Design */
 @media (max-width: 768px) {
   .marks-table {
     min-width: 300px;
@@ -445,7 +474,7 @@
   }
 }
 
-
+/* Summary Cards */
 .summary-section {
   margin: 25px 0;
 }
@@ -524,7 +553,7 @@
   color: #f44336;
 }
 
-
+/* Verification Section */
 .verification-section {
   background: white;
   padding: 25px;
@@ -614,7 +643,7 @@
   margin: 0;
 }
 
-
+/* Notes Section */
 .notes-section {
   background: #fff8e1;
   padding: 20px;
@@ -649,7 +678,7 @@
   margin-bottom: 0;
 }
 
-
+/* Action Buttons */
 .action-buttons {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -711,7 +740,7 @@ button i {
   background: #616161;
 }
 
-
+/* Footer */
 .footer {
   text-align: center;
   margin-top: 25px;
@@ -739,7 +768,7 @@ button i {
   margin-top: 4px !important;
 }
 
-
+/* Print Styles */
 @media print {
   .action-buttons {
     display: none !important;
@@ -753,7 +782,7 @@ button i {
   }
 }
 
-
+/* Mobile Responsive */
 @media (max-width: 768px) {
   .result-container {
     padding: 20px 15px;
@@ -862,56 +891,32 @@ button i {
   }
 }
 
-
-.data-source-indicator {
-  margin-bottom: 20px;
-}
-
-.indicator-content {
-  padding: 12px 20px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.indicator-content.backend {
-  background: #e8f5e9;
-  border: 1px solid #4caf50;
-  color: #2e7d32;
-}
-
-.indicator-content.sample {
-  background: #fff3e0;
-  border: 1px solid #ff9800;
-  color: #ef6c00;
-}
-
-.indicator-content mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-
-.status-card.pending {
-  border-top: 3px solid #ff9800;
-}
-
-.status-card.pending i {
-  color: #ff9800;
-}
-
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: #bdbdbd !important;
-}
-
-button:disabled:hover {
-  transform: none !important;
-  box-shadow: none !important;
+@media (max-width: 768px) {
+  .track-recheck-container {
+    padding: 20px 15px;
+  }
+  
+  .track-header-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px 25px;
+  }
+  
+  .track-content {
+    padding: 30px 25px;
+  }
+  
+  table {
+    min-width: 400px;
+  }
+  
+  th, td {
+    padding: 14px 12px;
+  }
+  
+  .stats-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Remove timeline responsive styles */
 }

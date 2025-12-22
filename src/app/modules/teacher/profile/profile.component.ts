@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { TeacherService } from '../../../core/services/teacher.service';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -29,8 +28,7 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private teacherService: TeacherService,
-    private authService: AuthService,
-    private router: Router
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -130,15 +128,6 @@ export class ProfileComponent implements OnInit {
    */
   refreshProfile(): void {
     this.loadTeacherProfile();
-  }
-
-  /**
-   * Logout user
-   */
-  logout(): void {
-    console.log('🔓 Teacher logout initiated');
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 
 }

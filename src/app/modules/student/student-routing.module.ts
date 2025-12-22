@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { StudentGuard } from '../../core/guards/student.guard';
 
 import { StudentDashboardComponent } from './student-dashboard.component';
 import { ViewMarksComponent } from './view-marks/view-marks.component';
@@ -15,10 +14,9 @@ const routes: Routes = [
 
   {
     path: '',
-    component: StudentDashboardComponent,
-    canActivate: [StudentGuard],
+    component: StudentDashboardComponent,   // Navbar + router-outlet 
     children: [
-      { path: '', component: ViewMarksComponent },
+      { path: '', component: ViewMarksComponent },  // Default page
       { path: 'view-marks', component: ViewMarksComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'request-recheck', component: RequestRecheckComponent },

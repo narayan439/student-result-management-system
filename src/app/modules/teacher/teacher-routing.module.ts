@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { TeacherGuard } from '../../core/guards/teacher.guard';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AddMarksComponent } from './add-marks/add-marks.component';
@@ -10,9 +11,10 @@ import { UpdateMarksComponent } from './update-marks/update-marks.component';
 const routes: Routes = [
   {
     path: '',
-    component: DashboardComponent,   // NOW ACTS AS MAIN LAYOUT
+    component: DashboardComponent,
+    canActivate: [TeacherGuard],
     children: [
-      { path: '', component: AddMarksComponent }, // default page
+      { path: '', component: AddMarksComponent },
       { path: 'add-marks', component: AddMarksComponent },
       { path: 'update-marks', component: UpdateMarksComponent },
       { path: 'update-marks/:rollNo', component: UpdateMarksComponent },

@@ -1,0 +1,35 @@
+{
+  "name": "Student Result Management System",
+  "description": "Complete student result management system with Angular frontend and Spring Boot backend",
+  "build": {
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "environmentVariables": {
+      "SPRING_DATASOURCE_URL": {
+        "description": "MySQL database URL",
+        "value": "jdbc:mysql://MYSQL_HOST:3306/srms_db"
+      },
+      "SPRING_DATASOURCE_USERNAME": {
+        "description": "Database username",
+        "value": "root"
+      },
+      "SPRING_DATASOURCE_PASSWORD": {
+        "description": "Database password",
+        "value": "password"
+      },
+      "SPRING_JPA_HIBERNATE_DDL_AUTO": {
+        "description": "Hibernate DDL auto-update",
+        "value": "update"
+      },
+      "SPRING_JPA_SHOW_SQL": {
+        "description": "Show SQL in logs",
+        "value": "false"
+      },
+      "SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT": {
+        "description": "MySQL dialect for Hibernate",
+        "value": "org.hibernate.dialect.MySQL8Dialect"
+      }
+    }
+  }
+}

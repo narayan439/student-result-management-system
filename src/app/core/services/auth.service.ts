@@ -217,12 +217,18 @@ export class AuthService {
   }
 
   /**
-   * Logout user
+   * Logout user and prevent back navigation
    */
   logout(): void {
     console.log('🔓 Logging out user...');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('teacherToken');
-    console.log('✓ Session cleared');
+    localStorage.clear();
+    
+    // Prevent back button from accessing protected routes
+    // Replace current history entry so user can't use back button
+    window.history.replaceState(null, '', window.location.href);
+    
+    console.log('✓ Session cleared and history reset');
   }
 }

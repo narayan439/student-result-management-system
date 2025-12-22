@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -25,7 +26,7 @@ export class DashboardComponent implements OnInit {
     score: ''
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadTeacherInfo();
@@ -80,8 +81,8 @@ export class DashboardComponent implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem("teacherToken");
-    localStorage.removeItem("currentUser");
+    console.log('🔓 Teacher logout initiated');
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 

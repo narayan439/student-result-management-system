@@ -52,6 +52,9 @@ export class LoginComponent {
       if (role && role.length > 0) {
         console.log(`✅ Login successful - Role: ${role}`);
         
+        // Prevent going back to login page using browser back button
+        window.history.replaceState(null, '', window.location.href);
+        
         // Session already saved in auth service, no need to call again
         
         // Navigate based on role

@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponse {
-    private Long userId;
-    private String email;
-    private String role;
+    private Boolean success;
     private String message;
-    private boolean success;
+    private Long userId;
+    private String role;
+    private String name;
+    private String redirectPath;
 }

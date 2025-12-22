@@ -2,18 +2,16 @@
   
   <!-- Dashboard Header -->
   <div class="dashboard-header">
-    <h1>📊 Admin Dashboard</h1>
+    <h1>Admin Dashboard</h1>
     <p>Complete overview of your school's management system</p>
   </div>
 
-  <!-- Debug Info
-  <div style="background: #f0f4ff; padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #667eea;">
-    <small style="color: #667eea;">📊 Students: <strong>{{ totalStudents }}</strong> | 👨‍🏫 Teachers: <strong>{{ totalTeachers }}</strong> | 📚 Subjects: <strong>{{ totalSubjects }}</strong> | 🏫 Classes: <strong>{{ totalClasses }}</strong></small>
-  </div> -->
+
 
   <!-- Key Statistics Cards -->
   <div class="stats-grid">
-    <div class="stat-card">
+    <!-- Students Card -->
+    <mat-card class="stat-card">
       <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <mat-icon>people</mat-icon>
       </div>
@@ -22,9 +20,10 @@
         <p>Total Students</p>
         <span class="stat-sub">{{ activeStudents }} Active</span>
       </div>
-    </div>
+    </mat-card>
 
-    <div class="stat-card">
+    <!-- Teachers Card -->
+    <mat-card class="stat-card">
       <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
         <mat-icon>school</mat-icon>
       </div>
@@ -33,9 +32,10 @@
         <p>Total Teachers</p>
         <span class="stat-sub">{{ activeTeachers }} Active</span>
       </div>
-    </div>
+    </mat-card>
 
-    <div class="stat-card">
+    <!-- Subjects Card -->
+    <mat-card class="stat-card">
       <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
         <mat-icon>subject</mat-icon>
       </div>
@@ -44,9 +44,10 @@
         <p>Total Subjects</p>
         <span class="stat-sub">Being taught</span>
       </div>
-    </div>
+    </mat-card>
 
-    <div class="stat-card">
+    <!-- Classes Card -->
+    <mat-card class="stat-card">
       <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
         <mat-icon>class</mat-icon>
       </div>
@@ -55,174 +56,309 @@
         <p>Total Classes</p>
         <span class="stat-sub">All grades</span>
       </div>
-    </div>
+    </mat-card>
   </div>
 
-  <!-- Quick Action Cards -->
+  
+
+  <!-- Quick Actions Section -->
   <div class="section-title">
-    <h2>📋 Quick Access</h2>
+    <h2>Quick Actions</h2>
   </div>
 
   <div class="action-cards">
-    <!-- Students Card -->
+    <!-- Students -->
     <mat-card class="action-card" routerLink="/admin/manage-students">
       <div class="card-icon-wrapper">
-        <mat-icon class="card-icon">people</mat-icon>
+        <mat-icon>group_add</mat-icon>
       </div>
-      <h3>Students Management</h3>
-      <p>{{ totalStudents }} students enrolled</p>
+      <h3>Manage Students</h3>
+      <p>Add, edit, or remove student records</p>
       <div class="card-action">
-        <span>Manage Students</span>
+        <span>Go to Students</span>
         <mat-icon>arrow_forward</mat-icon>
       </div>
     </mat-card>
 
-    <!-- Teachers Card -->
+    <!-- Teachers -->
     <mat-card class="action-card" routerLink="/admin/manage-teachers">
       <div class="card-icon-wrapper">
-        <mat-icon class="card-icon">school</mat-icon>
+        <mat-icon>person_add_alt</mat-icon>
       </div>
-      <h3>Teachers Management</h3>
-      <p>{{ totalTeachers }} teachers assigned</p>
+      <h3>Manage Teachers</h3>
+      <p>Add, edit, or remove teacher records</p>
       <div class="card-action">
-        <span>Manage Teachers</span>
+        <span>Go to Teachers</span>
         <mat-icon>arrow_forward</mat-icon>
       </div>
     </mat-card>
 
-    <!-- Classes Card -->
-    <mat-card class="action-card" routerLink="/admin/manage-classes">
-      <div class="card-icon-wrapper">
-        <mat-icon class="card-icon">class</mat-icon>
-      </div>
-      <h3>Classes Management</h3>
-      <p>{{ totalClasses }} classes available</p>
-      <div class="card-action">
-        <span>Manage Classes</span>
-        <mat-icon>arrow_forward</mat-icon>
-      </div>
-    </mat-card>
-
-    <!-- Subjects Card -->
+    <!-- Subjects -->
     <mat-card class="action-card" routerLink="/admin/manage-subjects">
       <div class="card-icon-wrapper">
-        <mat-icon class="card-icon">subject</mat-icon>
+        <mat-icon>menu_book</mat-icon>
       </div>
-      <h3>Subjects Management</h3>
-      <p>{{ totalSubjects }} subjects offered</p>
+      <h3>Manage Subjects</h3>
+      <p>Add or remove academic subjects</p>
       <div class="card-action">
-        <span>Manage Subjects</span>
+        <span>Go to Subjects</span>
+        <mat-icon>arrow_forward</mat-icon>
+      </div>
+    </mat-card>
+
+    <!-- Add Marks -->
+    <mat-card class="action-card" routerLink="/admin/add-marks">
+      <div class="card-icon-wrapper">
+        <mat-icon>score</mat-icon>
+      </div>
+      <h3>Add Marks</h3>
+      <p>Enter student examination marks</p>
+      <div class="card-action">
+        <span>Go to Marks</span>
+        <mat-icon>arrow_forward</mat-icon>
+      </div>
+    </mat-card>
+
+    <!-- Rechecks -->
+    <mat-card class="action-card" routerLink="/admin/manage-rechecks">
+      <div class="card-icon-wrapper">
+        <mat-icon>replay</mat-icon>
+      </div>
+      <h3>Recheck Requests</h3>
+      <p>Manage re-evaluation requests</p>
+      <div class="card-action">
+        <span>Go to Rechecks</span>
+        <mat-icon>arrow_forward</mat-icon>
+      </div>
+    </mat-card>
+
+    <!-- Reports -->
+    <mat-card class="action-card" routerLink="/admin/reports">
+      <div class="card-icon-wrapper">
+        <mat-icon>analytics</mat-icon>
+      </div>
+      <h3>View Reports</h3>
+      <p>Generate and view reports</p>
+      <div class="card-action">
+        <span>Go to Reports</span>
         <mat-icon>arrow_forward</mat-icon>
       </div>
     </mat-card>
   </div>
 
   <!-- Recent Activity Section -->
-  <div class="section-title">
-    <h2>👥 Recent Activity</h2>
-  </div>
+  <div class="recent-activity-section">
+    <div class="section-title">
+      <h2>Recent Activity</h2>
+    </div>
 
-  <div class="recent-grid">
-    <!-- Recent Students -->
-    <div class="recent-card">
-      <h3>
-        <mat-icon>person_add</mat-icon>
-        Latest Students
-      </h3>
-      <div class="recent-list">
-        <div *ngIf="recentStudents.length > 0" class="list-container">
-          <div *ngFor="let student of recentStudents" class="list-item">
-            <div class="item-avatar">{{ student.name.charAt(0) }}</div>
+    <div class="recent-grid">
+      <!-- Recent Students -->
+      <mat-card class="recent-card">
+        <div class="recent-card-header">
+          <h3>
+            <mat-icon>person</mat-icon>
+            Latest Students
+          </h3>
+          <button mat-button color="primary" routerLink="/admin/manage-students">
+            View All
+          </button>
+        </div>
+        
+        <div *ngIf="recentStudents.length > 0" class="recent-list">
+          <div *ngFor="let student of recentStudents" class="recent-item">
+            <div class="item-avatar">
+              {{ student.name?.charAt(0) || 'S' }}
+            </div>
             <div class="item-details">
-              <div class="item-name">{{ student.name }}</div>
-              <div class="item-meta">Class: {{ student.className }} | Roll: {{ student.rollNo }}</div>
+              <div class="item-name">{{ student.name || 'Unknown Student' }}</div>
+              <div class="item-meta">
+                Class: {{ student.className || 'N/A' }} | Roll: {{ student.rollNo || 'N/A' }}
+              </div>
+            </div>
+            <div class="item-status" [class.active]="student.isActive !== false">
+              {{ student.isActive !== false ? 'Active' : 'Inactive' }}
             </div>
           </div>
         </div>
+        
         <div *ngIf="recentStudents.length === 0" class="empty-state">
-          <mat-icon>person_outline</mat-icon>
-          <p>No students yet</p>
+          <mat-icon>person_off</mat-icon>
+          <p>No students found</p>
         </div>
-      </div>
-    </div>
+      </mat-card>
 
-    <!-- Recent Teachers -->
-    <div class="recent-card">
-      <h3>
-        <mat-icon>person_add_alt_1</mat-icon>
-        Latest Teachers
-      </h3>
-      <div class="recent-list">
-        <div *ngIf="recentTeachers.length > 0" class="list-container">
-          <div *ngFor="let teacher of recentTeachers" class="list-item">
-            <div class="item-avatar">{{ teacher.name.charAt(0) }}</div>
+      <!-- Recent Teachers -->
+      <mat-card class="recent-card">
+        <div class="recent-card-header">
+          <h3>
+            <mat-icon>school</mat-icon>
+            Latest Teachers
+          </h3>
+          <button mat-button color="primary" routerLink="/admin/manage-teachers">
+            View All
+          </button>
+        </div>
+        
+        <div *ngIf="recentTeachers.length > 0" class="recent-list">
+          <div *ngFor="let teacher of recentTeachers" class="recent-item">
+            <div class="item-avatar">
+              {{ teacher.name?.charAt(0) || 'T' }}
+            </div>
             <div class="item-details">
-              <div class="item-name">{{ teacher.name }}</div>
-              <div class="item-meta">Subjects: {{ teacher.subjects.join(', ') || 'N/A' }}</div>
+              <div class="item-name">{{ teacher.name || 'Unknown Teacher' }}</div>
+              <div class="item-meta">
+                Subject: {{ teacher.subject || 'N/A' }}
+              </div>
+            </div>
+            <div class="item-status" [class.active]="teacher.isActive !== false">
+              {{ teacher.isActive !== false ? 'Active' : 'Inactive' }}
             </div>
           </div>
         </div>
+        
         <div *ngIf="recentTeachers.length === 0" class="empty-state">
-          <mat-icon>person_outline</mat-icon>
-          <p>No teachers yet</p>
+          <mat-icon>person_off</mat-icon>
+          <p>No teachers found</p>
+        </div>
+      </mat-card>
+
+      <!-- Recent Rechecks -->
+      <mat-card class="recent-card">
+        <div class="recent-card-header">
+          <h3>
+            <mat-icon>pending_actions</mat-icon>
+            Recent Rechecks
+          </h3>
+          <button mat-button color="primary" routerLink="/admin/manage-rechecks">
+            View All
+          </button>
+        </div>
+        
+        <div *ngIf="recentRechecks.length > 0" class="recent-list">
+          <div *ngFor="let recheck of recentRechecks" class="recent-item">
+            <div class="item-avatar" [style.background]="getStatusColor(recheck.status)">
+              {{ recheck.subject?.charAt(0) || 'R' }}
+            </div>
+            <div class="item-details">
+              <div class="item-name">{{ recheck.studentName || 'Unknown Student' }}</div>
+              <div class="item-meta">
+                {{ recheck.subject || 'N/A' }} | Submitted: {{ recheck.requestDate ? (recheck.requestDate | date:'MMM dd') : 'N/A' }}
+              </div>
+            </div>
+            <div class="item-status" [class.pending]="recheck.status === 'PENDING' || recheck.status === 'pending'" 
+                 [class.approved]="recheck.status === 'APPROVED' || recheck.status === 'approved'"
+                 [class.rejected]="recheck.status === 'REJECTED' || recheck.status === 'rejected'">
+              {{ recheck.status }}
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="recentRechecks.length === 0" class="empty-state">
+          <mat-icon>inbox</mat-icon>
+          <p>No recheck requests</p>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Class Distribution -->
+  <div class="distribution-section">
+    <div class="section-title">
+      <h2>Class Distribution (1-10)</h2>
+    </div>
+    
+    <mat-card class="distribution-card">
+      <div *ngIf="getUniqueClassNumbers().length > 0" class="distribution-grid">
+        <div *ngFor="let classNum of getUniqueClassNumbers()" class="distribution-item" 
+             [style.background]="getClassColor(classNum)">
+          <div class="distribution-value">{{ getStudentsInClass(classNum) }}</div>
+          <div class="distribution-label">Class {{ classNum }}</div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Class Distribution Section -->
-  <div class="section-title">
-    <h2>🏫 Class Distribution (1 to 10)</h2>
-  </div>
-
-  <div class="class-distribution">
-    <div class="distribution-grid">
-      <div *ngFor="let classNum of getUniqueClassNumbers()" class="class-item">
-        <div class="class-name">Class {{ classNum }}</div>
-        <div class="class-count">{{ getStudentsInClass(classNum) }} students</div>
+      <div *ngIf="getUniqueClassNumbers().length === 0" class="empty-state">
+        <mat-icon>class</mat-icon>
+        <p>No class data available</p>
       </div>
+    </mat-card>
+  </div>
+
+
+  <div class="distribution-section">
+    <div class="section-title">
+      <h2>Teacher Distribution by Subject</h2>
     </div>
-  </div>
-
-  <!-- Subject Distribution Section -->
-  <div class="section-title">
-    <h2>📚 Subject Teaching Staff</h2>
-  </div>
-
-  <div class="subject-distribution">
-    <div *ngIf="allSubjects.length > 0" class="subjects-grid">
-      <div *ngFor="let subject of allSubjects" class="subject-item">
-        <div class="subject-name">{{ subject.subjectName }}</div>
-        <div class="subject-teachers">{{ getTeachersBySubject(subject.subjectName) }} teachers</div>
+    
+    <mat-card class="distribution-card">
+      <div *ngIf="allSubjects.length > 0" class="subjects-grid">
+        <div *ngFor="let subject of allSubjects.slice(0, 10)" class="subject-dist-item">
+          <div class="subject-icon">
+            <mat-icon>book</mat-icon>
+          </div>
+          <div class="subject-info">
+            <div class="subject-name">{{ subject.subjectName || subject.name || subject }}</div>
+            <div class="subject-teachers">
+              {{ getTeachersBySubject(subject.subjectName || subject.name || subject) }} teachers
+            </div>
+          </div>
+          <div class="subject-count-badge">
+            {{ getTeachersBySubject(subject.subjectName || subject.name || subject) }}
+          </div>
+        </div>
       </div>
-    </div>
-    <div *ngIf="allSubjects.length === 0" class="empty-state">
-      <mat-icon>inbox</mat-icon>
-      <p>No subjects configured</p>
-    </div>
+      <div *ngIf="allSubjects.length > 10" class="view-more">
+        <button mat-button color="primary" routerLink="/admin/manage-subjects">
+          View All {{ allSubjects.length }} Subjects
+        </button>
+      </div>
+      <div *ngIf="allSubjects.length === 0" class="empty-state">
+        <mat-icon>subject</mat-icon>
+        <p>No subjects configured yet</p>
+      </div>
+    </mat-card>
   </div>
 
-  <!-- Summary Section -->
+  <!-- System Summary -->
   <div class="summary-section">
-    <h3>📈 System Summary</h3>
-    <div class="summary-grid">
-      <div class="summary-item">
-        <span>Student to Teacher Ratio</span>
-        <strong>{{ totalTeachers > 0 ? (totalStudents / totalTeachers).toFixed(1) : '0' }}:1</strong>
-      </div>
-      <div class="summary-item">
-        <span>Average Class Size</span>
-        <strong>{{ totalClasses > 0 ? (totalStudents / totalClasses).toFixed(0) : '0' }} students</strong>
-      </div>
-      <div class="summary-item">
-        <span>Teachers per Subject</span>
-        <strong>{{ totalSubjects > 0 ? (totalTeachers / totalSubjects).toFixed(1) : '0' }}</strong>
-      </div>
-      <div class="summary-item">
-        <span>Total Records</span>
-        <strong>{{ totalStudents + totalTeachers + totalClasses }}</strong>
-      </div>
+    <div class="section-title">
+      <h2>System Summary</h2>
     </div>
+    
+    <mat-card class="summary-card">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <mat-icon>people</mat-icon>
+          <div class="summary-content">
+            <div class="summary-value">{{ totalTeachers > 0 ? (totalStudents / totalTeachers).toFixed(1) : '0' }}:1</div>
+            <div class="summary-label">Student to Teacher Ratio</div>
+          </div>
+        </div>
+        
+        <div class="summary-item">
+          <mat-icon>groups</mat-icon>
+          <div class="summary-content">
+            <div class="summary-value">{{ totalClasses > 0 ? (totalStudents / totalClasses).toFixed(0) : '0' }}</div>
+            <div class="summary-label">Avg. Class Size</div>
+          </div>
+        </div>
+        
+        <div class="summary-item">
+          <mat-icon>balance</mat-icon>
+          <div class="summary-content">
+            <div class="summary-value">{{ totalSubjects > 0 ? (totalTeachers / totalSubjects).toFixed(1) : '0' }}</div>
+            <div class="summary-label">Teachers per Subject</div>
+          </div>
+        </div>
+        
+        <div class="summary-item">
+          <mat-icon>summarize</mat-icon>
+          <div class="summary-content">
+            <div class="summary-value">{{ totalStudents + totalTeachers + totalSubjects + totalClasses }}</div>
+            <div class="summary-label">Total Records</div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
   </div>
 
 </div>

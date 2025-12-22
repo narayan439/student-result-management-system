@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { StudentGuard } from '../../core/guards/student.guard';
 
 import { StudentDashboardComponent } from './student-dashboard.component';
 import { ViewMarksComponent } from './view-marks/view-marks.component';
@@ -10,13 +11,14 @@ import { ViewResultComponent } from './view-result/view-result.component';
 
 const routes: Routes = [
 
-        { path: 'view-result/:rollNo/:dob', component: ViewResultComponent },
+        { path: 'view-result/:rollNo/:email', component: ViewResultComponent },
 
   {
     path: '',
-    component: StudentDashboardComponent,   // Navbar + router-outlet 
+    component: StudentDashboardComponent,
+    canActivate: [StudentGuard],
     children: [
-      { path: '', component: ViewMarksComponent },  // Default page
+      { path: '', component: ViewMarksComponent },
       { path: 'view-marks', component: ViewMarksComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'request-recheck', component: RequestRecheckComponent },

@@ -46,7 +46,7 @@
 
         <!-- Logout -->
         <li class="logout">
-          <a routerLink="/login">Logout</a>
+          <a (click)="logout()" style="cursor: pointer;">Logout</a>
         </li>
       </ul>
     </div>
@@ -146,7 +146,7 @@
     </ul>
 
     <div class="mobile-logout">
-      <a routerLink="/login" class="mobile-logout-btn">
+      <a (click)="logout()" class="mobile-logout-btn" style="cursor: pointer;">
         <i class="fas fa-sign-out-alt"></i> Logout
       </a>
     </div>

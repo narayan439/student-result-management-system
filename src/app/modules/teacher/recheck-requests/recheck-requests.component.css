@@ -6,6 +6,70 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Success Message */
+.success-message {
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  background: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.success-message mat-icon {
+  color: #4caf50;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.success-message strong {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.success-message p {
+  color: #1b5e20;
+  margin: 8px 0 0 0;
+  font-size: 14px;
+}
+
+/* Error Message */
+.error-message {
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  background: #ffebee;
+  border-left: 4px solid #d32f2f;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.error-message mat-icon {
+  color: #d32f2f;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.error-message strong {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.error-message p {
+  color: #c62828;
+  margin: 8px 0 0 0;
+  font-size: 14px;
+}
+
 /* Header Styles */
 .page-header {
   max-width: 1200px;
@@ -344,11 +408,68 @@ mat-cell {
   color: #d32f2f !important;
 }
 
+/* Student Cell */
+.student-cell {
+  padding: 8px 0;
+}
+
+.student-name {
+  font-weight: 600;
+  color: #1a237e;
+  font-size: 15px;
+}
+
+.student-roll {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Marks Cell */
+.marks-cell {
+  padding: 8px 0;
+  min-width: 140px;
+}
+
+.marks-view {
+  font-weight: 600;
+  color: #1a237e;
+  font-size: 15px;
+}
+
+.mark-value {
+  background: #e8f5e9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #2e7d32;
+}
+
+.marks-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.marks-input {
+  width: 120px;
+  max-width: 100%;
+}
+
+.marks-input .mat-form-field-infix {
+  border-top: none !important;
+}
+
 /* Action Buttons */
 .action-buttons {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+}
+
+.view-actions,
+.edit-actions {
+  display: flex;
+  gap: 4px;
 }
 
 .update-btn {

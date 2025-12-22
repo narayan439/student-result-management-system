@@ -1,3 +1,4 @@
+/* Manage Teachers Container */
 .manage-teachers-container {
   padding: 24px;
   background: #f8fafc;
@@ -126,6 +127,20 @@
   width: 200px;
 }
 
+/* Custom Form Field Styles */
+::ng-deep .mat-form-field-outline {
+  background: white;
+  border-radius: 8px !important;
+}
+
+::ng-deep .mat-form-field-outline-thick {
+  color: #1a237e !important;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+  color: #1a237e !important;
+}
+
 /* Table Styles */
 .table-responsive {
   overflow-x: auto;
@@ -193,61 +208,95 @@
   color: #718096;
 }
 
-/* Subject Cell */
-.subject-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  color: white;
-}
-
-.subject-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-}
-
-/* Contact Info Cell */
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.contact-item {
+/* Email Cell */
+.email-cell {
   display: flex;
   align-items: center;
   gap: 8px;
   color: #4a5568;
-  font-size: 14px;
 }
 
-.contact-item mat-icon {
+.email-icon {
   color: #a0aec0;
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
-/* DOB Cell */
-.dob-cell {
+/* Phone Cell */
+.phone-cell {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
+  color: #4a5568;
 }
 
-.dob-date {
-  font-weight: 500;
-  color: #2d3748;
+.phone-icon {
+  color: #a0aec0;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
-.dob-age {
+/* Subjects Cell */
+.subjects-cell {
+  max-width: 250px;
+}
+
+.subject-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.subject-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 16px;
   font-size: 12px;
-  color: #718096;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+}
+
+.subject-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.subject-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+}
+
+.no-subjects {
+  color: #999;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Experience Cell */
+.experience-cell {
+  display: flex;
+  align-items: center;
+}
+
+.experience-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Actions Cell */
@@ -279,11 +328,6 @@
   color: #1976d2;
 }
 
-.view-btn {
-  background: #f3e5f5;
-  color: #7b1fa2;
-}
-
 .delete-btn {
   background: #ffebee;
   color: #d32f2f;
@@ -292,6 +336,26 @@
 /* Table Rows */
 .table-row:hover {
   background: #f7fafc;
+}
+
+/* No Data Message */
+.no-data-message {
+  text-align: center;
+  padding: 40px;
+  color: #718096;
+}
+
+.no-data-message mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #cbd5e0;
+  margin-bottom: 16px;
+}
+
+.no-data-message p {
+  font-size: 16px;
+  margin: 0;
 }
 
 /* Table Footer */
@@ -372,5 +436,14 @@
 @media (max-width: 480px) {
   .table-cell {
     padding: 16px;
+  }
+  
+  .subject-chips {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .subject-chip {
+    width: fit-content;
   }
 }

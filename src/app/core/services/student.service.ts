@@ -13,45 +13,11 @@ export class StudentService {
   private studentsSubject = new BehaviorSubject<Student[]>([]);
   public students$ = this.studentsSubject.asObservable();
 
-  // Sample students data - 50 students (5 per class, 10 classes)
-  private sampleStudents: Student[] = this.generateSampleStudents();
-
-  private generateSampleStudents(): Student[] {
-    const students: Student[] = [
-      // Class 1 (studentId: 1-5)
-      { studentId: 1, name: 'Arjun Kumar', email: 'arjun.kumar1@gmail.com', className: 'Class 1', rollNo: '1A01', dob: '09/04/2011', phone: '9876540001', isActive: true },
-      { studentId: 2, name: 'Priya Singh', email: 'priya.singh2@gmail.com', className: 'Class 1', rollNo: '1A02', dob: '23/08/2009', phone: '9876540002', isActive: true },
-      { studentId: 3, name: 'Rahul Patel', email: 'rahul.patel3@gmail.com', className: 'Class 1', rollNo: '1A03', dob: '15/11/2010', phone: '9876540003', isActive: true },
-      { studentId: 4, name: 'Anjali Sharma', email: 'anjali.sharma4@gmail.com', className: 'Class 1', rollNo: '1A04', dob: '07/03/2011', phone: '9876540004', isActive: true },
-      { studentId: 5, name: 'Vikram Verma', email: 'vikram.verma5@gmail.com', className: 'Class 1', rollNo: '1A05', dob: '28/06/2010', phone: '9876540005', isActive: true },
-      
-      // Class 2 (studentId: 6-10)
-      { studentId: 6, name: 'Sneha Gupta', email: 'sneha.gupta6@gmail.com', className: 'Class 2', rollNo: '2A01', dob: '19/01/2009', phone: '9876540006', isActive: true },
-      { studentId: 7, name: 'Aditya Yadav', email: 'aditya.yadav7@gmail.com', className: 'Class 2', rollNo: '2A02', dob: '30/09/2010', phone: '9876540007', isActive: true },
-      { studentId: 8, name: 'Neha Nair', email: 'neha.nair8@gmail.com', className: 'Class 2', rollNo: '2A03', dob: '11/04/2011', phone: '9876540008', isActive: true },
-      { studentId: 9, name: 'Rohan Desai', email: 'rohan.desai9@gmail.com', className: 'Class 2', rollNo: '2A04', dob: '25/07/2010', phone: '9876540009', isActive: true },
-      { studentId: 10, name: 'Divya Bhat', email: 'divya.bhat10@gmail.com', className: 'Class 2', rollNo: '2A05', dob: '14/12/2009', phone: '9876540010', isActive: true },
-      
-      // Class 3 (studentId: 11-15)
-      { studentId: 11, name: 'Akshay Reddy', email: 'akshay.reddy11@gmail.com', className: 'Class 3', rollNo: '3A01', dob: '06/02/2008', phone: '9876540011', isActive: true },
-      { studentId: 12, name: 'Pooja Rao', email: 'pooja.rao12@gmail.com', className: 'Class 3', rollNo: '3A02', dob: '17/05/2009', phone: '9876540012', isActive: true },
-      { studentId: 13, name: 'Nikhil Chopra', email: 'nikhil.chopra13@gmail.com', className: 'Class 3', rollNo: '3A03', dob: '29/08/2008', phone: '9876540013', isActive: true },
-      { studentId: 14, name: 'Shreya Malhotra', email: 'shreya.malhotra14@gmail.com', className: 'Class 3', rollNo: '3A04', dob: '10/10/2009', phone: '9876540014', isActive: true },
-      { studentId: 15, name: 'Sanjay Kapoor', email: 'sanjay.kapoor15@gmail.com', className: 'Class 3', rollNo: '3A05', dob: '21/03/2008', phone: '9876540015', isActive: true },
-      
-      // Class 4 (studentId: 16-20)
-      { studentId: 16, name: 'Ananya Mishra', email: 'ananya.mishra16@gmail.com', className: 'Class 4', rollNo: '4A01', dob: '08/07/2008', phone: '9876540016', isActive: true },
-      { studentId: 17, name: 'Varun Agarwal', email: 'varun.agarwal17@gmail.com', className: 'Class 4', rollNo: '4A02', dob: '22/11/2007', phone: '9876540017', isActive: true },
-      { studentId: 18, name: 'Isha Jain', email: 'isha.jain18@gmail.com', className: 'Class 4', rollNo: '4A03', dob: '13/04/2008', phone: '9876540018', isActive: true },
-      { studentId: 19, name: 'Manish Srivastava', email: 'manish.srivastava19@gmail.com', className: 'Class 4', rollNo: '4A04', dob: '26/09/2007', phone: '9876540019', isActive: true },
-      { studentId: 20, name: 'Riya Dubey', email: 'riya.dubey20@gmail.com', className: 'Class 4', rollNo: '4A05', dob: '05/06/2008', phone: '9876540020', isActive: true }
-    ];
-
-    return students;
-  }
+  // Cache variables
+  private lastRefreshTime: number = 0;
+  private refreshCacheTime: number = 5000; // 5 seconds cache
 
   constructor(private http: HttpClient) {
-    this.studentsSubject.next(this.sampleStudents);
   }
 
   /**
@@ -63,10 +29,9 @@ export class StudentService {
         map(response => response.data || []),
         tap(students => this.studentsSubject.next(students)),
         catchError(err => {
-          console.warn('API call failed, returning sample data');
-          const sampleStudents = this.generateSampleStudents();
-          this.studentsSubject.next(sampleStudents);
-          return of(sampleStudents);
+          console.warn('API call failed');
+          this.studentsSubject.next([]);
+          return of([]);
         })
       );
   }
@@ -75,7 +40,40 @@ export class StudentService {
    * Get all students synchronously (for authentication)
    */
   getAllStudentsSync(): Student[] {
-    return this.studentsSubject.value || this.sampleStudents;
+    return this.studentsSubject.value || [];
+  }
+
+  /**
+   * Refresh students data from backend
+   * Used to ensure fresh data for login and admin operations
+   * Includes cache to prevent duplicate queries within 5 seconds
+   */
+  refreshStudents(): Observable<Student[]> {
+    const now = Date.now();
+    
+    // Check if we've refreshed recently (within 5 seconds)
+    if (now - this.lastRefreshTime < this.refreshCacheTime) {
+      console.log('⚡ Using cached student data (refreshed recently)');
+      return of(this.studentsSubject.value);
+    }
+    
+    console.log('🔄 Refreshing students data from backend...');
+    this.lastRefreshTime = now;
+    
+    return this.http.get<StudentListResponse>(`${this.baseUrl}/all`)
+      .pipe(
+        map(response => {
+          const students = response.data || [];
+          console.log(`✅ Loaded ${students.length} students from backend`);
+          this.studentsSubject.next(students);
+          return students;
+        }),
+        catchError(err => {
+          console.error('❌ Failed to refresh from backend, using cached data:', err);
+          const currentStudents = this.studentsSubject.value;
+          return of(currentStudents);
+        })
+      );
   }
 
   /**
@@ -90,6 +88,17 @@ export class StudentService {
    */
   getStudentById(studentId: number): Observable<Student> {
     return this.http.get<StudentResponse>(`${this.baseUrl}/${studentId}`)
+      .pipe(
+        map(response => response.data as Student),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Get student by roll number
+   */
+  getStudentByRollNo(rollNo: string): Observable<Student> {
+    return this.http.get<StudentResponse>(`${this.baseUrl}/rollNo/${rollNo}`)
       .pipe(
         map(response => response.data as Student),
         catchError(this.handleError)
@@ -409,9 +418,9 @@ export class StudentService {
   }
 
   /**
-   * Reset to sample data (for testing)
+   * Reset to empty data
    */
   resetToSampleData(): void {
-    this.studentsSubject.next([...this.sampleStudents]);
+    this.studentsSubject.next([]);
   }
 }

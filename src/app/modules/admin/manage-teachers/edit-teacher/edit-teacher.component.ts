@@ -21,7 +21,6 @@ export class EditTeacherComponent implements OnInit {
     name: '',
     email: '',
     subjects: [],
-    dob: '',
     phone: '',
     experience: 0,
     isActive: true
@@ -48,12 +47,15 @@ export class EditTeacherComponent implements OnInit {
 
   loadSubjects(): void {
     this.subjectService.getAllSubjects().subscribe({
-      next: (subjects: Subject[]) => {
-        this.subjectObjects = subjects;
-        this.availableSubjects = subjects.map(s => s.subjectName);
+      next: (response: any) => {
+        const subjectsArray = response.data ? (Array.isArray(response.data) ? response.data : []) : [];
+        // Filter only active subjects
+        this.subjectObjects = subjectsArray.filter((s: any) => s.isActive !== false);
+        this.availableSubjects = this.subjectObjects.map((s: any) => s.subjectName);
       },
       error: (err) => {
         console.error('Error loading subjects:', err);
+        this.availableSubjects = [];
       }
     });
   }
@@ -73,14 +75,23 @@ export class EditTeacherComponent implements OnInit {
   loadTeacher(): void {
     this.isLoading = true;
     this.teacherService.getAllTeachers().subscribe({
-      next: (teachers: Teacher[]) => {
-        console.log('Teachers loaded:', teachers.length);
+      next: (response: any) => {
+        // Service already extracts the data array via map operator
+        const teachersArray: Teacher[] = (Array.isArray(response) ? response : []) || [];
+        console.log('Teachers loaded:', teachersArray.length);
         console.log('Looking for email:', this.teacherEmail);
         
-        const found = teachers.find(t => t.email === this.teacherEmail);
+        const found = teachersArray.find((t: Teacher) => t.email === this.teacherEmail);
         if (found) {
-          this.teacher = JSON.parse(JSON.stringify(found));
-          this.originalTeacher = JSON.parse(JSON.stringify(found));
+          // Convert subjects string to array if needed
+          const subjectsArray = Array.isArray(found.subjects) ? found.subjects : 
+                               (typeof found.subjects === 'string' ? (found.subjects as string).split(',').map((s: string) => s.trim()) : []);
+          
+          this.teacher = {
+            ...found,
+            subjects: subjectsArray
+          };
+          this.originalTeacher = JSON.parse(JSON.stringify(this.teacher));
           this.isLoading = false;
           console.log('Teacher found:', this.teacher);
         } else {
@@ -93,10 +104,17 @@ export class EditTeacherComponent implements OnInit {
         console.error('Error loading teachers:', err);
         // Try to load from local storage as fallback
         const localTeachers = this.teacherService.getTeachersFromLocal();
-        const found = localTeachers.find(t => t.email === this.teacherEmail);
+        const found = localTeachers.find((t: Teacher) => t.email === this.teacherEmail);
         if (found) {
-          this.teacher = JSON.parse(JSON.stringify(found));
-          this.originalTeacher = JSON.parse(JSON.stringify(found));
+          // Convert subjects string to array if needed
+          const subjectsArray = Array.isArray(found.subjects) ? found.subjects : 
+                               (typeof found.subjects === 'string' ? (found.subjects as string).split(',').map((s: string) => s.trim()) : []);
+          
+          this.teacher = {
+            ...found,
+            subjects: subjectsArray
+          };
+          this.originalTeacher = JSON.parse(JSON.stringify(this.teacher));
           this.isLoading = false;
           console.log('Teacher found from local storage:', this.teacher);
         } else {
@@ -110,7 +128,7 @@ export class EditTeacherComponent implements OnInit {
   updateTeacher() {
     if (this.validateTeacherData()) {
       this.isSaving = true;
-      this.teacherService.updateTeacher(this.teacher.email!, this.teacher).subscribe({
+      this.teacherService.updateTeacher(this.teacher.teacherId!, this.teacher).subscribe({
         next: (res: any) => {
           alert('🎉 Teacher Updated Successfully!');
           this.router.navigate(['/admin/manage-teachers']);
@@ -148,11 +166,6 @@ export class EditTeacherComponent implements OnInit {
     
     if (!this.teacher.subjects || this.teacher.subjects.length === 0) {
       alert('Please select at least one subject');
-      return false;
-    }
-    
-    if (!this.teacher.dob) {
-      alert('Please select date of birth');
       return false;
     }
     

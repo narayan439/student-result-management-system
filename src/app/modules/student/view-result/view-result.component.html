@@ -1,181 +1,240 @@
 <div class="result-container">
 
-  <!-- Header Section -->
-  <div class="header-section">
-    <div class="school-info">
-      <h1><i class="fas fa-graduation-cap"></i> NARAYAN PUBLIC SCHOOL</h1>
-      <p class="subtitle">Annual Examination Result 2023-24</p>
-      <div class="official-stamp">
-        <div class="stamp-content">
-          <i class="fas fa-stamp"></i>
-          <span>OFFICIAL</span>
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner">
+      <div class="spin"></div>
+    </div>
+    <p class="loading-text">Loading marks data...</p>
+  </div>
+
+  <!-- Content Section (ALWAYS shown when not loading, even if no marks) -->
+  <div class="content-section" *ngIf="!isLoading">
+
+    <!-- Data Source Indicator -->
+    <div class="data-source-indicator" *ngIf="marksSource && marksSource !== 'unknown'">
+      <div class="indicator-content" [ngClass]="{
+        'backend': marksSource.includes('backend'),
+        'sample': marksSource.includes('sample') || marksSource.includes('fallback')
+      }">
+        <mat-icon *ngIf="marksSource.includes('backend')">cloud_done</mat-icon>
+        <mat-icon *ngIf="marksSource.includes('sample') || marksSource.includes('fallback')">computer</mat-icon>
+        <span>
+          Data Source: 
+          <strong>{{ marksSource === 'backend-404' ? 'No marks found in backend' : 
+                    marksSource === 'sample-fallback' ? 'Using sample data' : 
+                    marksSource.includes('backend') ? 'Backend' : marksSource }}</strong>
+          <span *ngIf="marksMessage"> - {{ marksMessage }}</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="school-info">
+        <h1><i class="fas fa-graduation-cap"></i>Sri Jayadev Shiksha Kendra</h1>
+        <p class="subtitle">Annual Examination Result 2023-24</p>
+        <div class="official-stamp">
+          <div class="stamp-content">
+            <i class="fas fa-stamp"></i>
+            <span>OFFICIAL</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <h2 class="page-title">STUDENT MARKSHEET</h2>
+    <h2 class="page-title">STUDENT MARKSHEET</h2>
 
-  <!-- Student Information -->
-  <div class="student-info">
-    <div class="info-grid">
-      <div class="info-item">
-        <i class="fas fa-user"></i>
-        <div>
-          <label>Name:</label>
-          <p>{{ result.name }}</p>
+    <!-- Student Information -->
+    <div class="student-info">
+      <div class="info-grid">
+        <div class="info-item">
+          <i class="fas fa-user"></i>
+          <div>
+            <label>Name:</label>
+            <p>{{ result.name }}</p>
+          </div>
         </div>
-      </div>
-      
-      <div class="info-item">
-        <i class="fas fa-id-card"></i>
-        <div>
-          <label>Roll No:</label>
-          <p>{{ result.rollNo }}</p>
+        
+        <div class="info-item">
+          <i class="fas fa-id-card"></i>
+          <div>
+            <label>Roll No:</label>
+            <p>{{ result.rollNo }}</p>
+          </div>
         </div>
-      </div>
-      
-      <div class="info-item">
-        <i class="fas fa-calendar-alt"></i>
-        <div>
-          <label>Date of Birth:</label>
-          <p>{{ result.dob }}</p>
+        
+        <div class="info-item">
+          <i class="fas fa-calendar-alt"></i>
+          <div>
+            <label>Date of Birth:</label>
+            <p>{{ result.dob }}</p>
+          </div>
         </div>
-      </div>
-      
-      <div class="info-item">
-        <i class="fas fa-school"></i>
-        <div>
-          <label>Class & Section:</label>
-          <p>{{ result.className }}</p>
+        
+        <div class="info-item">
+          <i class="fas fa-school"></i>
+          <div>
+            <label>Class & Section:</label>
+            <p>{{ result.className }}</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Marks Table Section -->
-<div class="marks-section">
-  <h3 class="section-title"><i class="fas fa-chart-bar"></i> Subject-wise Marks</h3>
-  
-  <div class="marks-table-container">
-    <table class="marks-table">
-      <thead>
-        <tr>
-          <th class="subject-col">Subject Name</th>
-          <th class="marks-col">Maximum Marks</th>
-          <th class="marks-col">Marks Obtained</th>
-          <th class="marks-col">Grade</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let mark of result.marks">
-          <td>{{ mark.subject }}</td>
-          <td>{{ mark.maxMarks }}</td>
-          <td class="obtained">{{ mark.marksObtained }}</td>
-          <td>{{ getGrade(mark.marksObtained) }}</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr class="total-row">
-          <td class="total-label">GRAND TOTAL</td>
-          <td class="total-value">{{ result.maxTotal }}</td>
-          <td class="total-value obtained">{{ result.total }}</td>
-          <td class="total-value">{{ result.percentage }}%</td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-</div>
-
- 
-
-  <!-- Summary Section -->
-  <div class="summary-section">
-    <div class="summary-cards">
-      <div class="card total-card">
-        <div class="card-icon">
-          <i class="fas fa-star"></i>
-        </div>
-        <div class="card-content">
-          <h4>Total Marks</h4>
-          <p class="big-number">{{ result.total }}/{{ result.maxTotal }}</p>
-        </div>
-      </div>
+    <!-- Marks Table Section -->
+    <div class="marks-section">
+      <h3 class="section-title"><i class="fas fa-chart-bar"></i> Subject-wise Marks</h3>
       
-      <div class="card percentage-card">
-        <div class="card-icon">
-          <i class="fas fa-percentage"></i>
-        </div>
-        <div class="card-content">
-          <h4>Percentage</h4>
-          <p class="big-number">{{ result.percentage }}%</p>
-        </div>
-      </div>
-      
-      <div class="card status-card" [ngClass]="{'pass': result.status=='PASS', 'fail': result.status=='FAIL'}">
-        <div class="card-icon">
-          <i class="fas" [ngClass]="result.status=='PASS' ? 'fa-check-circle' : 'fa-times-circle'"></i>
-        </div>
-        <div class="card-content">
-          <h4>Result</h4>
-          <p class="status-text">{{ result.status }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Verification Section -->
-  <div class="verification-section">
-    <div class="verification-content">
-      <div class="qr-verification">
-        <div class="qr-header">
-          <i class="fas fa-qrcode"></i>
-          <h4>VERIFICATION QR CODE</h4>
-        </div>
-        <div class="qr-container">
-          <!-- Actual QR Code Component -->
-          <qrcode 
-            [qrdata]="qrData"
-            [width]="150"
-            [errorCorrectionLevel]="'M'"
-            elementType="img"
-            class="qr-code-image">
-          </qrcode>
-          <p class="scan-text">
-            Scan QR code to verify result authenticity
+      <!-- No Marks Message (shown when marks array is empty) -->
+      <div *ngIf="!hasMarksAvailable()" class="no-marks-message">
+        <mat-icon>assignment</mat-icon>
+        <div class="message-content">
+          <h4>📋 Marks Not Available</h4>
+          <p *ngIf="marksSource === 'backend-404'">
+            Marks have not been entered for this student yet. Please check back later or contact your teacher.
           </p>
+          <p *ngIf="marksSource === 'sample-fallback'">
+            Backend is unavailable. Showing sample data for demonstration purposes.
+          </p>
+          <p *ngIf="!marksSource || marksSource === 'unknown'">
+            No marks data available at the moment.
+          </p>
+          <button class="refresh-marks-btn" (click)="refreshMarks()">
+            <mat-icon>refresh</mat-icon> Refresh Marks
+          </button>
         </div>
       </div>
       
-      <div class="signature-section">
-        <div class="signature-box">
-          <div class="signature-line"></div>
-          <p class="signature-label">Teacher's Signature</p>
-          <p class="teacher-name">Mrs. Sunita Mehta</p>
-          <p class="teacher-designation">Class Teacher</p>
+      <!-- Marks Table (shown when marks are available) -->
+      <div class="marks-table-container" *ngIf="hasMarksAvailable()">
+        <table class="marks-table">
+          <thead>
+            <tr>
+              <th class="subject-col">Subject Name</th>
+              <th class="marks-col">Maximum Marks</th>
+              <th class="marks-col">Marks Obtained</th>
+              <th class="marks-col">Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let mark of result.marks">
+              <td>{{ mark.subject }}</td>
+              <td>{{ mark.maxMarks }}</td>
+              <td class="obtained">{{ mark.marksObtained }}</td>
+              <td>{{ getGrade(mark.marksObtained) }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td class="total-label">GRAND TOTAL</td>
+              <td class="total-value">{{ result.maxTotal }}</td>
+              <td class="total-value obtained">{{ result.total }}</td>
+              <td class="total-value">{{ result.percentage }}%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+      <div class="summary-cards">
+        <div class="card total-card">
+          <div class="card-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="card-content">
+            <h4>Total Marks</h4>
+            <p class="big-number">{{ result.total }}/{{ result.maxTotal }}</p>
+          </div>
+        </div>
+        
+        <div class="card percentage-card">
+          <div class="card-icon">
+            <i class="fas fa-percentage"></i>
+          </div>
+          <div class="card-content">
+            <h4>Percentage</h4>
+            <p class="big-number">{{ result.percentage }}%</p>
+          </div>
+        </div>
+        
+        <div class="card status-card" [ngClass]="{
+          'pass': result.status=='PASS', 
+          'fail': result.status=='FAIL',
+          'pending': result.status=='PENDING'
+        }">
+          <div class="card-icon">
+            <i class="fas" [ngClass]="{
+              'fa-check-circle': result.status=='PASS',
+              'fa-times-circle': result.status=='FAIL',
+              'fa-clock': result.status=='PENDING'
+            }"></i>
+          </div>
+          <div class="card-content">
+            <h4>Result</h4>
+            <p class="status-text">{{ result.status }}</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- Action Buttons -->
-  <div class="action-buttons">
-    <button class="pdf-btn" (click)="downloadPDF()">
-      <i class="fas fa-file-pdf"></i> Download PDF
-    </button>
-    
-    <button class="print-btn" (click)="printResult()">
-      <i class="fas fa-print"></i> Print Result
-    </button>
-    
-    <button class="recheck-btn" (click)="goToLoginForRecheck()">
-      <i class="fas fa-redo-alt"></i> Request Recheck
-    </button>
-    
-    <button class="back-btn" routerLink="/">
-      <i class="fas fa-home"></i> Back to Home
-    </button>
-  </div>
 
-  
+    <!-- Verification Section -->
+    <div class="verification-section">
+      <div class="verification-content">
+        <div class="qr-verification">
+          <div class="qr-header">
+            <i class="fas fa-qrcode"></i>
+            <h4>VERIFICATION QR CODE</h4>
+          </div>
+          <div class="qr-container">
+            <!-- Actual QR Code Component -->
+            <qrcode 
+              [qrdata]="qrData"
+              [width]="150"
+              [errorCorrectionLevel]="'M'"
+              elementType="img"
+              class="qr-code-image">
+            </qrcode>
+            <p class="scan-text">
+              Scan QR code to verify result authenticity
+            </p>
+          </div>
+        </div>
+        
+        <div class="signature-section">
+          <div class="signature-box">
+            <div class="signature-line"></div>
+            <p class="signature-label">Teacher's Signature</p>
+            <p class="teacher-name">Mrs. Sunita Mehta</p>
+            <p class="teacher-designation">Class Teacher</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="pdf-btn" (click)="downloadPDF()">
+        <i class="fas fa-file-pdf"></i> Download PDF
+      </button>
+      
+      <button class="print-btn" (click)="printResult()">
+        <i class="fas fa-print"></i> Print Result
+      </button>
+      
+      <button class="recheck-btn" (click)="goToLoginForRecheck()" [disabled]="!hasMarksAvailable()">
+        <i class="fas fa-redo-alt"></i> Request Recheck
+      </button>
+      
+      <button class="back-btn" routerLink="/">
+        <i class="fas fa-home"></i> Back to Home
+      </button>
+      
+      
+    </div>
+
+  </div>
 
 </div>

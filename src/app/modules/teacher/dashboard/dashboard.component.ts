@@ -1,14 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-teacher-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
 
   mobileMenuOpen = false;
+  teacherName = 'Teacher';
+  teacherEmail = '';
   
   students = [
     { name: 'Narayan', rollNo: '23' },
@@ -23,7 +26,54 @@ export class DashboardComponent {
     score: ''
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.loadTeacherInfo();
+  }
+
+  /**
+   * Load teacher info from localStorage
+   */
+  loadTeacherInfo(): void {
+    const currentUser = localStorage.getItem('currentUser');
+    
+    if (currentUser) {
+      try {
+        const userData = JSON.parse(currentUser);
+        this.teacherEmail = userData.email || '';
+        console.log(`📋 Loaded teacher email: ${this.teacherEmail}`);
+        
+        // Extract name from email (before @) for display
+        if (this.teacherEmail) {
+          this.teacherName = this.formatNameFromEmail(this.teacherEmail);
+          console.log(`👤 Teacher name formatted: ${this.teacherName}`);
+        }
+      } catch (e) {
+        console.error('❌ Error parsing currentUser:', e);
+      }
+    } else {
+      console.warn('⚠️ No currentUser found in localStorage');
+    }
+  }
+
+  /**
+   * Format a proper name from email
+   * Example: "raj.kumar@school.com" → "Raj Kumar"
+   */
+  private formatNameFromEmail(email: string): string {
+    if (!email) return 'Teacher';
+    
+    // Extract name part before @
+    const namePart = email.split('@')[0];
+    
+    // Replace dots/underscores/hyphens with spaces and capitalize
+    return namePart
+      .replace(/[._-]/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
 
   saveMarks() {
     console.log("MARKS SUBMITTED:", this.marks);
@@ -31,7 +81,8 @@ export class DashboardComponent {
   }
 
   logout() {
-    localStorage.removeItem("teacherToken");
+    console.log('🔓 Teacher logout initiated');
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 

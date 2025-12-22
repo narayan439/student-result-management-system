@@ -1,3 +1,124 @@
+/* Loading and Error States */
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.spinner {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+.spinner .spin {
+  width: 100%;
+  height: 100%;
+  border: 4px solid #e0e0e0;
+  border-top-color: #2196F3;
+  border-radius: 50%;
+  animation: spinRotate 1s linear infinite;
+}
+
+@keyframes spinRotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  color: #666;
+  font-size: 16px;
+  text-align: center;
+  margin: 0;
+}
+
+/* Error Container */
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.error-card {
+  background: #ffebee;
+  border: 2px solid #ef5350;
+  border-radius: 8px;
+  padding: 40px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(239, 83, 80, 0.15);
+}
+
+.error-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #ef5350;
+  margin: 0 auto 20px;
+}
+
+.error-card h3 {
+  color: #c62828;
+  margin: 0 0 10px 0;
+  font-size: 22px;
+}
+
+.error-message {
+  color: #d32f2f;
+  margin: 0 0 25px 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.retry-btn {
+  background: #ef5350;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: #e53935;
+  box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+}
+
+.retry-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Content Section */
+.content-section {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Main Container */
 .result-container {
   max-width: 900px;
@@ -132,6 +253,75 @@
 
 .section-title i {
   color: #304ffe;
+}
+
+/* No Marks Message */
+.no-marks-message {
+  background: #fff3e0;
+  border: 2px solid #ff9800;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.no-marks-message mat-icon {
+  color: #ff9800;
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.message-content {
+  flex: 1;
+}
+
+.message-content h4 {
+  color: #e65100;
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.message-content p {
+  color: #ff9800;
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.refresh-marks-btn {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.refresh-marks-btn:hover {
+  background: #f57c00;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.refresh-marks-btn:active {
+  transform: translateY(0);
+}
+
+.refresh-marks-btn mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 .marks-table-container {
@@ -729,4 +919,70 @@ button i {
   }
   
   /* Remove timeline responsive styles */
+}
+
+/* Data Source Indicator */
+.data-source-indicator {
+  margin-bottom: 20px;
+  animation: slideInDown 0.5s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.indicator-content {
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.indicator-content.backend {
+  background: #e8f5e9;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+}
+
+.indicator-content.sample {
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  color: #ef6c00;
+}
+
+.indicator-content mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Status card for pending */
+.status-card.pending {
+  border-top: 3px solid #ff9800;
+}
+
+.status-card.pending i {
+  color: #ff9800;
+}
+
+/* Disabled button style */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #bdbdbd !important;
+}
+
+button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
 }

@@ -36,8 +36,8 @@
         </div>
         
         <div class="stat-card">
-          <div class="stat-value">{{ completedRequests }}</div>
-          <p class="stat-label">Completed</p>
+          <div class="stat-value">{{ rejectedRequests }}</div>
+          <p class="stat-label">Rejected</p>
         </div>
         
         <div class="stat-card">
@@ -53,23 +53,93 @@
             <tr>
               <th>Subject</th>
               <th>Request Date</th>
+              <th>Resolve Date</th>
               <th style="text-align: center;">Status</th>
+              <th style="text-align: center;">Details</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let r of requests">
-              <td class="subject-cell">
-                {{ r.subject }}
-              </td>
-              <td class="date-cell">
-                {{ r.date }}
-              </td>
-              <td class="status-cell">
-                <span class="status-badge" [ngClass]="getStatusClass(r.status)">
-                  {{ r.status }}
-                </span>
-              </td>
-            </tr>
+            <ng-container *ngFor="let r of requests; let i = index">
+              <!-- Main Request Row -->
+              <tr class="request-row">
+                <td class="subject-cell">
+                  <strong>{{ r.subject }}</strong>
+                </td>
+                <td class="date-cell">
+                  {{ r.requestDate ? (r.requestDate | date:'MMM dd, yyyy') : '-' }}
+                </td>
+                <td class="date-cell">
+                  {{ r.resolvedDate ? (r.resolvedDate | date:'MMM dd, yyyy') : '-' }}
+                </td>
+                <td class="status-cell">
+                  <span class="status-badge" [ngClass]="getStatusClass(r.status)">
+                    {{ getStatusText(r.status) }}
+                  </span>
+                </td>
+                <td class="details-cell">
+                  <button class="view-details-btn" (click)="toggleRequestDetails(i)" [attr.aria-label]="'View details for ' + r.subject">
+                    <mat-icon>{{ expandedRequestIndex === i ? 'expand_less' : 'expand_more' }}</mat-icon>
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Expanded Details Row -->
+              <tr *ngIf="expandedRequestIndex === i" class="details-row">
+                <td colspan="5" class="details-content">
+                  <div class="request-details">
+                    
+                    <!-- Reason Section -->
+                    <div class="detail-section">
+                      <h4>📝 Reason for Recheck</h4>
+                      <p class="detail-text">{{ r.reason || 'No reason provided' }}</p>
+                    </div>
+
+                    <!-- Admin Notes Section -->
+                    <div class="detail-section" *ngIf="r.adminNotes">
+                      <h4>📋 Admin Notes</h4>
+                      <p class="detail-text">{{ r.adminNotes }}</p>
+                    </div>
+
+                    <!-- Timeline Section -->
+                    <div class="detail-section">
+                      <h4>📅 Timeline</h4>
+                      <div class="timeline">
+                        <div class="timeline-item">
+                          <span class="timeline-label">Requested:</span>
+                          <span class="timeline-value">{{ r.requestDate ? (r.requestDate | date:'MMM dd, yyyy hh:mm a') : 'N/A' }}</span>
+                        </div>
+                        <div class="timeline-item" *ngIf="r.resolvedDate">
+                          <span class="timeline-label">Resolved:</span>
+                          <span class="timeline-value">{{ r.resolvedDate | date:'MMM dd, yyyy hh:mm a' }}</span>
+                        </div>
+                        <div class="timeline-item" *ngIf="!r.resolvedDate && (r.status === 'pending' || r.status === 'PENDING')">
+                          <span class="timeline-label">Status:</span>
+                          <span class="timeline-value" style="color: #ff9800;">⏳ Pending Review</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Status Details Section -->
+                    <div class="detail-section">
+                      <h4>📊 Status Details</h4>
+                      <div class="status-details">
+                        <div class="status-detail-item">
+                          <span class="label">Current Status:</span>
+                          <span class="badge" [ngClass]="'status-' + r.status?.toLowerCase()">
+                            {{ getStatusText(r.status) }}
+                          </span>
+                        </div>
+                        <div class="status-detail-item">
+                          <span class="label">Request ID:</span>
+                          <span class="value">#{{ r.recheckId }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>
@@ -89,7 +159,7 @@
 
   <!-- Footer -->
   <div class="track-footer">
-    <p>© 2023 Delhi Public School. All rights reserved.</p>
+    <p>© 2023 Sri Jayadev Shiksha Kendra. All rights reserved.</p>
     <p>Status updates are typically refreshed every 24 hours</p>
   </div>
 

@@ -1,4 +1,6 @@
 import { Component, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin',
@@ -6,6 +8,8 @@ import { Component, HostListener } from '@angular/core';
   styleUrls: ['./admin.component.css']
 })
 export class AdminComponent {
+  
+  constructor(private authService: AuthService, private router: Router) {}
   
   mobileMenuOpen = false;
   mobileDropdowns = {
@@ -56,5 +60,11 @@ export class AdminComponent {
   private closeAllDropdowns() {
     this.mobileDropdowns.students = false;
     this.mobileDropdowns.teachers = false;
+  }
+
+  logout(): void {
+    console.log('🔓 Admin logout initiated');
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

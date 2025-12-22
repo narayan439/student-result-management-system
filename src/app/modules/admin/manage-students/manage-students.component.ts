@@ -49,9 +49,21 @@ export class ManageStudentsComponent implements OnInit, AfterViewInit {
   }
 
   loadClasses(): void {
-    // Get classes from ClassesService
-    this.classes = this.classesService.getClassesArray();
-    this.totalClasses = this.classes.length;
+    // Load classes from backend API
+    this.classesService.getAllClasses().subscribe({
+      next: (response: any) => {
+        const classesArray = Array.isArray(response?.data) ? response.data : 
+                            Array.isArray(response) ? response : [];
+        this.classes = classesArray || [];
+        this.totalClasses = this.classes.length;
+      },
+      error: (err: any) => {
+        console.error('Error loading classes:', err);
+        // Fallback to cached classes
+        this.classes = this.classesService.getClassesArray();
+        this.totalClasses = this.classes.length;
+      }
+    });
   }
 
   loadStudents(): void {

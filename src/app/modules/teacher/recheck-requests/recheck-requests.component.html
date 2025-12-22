@@ -7,6 +7,24 @@
     </div>
   </div>
 
+  <!-- Success Message -->
+  <div *ngIf="submitSuccess" class="success-message">
+    <mat-icon>check_circle</mat-icon>
+    <div>
+      <strong>Success!</strong>
+      <p>{{ submitSuccess }}</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="submitError" class="error-message">
+    <mat-icon>error</mat-icon>
+    <div>
+      <strong>Error!</strong>
+      <p>{{ submitError }}</p>
+    </div>
+  </div>
+
   <!-- Stats Cards -->
   <div class="stats-container">
     <div class="stat-card">
@@ -73,22 +91,6 @@
     <div class="table-container">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
         
-        <!-- Roll Column -->
-        <ng-container matColumnDef="rollNo">
-          <th mat-header-cell *matHeaderCellDef> 
-            <div class="column-header">
-              <mat-icon>badge</mat-icon>
-              Roll No
-            </div>
-          </th>
-          <td mat-cell *matCellDef="let r">
-            <div class="roll-cell">
-              <mat-icon>numbers</mat-icon>
-              {{ r.rollNo }}
-            </div>
-          </td>
-        </ng-container>
-
         <!-- Student Name Column -->
         <ng-container matColumnDef="studentName">
           <th mat-header-cell *matHeaderCellDef>
@@ -98,12 +100,13 @@
             </div>
           </th>
           <td mat-cell *matCellDef="let r">
-            <div class="name-cell">
-              {{ r.studentName }}
+            <div class="student-cell">
+              <div class="student-name">{{ r.studentName }}</div>
+              <div class="student-roll">{{ r.rollNo }} | {{ r.className }}</div>
             </div>
           </td>
         </ng-container>
-
+        
         <!-- Subject Column -->
         <ng-container matColumnDef="subject">
           <th mat-header-cell *matHeaderCellDef>
@@ -136,6 +139,40 @@
           </td>
         </ng-container>
 
+        <!-- Marks Column -->
+        <ng-container matColumnDef="marksObtained">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="column-header">
+              <mat-icon>grade</mat-icon>
+              Marks
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let r">
+            <div class="marks-cell">
+              <!-- View Mode -->
+              <div *ngIf="editingMarkId !== r.marksId" class="marks-view">
+                <span class="mark-value">{{ r.marksObtained }}/{{ r.maxMarks || 100 }}</span>
+              </div>
+              <!-- Edit Mode -->
+              <div *ngIf="editingMarkId === r.marksId" class="marks-edit">
+                <mat-form-field appearance="outline" class="marks-input">
+                  <mat-label>Marks</mat-label>
+                  <input 
+                    matInput 
+                    type="number"
+                    [(ngModel)]="editedMarks[r.marksId]"
+                    min="0"
+                    max="100"
+                    [name]="'marks_' + r.marksId"
+                  >
+                  <mat-icon matPrefix>grade</mat-icon>
+                  <span matSuffix>/100</span>
+                </mat-form-field>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
         <!-- Status Column -->
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>
@@ -152,21 +189,6 @@
           </td>
         </ng-container>
 
-        <!-- Date Column -->
-        <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef>
-            <div class="column-header">
-              <mat-icon>event</mat-icon>
-              Date
-            </div>
-          </th>
-          <td mat-cell *matCellDef="let r">
-            <div class="date-cell">
-              {{ r.requestDate | date:'mediumDate' }}
-            </div>
-          </td>
-        </ng-container>
-
         <!-- Action Column -->
         <ng-container matColumnDef="action">
           <th mat-header-cell *matHeaderCellDef>
@@ -177,32 +199,56 @@
           </th>
           <td mat-cell *matCellDef="let r">
             <div class="action-buttons">
-              <button 
-                mat-icon-button 
-                color="primary"
-                (click)="viewDetails(r)"
-                matTooltip="View Details"
-              >
-                <mat-icon>visibility</mat-icon>
-              </button>
-              <button 
-                mat-icon-button 
-                color="accent"
-                (click)="approveRequest(r)"
-                matTooltip="Approve"
-                *ngIf="r.status === 'pending'"
-              >
-                <mat-icon>thumb_up</mat-icon>
-              </button>
-              <button 
-                mat-icon-button 
-                color="warn"
-                (click)="rejectRequest(r)"
-                matTooltip="Reject"
-                *ngIf="r.status === 'pending'"
-              >
-                <mat-icon>cancel</mat-icon>
-              </button>
+              <!-- View Mode -->
+              <div *ngIf="editingMarkId !== r.marksId" class="view-actions">
+                <button 
+                  mat-icon-button 
+                  color="accent"
+                  (click)="editMark(r)"
+                  matTooltip="Edit Mark"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="accent"
+                  (click)="approveRequest(r)"
+                  matTooltip="Approve"
+                  *ngIf="r.status === 'pending'"
+                >
+                  <mat-icon>thumb_up</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="warn"
+                  (click)="rejectRequest(r)"
+                  matTooltip="Reject"
+                  *ngIf="r.status === 'pending'"
+                >
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </div>
+              <!-- Edit Mode -->
+              <div *ngIf="editingMarkId === r.marksId" class="edit-actions">
+                <button 
+                  mat-icon-button 
+                  color="primary"
+                  (click)="saveMark(r)"
+                  matTooltip="Save changes"
+                  [disabled]="isSubmitting"
+                >
+                  <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="accent"
+                  (click)="cancelEdit()"
+                  matTooltip="Cancel edit"
+                  [disabled]="isSubmitting"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
             </div>
           </td>
         </ng-container>

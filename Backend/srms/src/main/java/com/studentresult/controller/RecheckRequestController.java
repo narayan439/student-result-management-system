@@ -2,6 +2,8 @@ package com.studentresult.controller;
 
 import com.studentresult.dto.ApiResponse;
 import com.studentresult.dto.RecheckRequestDTO;
+import com.studentresult.dto.RecheckRequestCreateRequest;
+import com.studentresult.entity.RecheckRequest;
 import com.studentresult.service.RecheckRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,79 +11,181 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/recheck-requests")
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:3000"})
+@RequestMapping("/rechecks")
+@CrossOrigin(origins = "http://localhost:4200")
 public class RecheckRequestController {
-
+    
     @Autowired
     private RecheckRequestService recheckRequestService;
-
+    
+    /**
+     * Get all recheck requests
+     */
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<RecheckRequestDTO>>> getAllRecheckRequests() {
-        try {
-            List<RecheckRequestDTO> requests = recheckRequestService.getAllRecheckRequests();
-            return ResponseEntity.ok(ApiResponse.success("Recheck requests retrieved successfully", requests));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error("Failed to retrieve recheck requests", e.getMessage()));
-        }
+        List<RecheckRequestDTO> requests = recheckRequestService.getAllRecheckRequests();
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Recheck requests retrieved successfully", requests)
+        );
     }
-
+    
+    /**
+     * Get recheck request by ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<RecheckRequestDTO>> getRecheckRequestById(
+            @PathVariable Long id) {
+        Optional<RecheckRequestDTO> request = recheckRequestService.getRecheckRequestById(id);
+        if (request.isPresent()) {
+            return ResponseEntity.ok(
+                new ApiResponse<>(true, "Recheck request retrieved successfully", request.get())
+            );
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ApiResponse<>(false, "Recheck request not found", null));
+    }
+    
+    /**
+     * Get recheck requests for a student
+     */
     @GetMapping("/student/{studentId}")
-    public ResponseEntity<ApiResponse<List<RecheckRequestDTO>>> getRecheckRequestsByStudent(@PathVariable Long studentId) {
-        try {
-            List<RecheckRequestDTO> requests = recheckRequestService.getRecheckRequestsByStudent(studentId);
-            return ResponseEntity.ok(ApiResponse.success("Recheck requests retrieved successfully", requests));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error("Failed to retrieve recheck requests", e.getMessage()));
+    public ResponseEntity<ApiResponse<List<RecheckRequestDTO>>> getRecheckRequestsByStudentId(
+            @PathVariable Long studentId) {
+        System.out.println("\n📥 GET /rechecks/student/{" + studentId + "}");
+        System.out.println("  Requesting recheck requests for student ID: " + studentId);
+        
+        List<RecheckRequestDTO> requests = 
+            recheckRequestService.getRecheckRequestsByStudentId(studentId);
+        
+        System.out.println("  Retrieved recheck requests count: " + requests.size());
+        if (requests.isEmpty()) {
+            System.out.println("  ℹ️  No recheck requests found for student " + studentId);
+        } else {
+            System.out.println("  Recheck request details:");
+            requests.forEach(r -> {
+                System.out.println("    - ID: " + r.getRecheckId() + ", Subject: " + r.getSubject() + 
+                                 ", Status: " + r.getStatus() + ", Date: " + r.getRequestDate());
+            });
         }
+        
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Recheck requests retrieved successfully", requests)
+        );
     }
-
+    
+    /**
+     * Get recheck requests by status
+     */
     @GetMapping("/status/{status}")
-    public ResponseEntity<ApiResponse<List<RecheckRequestDTO>>> getRecheckRequestsByStatus(@PathVariable String status) {
+    public ResponseEntity<ApiResponse<List<RecheckRequestDTO>>> getRecheckRequestsByStatus(
+            @PathVariable String status) {
         try {
-            List<RecheckRequestDTO> requests = recheckRequestService.getRecheckRequestsByStatus(status);
-            return ResponseEntity.ok(ApiResponse.success("Recheck requests retrieved successfully", requests));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error("Failed to retrieve recheck requests", e.getMessage()));
+            RecheckRequest.RecheckStatus enumStatus = 
+                RecheckRequest.RecheckStatus.valueOf(status.toUpperCase());
+            List<RecheckRequestDTO> requests = 
+                recheckRequestService.getRecheckRequestsByStatus(enumStatus);
+            return ResponseEntity.ok(
+                new ApiResponse<>(true, "Recheck requests retrieved successfully", requests)
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, "Invalid status", null));
         }
     }
-
-    @PostMapping
-    public ResponseEntity<ApiResponse<RecheckRequestDTO>> createRecheckRequest(@RequestBody RecheckRequestDTO recheckDTO) {
+    
+    /**
+     * Create recheck request from frontend data
+     * Accepts RecheckRequestCreateRequest and processes it
+     */
+    @PostMapping("/request")
+    public ResponseEntity<ApiResponse<RecheckRequestDTO>> createRecheckRequest(
+            @RequestBody RecheckRequestCreateRequest recheckRequest) {
         try {
-            RecheckRequestDTO createdRequest = recheckRequestService.createRecheckRequest(recheckDTO);
+            System.out.println("📥 Received recheck request from frontend: " + recheckRequest);
+            
+            if (recheckRequest == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(false, "Request body cannot be null", null));
+            }
+            
+            RecheckRequestDTO newRequest = 
+                recheckRequestService.createRecheckRequest(recheckRequest);
+            
+            System.out.println("✅ Recheck request created successfully with ID: " + newRequest.getRecheckId());
+            
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.success("Recheck request created successfully", createdRequest));
-        } catch (Exception e) {
+                .body(new ApiResponse<>(true, "Recheck request created successfully", newRequest));
+        } catch (IllegalArgumentException e) {
+            System.err.println("❌ Validation error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.error("Failed to create recheck request", e.getMessage()));
+                .body(new ApiResponse<>(false, "Validation error: " + e.getMessage(), null));
+        } catch (Exception e) {
+            System.err.println("❌ Error creating recheck request: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, "Error: " + e.getMessage(), null));
         }
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<RecheckRequestDTO>> updateRecheckRequest(@PathVariable Long id, @RequestBody RecheckRequestDTO recheckDTO) {
+    
+    /**
+     * Update recheck request status
+     */
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<RecheckRequestDTO>> updateRecheckStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
         try {
-            RecheckRequestDTO updatedRequest = recheckRequestService.updateRecheckRequest(id, recheckDTO);
-            return ResponseEntity.ok(ApiResponse.success("Recheck request updated successfully", updatedRequest));
-        } catch (Exception e) {
+            RecheckRequest.RecheckStatus enumStatus = 
+                RecheckRequest.RecheckStatus.valueOf(status.toUpperCase());
+            Optional<RecheckRequestDTO> updatedRequest = 
+                recheckRequestService.updateRecheckRequestStatus(id, enumStatus);
+            
+            if (updatedRequest.isPresent()) {
+                return ResponseEntity.ok(
+                    new ApiResponse<>(true, "Status updated successfully", updatedRequest.get())
+                );
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(false, "Recheck request not found", null));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.error("Failed to update recheck request", e.getMessage()));
+                .body(new ApiResponse<>(false, "Invalid status", null));
         }
     }
-
+    
+    /**
+     * Update recheck request with admin notes
+     */
+    @PutMapping("/{id}/notes")
+    public ResponseEntity<ApiResponse<RecheckRequestDTO>> updateWithAdminNotes(
+            @PathVariable Long id,
+            @RequestBody String notes) {
+        Optional<RecheckRequestDTO> updatedRequest = 
+            recheckRequestService.updateWithAdminNotes(id, notes);
+        
+        if (updatedRequest.isPresent()) {
+            return ResponseEntity.ok(
+                new ApiResponse<>(true, "Notes updated successfully", updatedRequest.get())
+            );
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ApiResponse<>(false, "Recheck request not found", null));
+    }
+    
+    /**
+     * Delete recheck request
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteRecheckRequest(@PathVariable Long id) {
-        try {
-            recheckRequestService.deleteRecheckRequest(id);
-            return ResponseEntity.ok(ApiResponse.success("Recheck request deleted successfully", null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.error("Failed to delete recheck request", e.getMessage()));
+        if (recheckRequestService.deleteRecheckRequest(id)) {
+            return ResponseEntity.ok(
+                new ApiResponse<>(true, "Recheck request deleted successfully", null)
+            );
         }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(new ApiResponse<>(false, "Recheck request not found", null));
     }
 }

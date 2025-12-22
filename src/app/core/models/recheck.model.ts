@@ -1,15 +1,16 @@
 export interface Recheck {
   recheckId?: number;
   studentId: number;
+  marksId: number;  // New field from schema
   studentEmail?: string;
   rollNo?: string;
   studentName?: string;
   subject: string;
   reason: string;
-  status: 'pending' | 'approved' | 'rejected' | 'completed';
-  requestDate?: string;
-  completionDate?: string;
-  notes?: string;
+  adminNotes?: string;  // New field from schema (admin_notes)
+  status: 'pending' | 'approved' | 'rejected' | 'PENDING' | 'APPROVED' | 'REJECTED';
+  requestDate: string;
+  resolvedDate?: string;  // New field from schema (resolved_date)
   marksObtained?: number;
   maxMarks?: number;
 }

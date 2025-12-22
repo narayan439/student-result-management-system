@@ -3,36 +3,63 @@
   <div class="page-header">
     <div class="header-left">
       <h1 class="page-title">Teacher Profile</h1>
-      <p class="page-subtitle">View and manage teacher information</p>
+      <p class="page-subtitle">View teacher information from database</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage && !isLoading" class="error-message">
+    <mat-icon>error</mat-icon>
+    <div>
+      <strong>Error Loading Profile!</strong>
+      <p>{{ errorMessage }}</p>
+      <button mat-raised-button color="warn" (click)="refreshProfile()" class="retry-btn">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
     </div>
   </div>
 
   <!-- Main Profile Content -->
-  <div class="profile-content">
+  <div *ngIf="!isLoading && !errorMessage" class="profile-content">
     
     <!-- Profile Card -->
     <div class="profile-card">
       <!-- Profile Header -->
       <div class="profile-header">
         <div class="profile-avatar">
-          {{ teacher.name.charAt(0) }}
+          {{ teacher.name ? teacher.name.charAt(0) : 'T' }}
         </div>
         <h1>{{ teacher.name }}</h1>
         <p class="profile-title">{{ teacher.subject }} Teacher</p>
-        <div class="status-badge">
-          <mat-icon>circle</mat-icon>
-          Active
+        <div class="status-badge" [class.active]="teacher.isActive">
+          <mat-icon>{{ teacher.isActive ? 'check_circle' : 'cancel' }}</mat-icon>
+          {{ teacher.isActive ? 'Active' : 'Inactive' }}
         </div>
       </div>
 
-      <!-- Profile Info -->
+      <!-- Profile Info - Contact Information -->
       <div class="profile-info">
         <h3 class="section-title">
-          <mat-icon>person</mat-icon>
+          <mat-icon>contact_mail</mat-icon>
           Contact Information
         </h3>
         
         <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>email</mat-icon>
+              Email
+            </div>
+            <div class="info-value">{{ teacher.email }}</div>
+          </div>
+
           <div class="info-item">
             <div class="info-label">
               <mat-icon>phone</mat-icon>
@@ -48,6 +75,72 @@
             </div>
             <div class="info-value">{{ teacher.address }}</div>
           </div>
+
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>calendar_today</mat-icon>
+              Date of Birth
+            </div>
+            <div class="info-value">{{ teacher.dob }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Info - Professional Information -->
+      <div class="profile-info">
+        <h3 class="section-title">
+          <mat-icon>work</mat-icon>
+          Professional Information
+        </h3>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>school</mat-icon>
+              Subject(s)
+            </div>
+            <div class="info-value">{{ teacher.subject }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>timeline</mat-icon>
+              Years of Experience
+            </div>
+            <div class="info-value">{{ teacher.experience }} years</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>card_membership</mat-icon>
+              Qualifications
+            </div>
+            <div class="info-value">{{ teacher.qualifications }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>assignment</mat-icon>
+              Employment Status
+            </div>
+            <div class="info-value">{{ teacher.employmentStatus }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>date_range</mat-icon>
+              Date of Joining
+            </div>
+            <div class="info-value">{{ teacher.dateOfJoining }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">
+              <mat-icon>badge</mat-icon>
+              Teacher ID
+            </div>
+            <div class="info-value">{{ teacher.teacherId }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -55,16 +148,26 @@
     <!-- Action Card -->
     <div class="action-card">
       <h3>
-        <mat-icon>settings</mat-icon>
-        Quick Actions
+        <mat-icon>refresh</mat-icon>
+        Actions
       </h3>
       <div class="action-buttons">
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="refreshProfile()"
+          class="action-btn"
+        >
+          <mat-icon>refresh</mat-icon>
+          Refresh Profile
+        </button>
+        
         <button mat-stroked-button class="action-btn">
           <mat-icon>password</mat-icon>
           Change Password
         </button>
         
-        <button mat-stroked-button class="action-btn delete">
+        <button mat-stroked-button class="action-btn delete" (click)="logout()">
           <mat-icon>logout</mat-icon>
           Logout
         </button>

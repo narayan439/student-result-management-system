@@ -1,18 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { TeacherService } from '../../../core/services/teacher.service';
 import { SubjectService } from '../../../core/services/subject.service';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
 import { Teacher } from '../../../core/models/teacher.model';
 import { Subject } from '../../../core/models/subject.model';
+import { Router } from '@angular/router';
+
+// ... existing imports ...
 
 @Component({
   selector: 'app-manage-teachers',
   templateUrl: './manage-teachers.component.html',
   styleUrls: ['./manage-teachers.component.css']
 })
-export class ManageTeachersComponent implements OnInit {
+export class ManageTeachersComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['name', 'subjects', 'email', 'actions'];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  displayedColumns: string[] = ['name', 'email', 'phone', 'subjects', 'experience', 'actions'];
   dataSource = new MatTableDataSource<Teacher>([]);
 
   teachers: Teacher[] = [];
@@ -22,10 +28,14 @@ export class ManageTeachersComponent implements OnInit {
   searchTerm = '';
   selectedSubject = 'all';
   allSubjects: string[] = [];
+  
+  // Loading state
+  isLoading = false;
 
   constructor(
     private teacherService: TeacherService,
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -33,50 +43,124 @@ export class ManageTeachersComponent implements OnInit {
     this.loadSubjects();
   }
 
-  loadTeachers(): void {
-    // Get teachers from local data first
-    this.teachers = this.teacherService.getTeachersFromLocal();
-    this.applyFilters();
+  ngAfterViewInit(): void {
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
+  }
 
-    // Try to load from backend
+  loadTeachers(): void {
+    this.isLoading = true;
+
+    // Load from backend API
     this.teacherService.getAllTeachers().subscribe({
-      next: (teachers: Teacher[]) => {
-        this.teachers = teachers;
-        this.loadSubjects();
+      next: (response: any) => {
+        // Service already extracts the data array via map operator
+        this.teachers = (Array.isArray(response) ? response : []) || [];
+        
+        // Process each teacher's subjects
+        this.teachers = this.teachers.map(teacher => {
+          return {
+            ...teacher,
+            // Ensure subjects is always an array of strings
+            subjects: this.extractSubjectNames(teacher)
+          };
+        });
+        
+        console.log('Teachers loaded:', this.teachers);
         this.applyFilters();
+        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading teachers:', err);
+        this.teachers = this.teacherService.getTeachersFromLocal();
+        // Process local teachers too
+        this.teachers = this.teachers.map(teacher => {
+          return {
+            ...teacher,
+            subjects: this.extractSubjectNames(teacher)
+          };
+        });
+        this.applyFilters();
+        this.isLoading = false;
       }
     });
+  }
+
+  // Helper method to extract subject names from teacher object
+  private extractSubjectNames(teacher: any): string[] {
+    let subjectsArray: string[] = [];
+    
+    if (teacher.subjects) {
+      if (Array.isArray(teacher.subjects)) {
+        // Handle array of subjects
+        subjectsArray = teacher.subjects.map((s: any) => {
+          if (typeof s === 'string') {
+            return s;
+          } else if (s && typeof s === 'object') {
+            // Handle object with subjectName property
+            return s.subjectName || s.name || s.subject || '';
+          }
+          return '';
+        }).filter((s: string) => s.trim() !== '');
+      } else if (typeof teacher.subjects === 'string') {
+        // Handle comma-separated string
+        subjectsArray = teacher.subjects.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '');
+      }
+    } else if (teacher.subject) {
+      // Handle single subject field
+      if (typeof teacher.subject === 'string') {
+        subjectsArray = [teacher.subject];
+      }
+    }
+    
+    return subjectsArray;
   }
 
   loadSubjects(): void {
     this.subjectService.getAllSubjects().subscribe({
-      next: (subjects: Subject[]) => {
-        this.allSubjects = subjects.map(s => s.subjectName);
+      next: (response: any) => {
+        // Response is the full API response with { success, data: [...], message }
+        const subjectsArray = response.data ? (Array.isArray(response.data) ? response.data : []) : [];
+        console.log('Subjects loaded from API:', subjectsArray);
+        // Filter only active subjects and extract subject names
+        this.allSubjects = subjectsArray
+          .filter((s: any) => s.isActive !== false)
+          .map((s: any) => s.subjectName);
+        console.log('All subjects after filter:', this.allSubjects);
       },
       error: (err) => {
         console.error('Error loading subjects:', err);
+        this.allSubjects = [];
       }
     });
   }
 
-  deleteTeacher(email: string) {
+  deleteTeacher(teacherId: string) {
     if (confirm("Are you sure you want to delete this teacher?")) {
-      this.teacherService.deleteTeacher(email).subscribe({
+      this.teacherService.deleteTeacher(teacherId).subscribe({
         next: (response: any) => {
-          this.teachers = this.teachers.filter(t => t.email !== email);
+          this.teachers = this.teachers.filter(t => t.teacherId !== teacherId);
           this.applyFilters();
-          alert("🎉 Teacher Deleted Successfully!");
+          alert("✓ Teacher Deleted Successfully!");
         },
         error: (err) => {
           const errorMsg = err.error?.message || 'Failed to delete teacher';
-          alert("❌ Error: " + errorMsg);
+          alert("✗ Error: " + errorMsg);
           console.error('Error deleting teacher:', err);
         }
       });
     }
+  }
+
+  editTeacher(teacher: Teacher): void {
+    this.router.navigate(['/admin/manage-teachers/edit', teacher.teacherId], {
+      state: { teacher }
+    });
+  }
+
+  addTeacher(): void {
+    this.router.navigate(['/admin/manage-teachers/add']);
   }
 
   // Search functionality
@@ -97,7 +181,11 @@ export class ManageTeachersComponent implements OnInit {
 
     // Filter by subject
     if (this.selectedSubject !== 'all') {
-      filtered = filtered.filter(t => t.subjects.includes(this.selectedSubject));
+      filtered = filtered.filter(t => 
+        t.subjects && t.subjects.some((s: string) => 
+          s.toLowerCase() === this.selectedSubject.toLowerCase()
+        )
+      );
     }
 
     // Filter by search term
@@ -105,7 +193,7 @@ export class ManageTeachersComponent implements OnInit {
       filtered = filtered.filter(t =>
         t.name.toLowerCase().includes(this.searchTerm) ||
         t.email.toLowerCase().includes(this.searchTerm) ||
-        t.subjects.some(s => s.toLowerCase().includes(this.searchTerm))
+        (t.subjects && t.subjects.some((s: string) => s.toLowerCase().includes(this.searchTerm)))
       );
     }
 
@@ -139,12 +227,14 @@ export class ManageTeachersComponent implements OnInit {
   getSubjectColor(subject: string): string {
     const colorMap: {[key: string]: string} = {
       'Maths': '#4CAF50',
+      'Mathematics': '#4CAF50',
       'Science': '#2196F3',
       'English': '#FF9800',
       'History': '#9C27B0',
       'Physics': '#F44336',
       'Chemistry': '#795548',
       'Computer Science': '#00BCD4',
+      'Computer': '#00BCD4',
       'Geography': '#8BC34A',
       'Literature': '#E91E63',
       'Electronics': '#607D8B'

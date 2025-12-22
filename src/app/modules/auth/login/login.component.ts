@@ -41,31 +41,51 @@ export class LoginComponent {
 
     this.isLoading = true;
     
-    // Simulate API delay
-    setTimeout(() => {
-      const role = this.auth.fakeLogin(this.loginData.email, this.loginData.password);
-
-      if (role) {
-        // Save user session
-        this.auth.saveUserSession(this.loginData.email, role);
+    console.log('📝 Login attempt initiated');
+    console.log('   Email:', this.loginData.email);
+    console.log('   Password: ' + '*'.repeat(this.loginData.password.length));
+    
+    // Call async fakeLogin
+    this.auth.fakeLogin(this.loginData.email, this.loginData.password).then((role) => {
+      console.log('📊 Login response received:', role);
+      
+      if (role && role.length > 0) {
+        console.log(`✅ Login successful - Role: ${role}`);
+        
+        // Prevent going back to login page using browser back button
+        window.history.replaceState(null, '', window.location.href);
+        
+        // Session already saved in auth service, no need to call again
         
         // Navigate based on role
         if (role === 'ADMIN') {
+          console.log('🔀 Redirecting to /admin');
           this.router.navigate(['/admin']);
         }
         else if (role === 'TEACHER') {
+          console.log('🔀 Redirecting to /teacher');
           this.router.navigate(['/teacher']);
         }
         else if (role === 'STUDENT') {
+          console.log('🔀 Redirecting to /student');
           this.router.navigate(['/student']);
+        }
+        else {
+          console.warn('⚠️ Unknown role:', role);
+          alert(`Unknown user role: ${role}`);
         }
       }
       else {
+        console.error('❌ Login failed - No role returned');
         alert("❌ Invalid email or password");
       }
       
       this.isLoading = false;
-    }, 1000);
+    }).catch((error) => {
+      console.error('❌ Login error caught:', error);
+      alert("❌ Invalid email or password");
+      this.isLoading = false;
+    });
   }
 
   togglePasswordVisibility() {

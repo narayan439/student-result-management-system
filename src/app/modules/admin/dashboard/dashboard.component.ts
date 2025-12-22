@@ -3,9 +3,7 @@ import { StudentService } from '../../../core/services/student.service';
 import { TeacherService } from '../../../core/services/teacher.service';
 import { SubjectService } from '../../../core/services/subject.service';
 import { ClassesService, SchoolClass } from '../../../core/services/classes.service';
-import { Student } from '../../../core/models/student.model';
-import { Teacher } from '../../../core/models/teacher.model';
-import { Subject } from '../../../core/models/subject.model';
+import { RequestRecheckService } from '../../../core/services/request-recheck.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,20 +21,36 @@ export class DashboardComponent implements OnInit {
   activeTeachers = 0;
 
   // Data arrays
-  students: Student[] = [];
-  teachers: Teacher[] = [];
-  classes: SchoolClass[] = [];
-  allSubjects: Subject[] = [];
+  students: any[] = [];
+  teachers: any[] = [];
+  classes: any[] = [];
+  allSubjects: any[] = [];
 
   // Recent activity
-  recentStudents: Student[] = [];
-  recentTeachers: Teacher[] = [];
+  recentStudents: any[] = [];
+  recentTeachers: any[] = [];
+  recentRechecks: any[] = [];
+
+  // Class colors for distribution
+  classColors = [
+    'linear-gradient(135deg, #667eea, #764ba2)',
+    'linear-gradient(135deg, #f093fb, #f5576c)',
+    'linear-gradient(135deg, #4facfe, #00f2fe)',
+    'linear-gradient(135deg, #43e97b, #38f9d7)',
+    'linear-gradient(135deg, #ff9a9e, #fad0c4)',
+    'linear-gradient(135deg, #a18cd1, #fbc2eb)',
+    'linear-gradient(135deg, #fad0c4, #ffd1ff)',
+    'linear-gradient(135deg, #ffecd2, #fcb69f)',
+    'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
+    'linear-gradient(135deg, #d4fc79, #96e6a1)'
+  ];
 
   constructor(
     private studentService: StudentService,
     private teacherService: TeacherService,
     private subjectService: SubjectService,
-    private classesService: ClassesService
+    private classesService: ClassesService,
+    private recheckService: RequestRecheckService
   ) {}
 
   ngOnInit(): void {
@@ -44,99 +58,159 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
-    // Load students with timeout to ensure services are initialized
-    setTimeout(() => {
-      console.log('Loading students...');
-      this.studentService.getAllStudents().subscribe({
-        next: (students: any) => {
-          console.log('Students received:', students);
-          this.students = (Array.isArray(students) ? students : []) || [];
-          this.totalStudents = this.students.length;
-          this.activeStudents = this.students.filter(s => s.isActive !== false).length;
-          this.recentStudents = this.students.slice(-5).reverse();
-          console.log('✓ Students loaded:', this.totalStudents);
-        },
-        error: (err: any) => {
-          console.error('✗ Error loading students:', err);
-          this.students = [];
-          this.totalStudents = 0;
-          this.activeStudents = 0;
-        }
-      });
+    // Load students
+    this.studentService.getAllStudents().subscribe({
+      next: (students: any) => {
+        this.students = Array.isArray(students) ? students : [];
+        this.totalStudents = this.students.length;
+        this.activeStudents = this.students.filter(s => s.isActive !== false).length;
+        this.recentStudents = this.students.slice(-5).reverse();
+      },
+      error: (err: any) => {
+        console.error('Error loading students:', err);
+        this.students = [];
+        this.totalStudents = 0;
+        this.activeStudents = 0;
+      }
+    });
 
-      // Load teachers
-      console.log('Loading teachers...');
-      this.teacherService.getAllTeachers().subscribe({
-        next: (teachers: any) => {
-          console.log('Teachers received:', teachers);
-          this.teachers = (Array.isArray(teachers) ? teachers : []) || [];
-          this.totalTeachers = this.teachers.length;
-          this.activeTeachers = this.teachers.filter(t => t.isActive !== false).length;
-          this.recentTeachers = this.teachers.slice(-5).reverse();
-          console.log('✓ Teachers loaded:', this.totalTeachers);
-        },
-        error: (err: any) => {
-          console.error('✗ Error loading teachers:', err);
-          this.teachers = [];
-          this.totalTeachers = 0;
-          this.activeTeachers = 0;
-        }
-      });
+    // Load teachers
+    this.teacherService.getAllTeachers().subscribe({
+      next: (teachers: any) => {
+        this.teachers = Array.isArray(teachers) ? teachers : [];
+        this.totalTeachers = this.teachers.length;
+        this.activeTeachers = this.teachers.filter(t => t.isActive !== false).length;
+        this.recentTeachers = this.teachers.slice(-5).reverse();
+      },
+      error: (err: any) => {
+        console.error('Error loading teachers:', err);
+        this.teachers = [];
+        this.totalTeachers = 0;
+        this.activeTeachers = 0;
+      }
+    });
 
-      // Load subjects
-      console.log('Loading subjects...');
-      this.subjectService.getAllSubjects().subscribe({
-        next: (subjects: any) => {
-          console.log('Subjects received:', subjects);
-          this.allSubjects = (Array.isArray(subjects) ? subjects : []) || [];
-          this.totalSubjects = this.allSubjects.length;
-          console.log('✓ Subjects loaded:', this.totalSubjects);
-        },
-        error: (err: any) => {
-          console.error('✗ Error loading subjects:', err);
-          this.allSubjects = [];
-          this.totalSubjects = 0;
-        }
-      });
+    // Load subjects
+    this.subjectService.getAllSubjects().subscribe({
+      next: (response: any) => {
+        const subjectsArray = Array.isArray(response?.data) ? response.data : 
+                             Array.isArray(response) ? response : [];
+        this.allSubjects = subjectsArray || [];
+        this.totalSubjects = this.allSubjects.length;
+      },
+      error: (err: any) => {
+        console.error('Error loading subjects:', err);
+        this.allSubjects = [];
+        this.totalSubjects = 0;
+      }
+    });
 
-      // Load classes
-      console.log('Loading classes...');
-      this.classesService.getClasses().subscribe({
-        next: (classes: any) => {
-          console.log('Classes received:', classes);
-          this.classes = (Array.isArray(classes) ? classes : []) || [];
-          this.totalClasses = this.classes.length;
-          console.log('✓ Classes loaded:', this.totalClasses);
-        },
-        error: (err: any) => {
-          console.error('✗ Error loading classes:', err);
-          this.classes = [];
-          this.totalClasses = 0;
-        }
-      });
-    }, 500);
+    // Load classes
+    this.classesService.getAllClasses().subscribe({
+      next: (response: any) => {
+        const classesArray = Array.isArray(response?.data) ? response.data : 
+                            Array.isArray(response) ? response : [];
+        this.classes = classesArray || [];
+        this.totalClasses = this.classes.length;
+      },
+      error: (err: any) => {
+        console.error('Error loading classes:', err);
+        this.classes = [];
+        this.totalClasses = 0;
+      }
+    });
+
+    // Load recent rechecks
+    this.recheckService.getAllRechecks().subscribe({
+      next: (rechecks: any) => {
+        const rechecksArray = Array.isArray(rechecks) ? rechecks : [];
+        this.recentRechecks = rechecksArray.slice(-5).reverse();
+      },
+      error: (err: any) => {
+        console.error('Error loading rechecks:', err);
+        this.recentRechecks = [];
+      }
+    });
   }
 
-  // Helper methods for UI
-  getStudentsByClass(className: string): number {
-    return this.students.filter(s => s.className === className).length;
-  }
-
-  getTeachersBySubject(subject: string): number {
-    return this.teachers.filter(t => t.subjects?.includes(subject)).length;
-  }
-
-  // Get unique class numbers (1-10) to show in dashboard
+  // Get unique class numbers (1-10)
   getUniqueClassNumbers(): number[] {
-    const uniqueClasses = new Set<number>();
+    const numbers = [];
     for (let i = 1; i <= 10; i++) {
-      uniqueClasses.add(i);
+      numbers.push(i);
     }
-    return Array.from(uniqueClasses).sort((a, b) => a - b);
+    return numbers;
   }
 
-  // Get student count for a specific class number across all sections
+  // Get student count for a specific class
   getStudentsInClass(classNumber: number): number {
-    return this.students.filter(s => s.className.includes(`Class ${classNumber}`)).length;
+    if (!this.students.length) return 0;
+    
+    // Exact match for class name
+    const targetClassName = `Class ${classNumber}`;
+    return this.students.filter(student => {
+      return student.className === targetClassName;
+    }).length;
+  }
+
+  // Get color for class distribution
+  getClassColor(classNumber: number): string {
+    return this.classColors[(classNumber - 1) % this.classColors.length];
+  }
+
+  // Get teachers by subject - improved version
+  getTeachersBySubject(subjectName: string): number {
+    if (!this.teachers.length || !subjectName) return 0;
+    
+    const searchTerm = subjectName.toLowerCase().trim();
+    
+    return this.teachers.filter(teacher => {
+      // Check direct subject field
+      if (teacher.subject) {
+        if (typeof teacher.subject === 'string') {
+          if (teacher.subject.toLowerCase().includes(searchTerm)) {
+            return true;
+          }
+        }
+      }
+      
+      // Check subjects array
+      if (teacher.subjects) {
+        if (Array.isArray(teacher.subjects)) {
+          return teacher.subjects.some((s: any) => {
+            if (typeof s === 'string') {
+              return s.toLowerCase().includes(searchTerm);
+            } else if (s && typeof s === 'object' && s.subjectName) {
+              return s.subjectName.toLowerCase().includes(searchTerm);
+            }
+            return false;
+          });
+        } else if (typeof teacher.subjects === 'string') {
+          return teacher.subjects.toLowerCase().includes(searchTerm);
+        }
+      }
+      
+      // Check for subjectName field in teacher object
+      if (teacher.subjectName) {
+        if (typeof teacher.subjectName === 'string') {
+          return teacher.subjectName.toLowerCase().includes(searchTerm);
+        }
+      }
+      
+      return false;
+    }).length;
+  }
+
+  // Get status color for recheck avatar
+  getStatusColor(status: string): string {
+    const normalizedStatus = (status || '').toUpperCase();
+    if (normalizedStatus === 'PENDING') {
+      return 'linear-gradient(135deg, #ff9800, #ff5722)';
+    } else if (normalizedStatus === 'APPROVED') {
+      return 'linear-gradient(135deg, #4caf50, #388e3c)';
+    } else if (normalizedStatus === 'REJECTED') {
+      return 'linear-gradient(135deg, #f44336, #d32f2f)';
+    }
+    return 'linear-gradient(135deg, #9e9e9e, #757575)';
   }
 }

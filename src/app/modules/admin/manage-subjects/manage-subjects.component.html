@@ -13,7 +13,15 @@
     <div class="card-header">
       <h2>All Subjects</h2>
       <div class="subject-count">
-        <span class="count-badge">{{subjects.length}} Subjects</span>
+        <span class="count-badge">{{activeSubjectsCount}} Active Subjects</span>
+        <button 
+          mat-icon-button 
+          (click)="toggleShowDeletedSubjects()"
+          [color]="showDeletedSubjects ? 'warn' : 'primary'"
+          matTooltip="Show/Hide Deleted Subjects"
+        >
+          <mat-icon>{{ showDeletedSubjects ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
       </div>
     </div>
 
@@ -63,7 +71,7 @@
           <th mat-header-cell *matHeaderCellDef> Code </th>
           <td mat-cell *matCellDef="let subject">
             <div class="code-badge">
-              {{ subject.subjectCode }}
+              {{ subject.code }}
             </div>
           </td>
         </ng-container>
@@ -83,14 +91,26 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef class="actions-header"> Actions </th>
           <td mat-cell *matCellDef="let subject">
-            <button 
-              mat-button 
-              color="warn" 
-              (click)="deleteSubject(subject)"
-              class="delete-btn"
-            >
-              <mat-icon>delete</mat-icon> Delete
-            </button>
+            <ng-container *ngIf="subject.isActive !== false; else deletedActions">
+              <button 
+                mat-button 
+                color="warn" 
+                (click)="deleteSubject(subject)"
+                class="delete-btn"
+              >
+                <mat-icon>delete</mat-icon> Delete
+              </button>
+            </ng-container>
+            <ng-template #deletedActions>
+              <button 
+                mat-button 
+                color="accent" 
+                (click)="reactivateSubject(subject)"
+                class="restore-btn"
+              >
+                <mat-icon>restore</mat-icon> Reactivate
+              </button>
+            </ng-template>
           </td>
         </ng-container>
 

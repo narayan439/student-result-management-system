@@ -16,7 +16,6 @@ export class AddTeacherComponent implements OnInit {
     name: '',
     email: '',
     subjects: [],
-    dob: '',
     phone: '',
     experience: 0,
     isActive: true
@@ -24,6 +23,7 @@ export class AddTeacherComponent implements OnInit {
 
   availableSubjects: string[] = [];
   subjectObjects: Subject[] = [];
+  generatedPassword: string = '';
 
   constructor(
     private teacherService: TeacherService,
@@ -37,12 +37,15 @@ export class AddTeacherComponent implements OnInit {
 
   loadSubjects(): void {
     this.subjectService.getAllSubjects().subscribe({
-      next: (subjects: Subject[]) => {
-        this.subjectObjects = subjects;
-        this.availableSubjects = subjects.map(s => s.subjectName);
+      next: (response: any) => {
+        const subjectsArray = response.data ? (Array.isArray(response.data) ? response.data : []) : [];
+        // Filter only active subjects
+        this.subjectObjects = subjectsArray.filter((s: any) => s.isActive !== false);
+        this.availableSubjects = this.subjectObjects.map((s: any) => s.subjectName);
       },
       error: (err) => {
         console.error('Error loading subjects:', err);
+        this.availableSubjects = [];
       }
     });
   }
@@ -57,6 +60,31 @@ export class AddTeacherComponent implements OnInit {
 
   isSubjectSelected(subject: string): boolean {
     return this.teacher.subjects.includes(subject);
+  }
+
+  /**
+   * Generate password preview as user enters name and phone
+   * Format: First 3 letters of name (UPPERCASE) + Last 4 digits of phone
+   */
+  generatePasswordPreview(): void {
+    if (this.teacher.name && this.teacher.phone) {
+      const namePart = this.teacher.name.substring(0, 3).toUpperCase();
+      const phonePart = this.teacher.phone.replace(/\D/g, '').slice(-4);
+      this.generatedPassword = namePart + phonePart;
+    } else {
+      this.generatedPassword = '';
+    }
+  }
+
+  /**
+   * Copy password to clipboard
+   */
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('✅ Password copied to clipboard!');
+    }).catch(() => {
+      alert('❌ Failed to copy password');
+    });
   }
 
   createTeacher() {
@@ -95,34 +123,11 @@ export class AddTeacherComponent implements OnInit {
       return false;
     }
     
-    if (!this.teacher.dob) {
-      alert('Please select date of birth');
-      return false;
-    }
-    
-    if (!this.isValidAge(this.teacher.dob)) {
-      alert('Teacher must be at least 21 years old');
-      return false;
-    }
-    
     return true;
   }
 
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  }
-
-  private isValidAge(dob: string): boolean {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    return age >= 21;
   }
 }

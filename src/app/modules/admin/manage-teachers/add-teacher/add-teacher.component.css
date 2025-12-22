@@ -332,3 +332,94 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Password Preview Styling */
+.password-preview {
+  margin-top: 16px;
+}
+
+.password-info-box {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eaff 100%);
+  border: 2px solid #304ffe;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0;
+}
+
+.password-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #1a237e;
+  font-size: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(48, 79, 254, 0.2);
+}
+
+.password-header mat-icon {
+  color: #304ffe;
+}
+
+.password-format-info {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #424242;
+}
+
+.password-format-info p {
+  margin: 6px 0;
+}
+
+.password-format-info code {
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.password-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.password-display .label {
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.password-display .password-value {
+  background: #f5f5f5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  color: #d32f2f;
+  letter-spacing: 1px;
+  flex: 1;
+}
+
+.password-display button {
+  color: #304ffe;
+}
+
+.password-note {
+  font-size: 12px;
+  color: #d32f2f;
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(211, 47, 47, 0.05);
+  border-radius: 6px;
+}

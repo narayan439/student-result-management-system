@@ -24,6 +24,76 @@
   margin: 0;
 }
 
+/* Loading State */
+.loading-state {
+  max-width: 800px;
+  margin: 60px auto;
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.loading-state mat-spinner {
+  margin: 0 auto 20px;
+}
+
+.loading-state p {
+  color: #718096;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Error Message */
+.error-message {
+  max-width: 800px;
+  margin: 60px auto;
+  background: #ffebee;
+  border-left: 4px solid #d32f2f;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.error-message mat-icon {
+  color: #d32f2f;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.error-message strong {
+  color: #d32f2f;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.error-message p {
+  color: #c62828;
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.retry-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
 /* Main Profile Content - Centered Layout */
 .profile-content {
   max-width: 800px;
@@ -88,17 +158,347 @@
   color: white;
 }
 
+.status-badge.active mat-icon {
+  color: #4caf50;
+}
+
 .status-badge mat-icon {
   font-size: 16px;
   width: 16px;
   height: 16px;
-  color: #4caf50;
 }
 
 /* Profile Info Section */
 .profile-info {
   padding: 32px;
 }
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a237e;
+  margin: 0 0 24px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e8eaf6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-label mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #a0aec0;
+}
+
+.info-value {
+  font-size: 16px;
+  color: #2d3748;
+  font-weight: 500;
+  padding: 8px 0;
+}
+
+/* Action Card */
+.action-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.action-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a237e;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-card h3 mat-icon {
+  color: #304ffe;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #4a5568;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.action-btn:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.action-btn mat-icon {
+  color: #718096;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.action-btn.delete {
+  color: #d32f2f;
+  border-color: #ffebee;
+}
+
+.action-btn.delete:hover {
+  background: #ffebee;
+  border-color: #ffcdd2;
+}
+
+.action-btn.delete mat-icon {
+  color: #d32f2f;
+}
+
+/* ========================= */
+/* RESPONSIVE BREAKPOINTS */
+/* ========================= */
+
+/* Tablet Devices (768px - 1024px) */
+@media (max-width: 1024px) {
+  .profile-container {
+    padding: 20px;
+  }
+  
+  .profile-content {
+    max-width: 600px;
+  }
+  
+  .profile-header {
+    padding: 30px;
+  }
+  
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+    font-size: 36px;
+  }
+  
+  .profile-info {
+    padding: 24px;
+  }
+}
+
+/* Large Mobile (600px - 768px) */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 16px;
+  }
+  
+  .page-header {
+    margin-bottom: 24px;
+  }
+  
+  .header-left .page-title {
+    font-size: 24px;
+  }
+  
+  .profile-header {
+    padding: 24px;
+  }
+  
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+  }
+  
+  .profile-header h1 {
+    font-size: 20px;
+  }
+  
+  .profile-title {
+    font-size: 14px;
+  }
+  
+  .profile-info {
+    padding: 20px;
+  }
+  
+  .action-card {
+    padding: 20px;
+  }
+}
+
+/* Mobile Devices (480px - 600px) */
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 12px;
+  }
+  
+  .page-header {
+    margin-bottom: 20px;
+  }
+  
+  .header-left .page-title {
+    font-size: 22px;
+  }
+  
+  .header-left .page-subtitle {
+    font-size: 14px;
+  }
+  
+  .profile-header {
+    padding: 20px;
+  }
+  
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 28px;
+    border-width: 3px;
+  }
+  
+  .profile-header h1 {
+    font-size: 18px;
+  }
+  
+  .profile-title {
+    font-size: 13px;
+  }
+  
+  .status-badge {
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+  
+  .profile-info {
+    padding: 16px;
+  }
+  
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .action-card {
+    padding: 16px;
+  }
+  
+  .action-card h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .action-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  .action-btn mat-icon {
+    font-size: 18px;
+  }
+}
+
+/* Small Mobile Devices (Below 480px) */
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 8px;
+  }
+  
+  .page-header {
+    margin-bottom: 16px;
+  }
+  
+  .header-left .page-title {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  
+  .profile-header {
+    padding: 16px;
+  }
+  
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .profile-header h1 {
+    font-size: 18px;
+  }
+  
+  .profile-title {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .profile-info {
+    padding: 12px;
+  }
+  
+  .section-title {
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+  
+  .info-grid {
+    gap: 16px;
+  }
+  
+  .info-label {
+    font-size: 11px;
+  }
+  
+  .info-value {
+    font-size: 15px;
+    padding: 6px 0;
+  }
+  
+  .action-card {
+    padding: 12px;
+  }
+  
+  .action-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
 
 .section-title {
   font-size: 18px;

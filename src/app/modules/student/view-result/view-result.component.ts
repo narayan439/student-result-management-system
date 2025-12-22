@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../../core/services/student.service';
 import { MarksService } from '../../../core/services/marks.service';
 import { SubjectService } from '../../../core/services/subject.service';
+import { forkJoin } from 'rxjs';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -19,6 +20,15 @@ export class ViewResultComponent implements OnInit {
   classNumber: number = 0;
   marks: any[] = [];
   classSubjects: any[] = [];
+  
+  // Loading and error states
+  isLoading: boolean = true;
+  hasError: boolean = false;
+  errorMessage: string = '';
+  
+  // Track data source
+  marksSource: string = 'unknown';
+  marksMessage: string = '';
 
   constructor(
     private route: ActivatedRoute, 
@@ -29,91 +39,302 @@ export class ViewResultComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Get parameters from route (rollNo and email)
+    console.log('📖 ViewResultComponent initializing...');
+    this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+    
+    // Get parameters from route
     let rollNo = this.route.snapshot.paramMap.get('rollNo');
     let studentEmail = this.route.snapshot.paramMap.get('email');
 
-    // Get all students
-    const students = this.studentService.getAllStudentsSync();
-    
-    if (!students || students.length === 0) {
-      console.error('No students found in StudentService');
+    console.log('Route params:', { rollNo, studentEmail });
+
+    // Load student data directly from backend using rollNo
+    if (!rollNo) {
+      console.error('❌ No rollNo provided in route parameters');
+      this.isLoading = false;
+      this.hasError = true;
+      this.errorMessage = 'Invalid URL. Roll number is required.';
+      setTimeout(() => this.router.navigate(['/welcome']), 2000);
       return;
     }
 
-    // Search for student by email first (most reliable)
-    if (studentEmail) {
-      this.student = students.find(s => s.email === studentEmail);
-      console.log('Searching by email:', studentEmail, 'Found:', this.student);
-    }
-    
-    // If not found by email, search by roll number
-    if (!this.student && rollNo) {
-      this.student = students.find(s => s.rollNo === rollNo);
-      console.log('Searching by rollNo:', rollNo, 'Found:', this.student);
-    }
-
-    // Fallback: use first student (shouldn't happen in normal flow)
-    if (!this.student && students.length > 0) {
-      console.warn('Student not found, defaulting to first student');
-      this.student = students[0];
-    }
-
-    if (this.student) {
-      console.log('✓ Student loaded:', this.student);
-      
-      // Extract class number
-      const classMatch = this.student.className.match(/Class\s(\d+)/);
-      this.classNumber = classMatch ? parseInt(classMatch[1]) : 1;
-
-      // Load class-specific subjects
-      this.classSubjects = this.subjectService.getSubjectsByClass(this.classNumber);
-      console.log(`✓ Loaded ${this.classSubjects.length} subjects for Class ${this.classNumber}`);
-
-      // Load marks for this student
-      this.marksService.getAllMarks().subscribe({
-        next: (allMarks: any) => {
-          const marksArray = Array.isArray(allMarks) ? allMarks : [];
-          const studentIdStr = String(this.student.studentId);
-          this.marks = marksArray.filter(m => m.studentId === studentIdStr) || [];
-          console.log(`✓ Loaded ${this.marks.length} marks for student`);
-          this.processResult();
-        },
-        error: (err) => {
-          console.error('Error loading marks:', err);
-          this.processResult();
+    console.log('🔄 Loading student data from backend using rollNo:', rollNo);
+    this.studentService.getStudentByRollNo(rollNo).subscribe({
+      next: (student) => {
+        console.log('✓ Student loaded from backend:', student);
+        this.student = student;
+        this.loadStudentDataAndMarks();
+      },
+      error: (err) => {
+        console.error('❌ Error loading student from backend:', err);
+        console.log('Falling back to local cached data...');
+        
+        // Fallback: Try to get from cache
+        const students = this.studentService.getAllStudentsSync();
+        
+        if (students && students.length > 0) {
+          let foundStudent = students.find(s => s.rollNo === rollNo);
+          if (!foundStudent && studentEmail) {
+            foundStudent = students.find(s => s.email === studentEmail);
+          }
+          
+          if (foundStudent) {
+            console.log('✓ Student found in cache:', foundStudent);
+            this.student = foundStudent;
+            this.loadStudentDataAndMarks();
+          } else {
+            this.isLoading = false;
+            this.hasError = true;
+            this.errorMessage = 'Student not found. Please check the roll number and try again.';
+            console.error('❌ Student not found in cache either');
+          }
+        } else {
+          this.isLoading = false;
+          this.hasError = true;
+          this.errorMessage = 'Unable to load student data. Please try again.';
+          console.error('❌ No cached students available');
         }
-      });
+      }
+    });
+  }
 
-      // Generate QR data
-      this.qrData = `ROLL:${this.student.rollNo},EMAIL:${this.student.email},CLASS:${this.student.className}`;
-    } else {
-      console.error('✗ No student found to display result');
+  /**
+   * Load student data and marks using parallel loading
+   */
+  private loadStudentDataAndMarks(): void {
+    if (!this.student) {
+      this.isLoading = false;
+      this.hasError = true;
+      this.errorMessage = 'Student data not available';
+      console.error('❌ Student data not available');
+      return;
     }
+
+    console.log('✓ Student loaded:', this.student.name, '(ID:', this.student.studentId, ')');
+    
+    // Extract class number
+    const classMatch = this.student.className.match(/Class\s(\d+)/);
+    this.classNumber = classMatch ? parseInt(classMatch[1]) : 1;
+    console.log('📚 Class number:', this.classNumber);
+
+    // Generate QR data
+    this.qrData = `ROLL:${this.student.rollNo},EMAIL:${this.student.email},CLASS:${this.student.className}`;
+    console.log('✓ QR data generated');
+
+    // Load marks and subjects in parallel
+    console.log('🔄 Loading marks and subjects in parallel...');
+    
+    forkJoin({
+      marks: this.marksService.getMarksByStudentId(this.student.studentId),
+      subjects: this.subjectService.getSubjectsByClass(this.classNumber)
+    }).subscribe({
+      next: (data) => {
+        console.log('✓ Both marks and subjects loaded successfully');
+        console.log('Marks response:', data.marks);
+        
+        // Determine data source and message
+        if (data.marks?.source) {
+          this.marksSource = data.marks.source;
+          this.marksMessage = data.marks?.message || '';
+          console.log(`📊 DATA SOURCE: ${this.marksSource.toUpperCase()}`);
+          console.log(`📝 MESSAGE: ${this.marksMessage}`);
+        }
+        
+        // ============ PROCESS MARKS ============
+        let marksArray: any[] = [];
+        
+        // Extract marks array from response
+        if (Array.isArray(data.marks)) {
+          marksArray = data.marks;
+        } else if (data.marks?.data && Array.isArray(data.marks.data)) {
+          marksArray = data.marks.data;
+        } else if (data.marks?.success !== false && data.marks?.data) {
+          if (Array.isArray(data.marks.data)) {
+            marksArray = data.marks.data;
+          }
+        }
+        
+        this.marks = marksArray;
+        console.log(`✓ Marks array set: ${marksArray.length} marks loaded`);
+        
+        // ============ PROCESS SUBJECTS ============
+        let subjectsArray: any[] = [];
+        if (Array.isArray(data.subjects)) {
+          subjectsArray = data.subjects;
+        } else if (data.subjects?.data && Array.isArray(data.subjects.data)) {
+          subjectsArray = data.subjects.data;
+        }
+        
+        this.classSubjects = subjectsArray;
+        console.log(`✓ Loaded ${subjectsArray.length} subjects for Class ${this.classNumber}`);
+        
+        // Process the result
+        this.processResult();
+        
+        // Set loading to false - ALWAYS show content even if no marks
+        this.isLoading = false;
+        this.hasError = false; // Reset error state
+      },
+      error: (err) => {
+        console.error('❌ Error loading marks or subjects:', err);
+        
+        // Set empty arrays and continue
+        this.marks = [];
+        this.classSubjects = [];
+        this.processResult();
+        
+        // Don't set hasError to true - still show the result container
+        this.isLoading = false;
+        this.hasError = false;
+        this.marksMessage = 'Failed to load marks data. Please try refreshing.';
+      }
+    });
+  }
+
+  /**
+   * Refresh marks - reload marks data
+   */
+  refreshMarks(): void {
+    console.log('🔄 Refreshing marks data...');
+    this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+
+    if (!this.student) {
+      console.error('❌ Student data not available for marks refresh');
+      this.isLoading = false;
+      this.hasError = true;
+      this.errorMessage = 'Student data not available. Please reload the page.';
+      return;
+    }
+
+    console.log('Reloading marks for student ID:', this.student.studentId);
+    this.marksService.getMarksByStudentId(this.student.studentId).subscribe({
+      next: (marksResponse: any) => {
+        console.log('✓ Marks response received:', marksResponse);
+        
+        let marksArray: any[] = [];
+        
+        // Update source info
+        if (marksResponse?.source) {
+          this.marksSource = marksResponse.source;
+          this.marksMessage = marksResponse?.message || '';
+        }
+        
+        // Extract marks array
+        if (Array.isArray(marksResponse)) {
+          marksArray = marksResponse;
+        } else if (marksResponse?.data && Array.isArray(marksResponse.data)) {
+          marksArray = marksResponse.data;
+        } else if (marksResponse?.success !== false && marksResponse?.data && Array.isArray(marksResponse.data)) {
+          marksArray = marksResponse.data;
+        }
+        
+        this.marks = marksArray;
+        console.log(`✓ Refreshed marks: ${marksArray.length} marks loaded`);
+        
+        // Re-process result with new marks
+        this.processResult();
+        this.isLoading = false;
+        this.hasError = false; // NEVER set hasError for "no marks" scenario
+        console.log('✓ Marks refresh complete');
+      },
+      error: (err) => {
+        console.error('❌ Error refreshing marks:', err);
+        this.isLoading = false;
+        
+        // Handle different error types
+        if (err.status === 404 || err.message?.includes('not found')) {
+          // 404 is NOT an error - just means no marks yet
+          this.marks = [];
+          this.processResult();
+          this.hasError = false;
+          this.marksSource = 'backend-404';
+          this.marksMessage = 'Marks not found. They may not be entered yet.';
+          console.log('ℹ️  No marks found for this student (404)');
+        } else if (err.status === 0) {
+          // Network error
+          this.marks = [];
+          this.processResult();
+          this.hasError = false; // Still show the page
+          this.marksMessage = 'Cannot connect to server. Please check your connection.';
+          console.error('❌ Network error - cannot connect to server');
+        } else {
+          // Other errors
+          this.hasError = false; // Still show the page
+          this.marksMessage = 'Failed to refresh marks. Please try again later.';
+          console.error('❌ Error refreshing marks:', err);
+        }
+      }
+    });
   }
 
   private processResult() {
-    const totalMarks = this.marks.reduce((sum, mark) => sum + (mark.marksObtained || 0), 0);
-    const percentage = this.marks.length > 0 
-      ? (totalMarks / (this.marks.length * 100) * 100).toFixed(2)
+    console.log('\n📊 Processing result data...');
+    console.log('  Marks count:', this.marks.length);
+
+    if (!this.student) {
+      console.error('❌ No student data available');
+      this.result = {};
+      return;
+    }
+
+    // Validate and extract marks data
+    const validMarks = this.marks.filter((m: any) => {
+      const hasMarks = m.marksObtained !== undefined && m.marksObtained !== null;
+      const hasSubject = m.subject || m.subjectName;
+      return hasMarks && hasSubject;
+    });
+
+    console.log('  Valid marks count:', validMarks.length);
+
+    const totalMarks = validMarks.reduce((sum: number, mark: any) => {
+      const obtained = parseInt(mark.marksObtained) || 0;
+      return sum + obtained;
+    }, 0);
+
+    const maxTotal = validMarks.length > 0 ? validMarks.length * 100 : 0;
+    const percentage = maxTotal > 0 
+      ? ((totalMarks / maxTotal) * 100).toFixed(2)
       : '0.00';
+    
+    // Determine result status - if no marks, show "PENDING" instead of "FAIL"
+    let resultStatus = "PENDING";
+    if (validMarks.length > 0) {
+      resultStatus = parseFloat(percentage) >= 33 ? "PASS" : "FAIL";
+    }
     
     this.result = {
       name: this.student.name,
       rollNo: this.student.rollNo,
       email: this.student.email,
-      dob: this.student.dob,
-      phone: this.student.phone,
+      dob: this.student.dob || 'N/A',
+      phone: this.student.phone || 'N/A',
       className: this.student.className,
-      marks: this.marks,
+      marks: validMarks.map((m: any) => ({
+        marksId: m.marksId,
+        subject: m.subject || m.subjectName || 'Unknown',
+        marksObtained: parseInt(m.marksObtained) || 0,
+        maxMarks: parseInt(m.maxMarks) || 100,
+        term: m.term || 'N/A',
+        year: m.year || new Date().getFullYear()
+      })),
       subjects: this.classSubjects,
       total: totalMarks,
-      maxTotal: this.marks.length * 100,
+      maxTotal: maxTotal,
       percentage: percentage,
-      status: parseFloat(percentage) >= 33 ? "PASS" : "FAIL"
+      status: resultStatus,
+      hasMarks: validMarks.length > 0
     };
 
-    console.log('Result processed:', this.result);
+    console.log('✅ Result processed successfully:');
+    console.log('  Total marks:', totalMarks);
+    console.log('  Max total:', maxTotal);
+    console.log('  Percentage:', percentage + '%');
+    console.log('  Status:', this.result.status);
+    console.log('  Has marks:', this.result.hasMarks);
   }
 
   goToLoginForRecheck() {
@@ -208,22 +429,8 @@ export class ViewResultComponent implements OnInit {
     return 'Poor';
   }
 
-  // Method to check performance class
-  isPerformanceExcellent(): boolean {
-    return parseFloat(this.result.percentage) >= 90;
-  }
-
-  isPerformanceGood(): boolean {
-    const percentage = parseFloat(this.result.percentage);
-    return percentage >= 75 && percentage < 90;
-  }
-
-  isPerformanceAverage(): boolean {
-    const percentage = parseFloat(this.result.percentage);
-    return percentage >= 60 && percentage < 75;
-  }
-
-  isPerformancePoor(): boolean {
-    return parseFloat(this.result.percentage) < 60;
+  // Method to check if marks are available
+  hasMarksAvailable(): boolean {
+    return this.result.marks && this.result.marks.length > 0;
   }
 }

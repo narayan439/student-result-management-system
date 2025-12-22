@@ -1,23 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { StudentService } from '../../../core/services/student.service';
 import { SubjectService } from '../../../core/services/subject.service';
+import { ClassesService } from '../../../core/services/classes.service';
 import { MarksService } from '../../../core/services/marks.service';
 import { Student } from '../../../core/models/student.model';
+import { GetMarkForSubjectPipe } from '../../../shared/pipes/get-mark-for-subject.pipe';
 
 @Component({
   selector: 'app-add-marks',
   templateUrl: './add-marks.component.html',
-  styleUrls: ['./add-marks.component.css']
+  styleUrls: ['./add-marks.component.css'],
+  standalone: false
 })
 export class AddMarksComponent implements OnInit {
 
   student: Student | null = null;
   subjects: any[] = [];
   studentClassNumber: number = 0;
+  studentClass: any = null;
   isSubmitting: boolean = false;
   submitSuccess: boolean = false;
   submitError: string = '';
   submittedMarks: any[] = [];
+  isSearching: boolean = false;
+  lastSubmittedRollNo: string = ''; // Track last submitted roll number
+  isAlreadySubmitted: boolean = false; // Track if marks already submitted for this student
+  existingMarks: any[] = []; // Store existing marks for the student
 
   marksData: { [key: string]: number | null } = {};
   rollNo: string = '';
@@ -25,10 +33,14 @@ export class AddMarksComponent implements OnInit {
   constructor(
     private studentService: StudentService,
     private subjectService: SubjectService,
+    private classesService: ClassesService,
     private marksService: MarksService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Reset on component initialization (on page load/refresh)
+    this.resetForm();
+  }
 
   searchStudent(): void {
     if (!this.rollNo.trim()) {
@@ -36,35 +48,180 @@ export class AddMarksComponent implements OnInit {
       this.student = null;
       this.subjects = [];
       this.marksData = {};
+      this.isAlreadySubmitted = false;
       return;
     }
 
-    const allStudents = this.studentService.getAllStudentsSync();
-    this.student = allStudents.find(s => s.rollNo.toLowerCase() === this.rollNo.toLowerCase()) || null;
+    this.isSearching = true;
+    this.isAlreadySubmitted = false;
+    this.submitError = ''; // Clear any previous error messages
+    console.log(`🔍 Searching for student: ${this.rollNo}`);
+    
+    // First try local sync data
+    let allStudents = this.studentService.getAllStudentsSync();
+    let foundStudent = allStudents.find(s => s.rollNo.toLowerCase() === this.rollNo.toLowerCase());
 
-    if (!this.student) {
-      this.submitError = `Student with roll number ${this.rollNo} not found`;
-      this.subjects = [];
-      this.marksData = {};
+    // If not found locally, try backend API
+    if (!foundStudent) {
+      console.log('⚠️ Student not found in cache, querying backend API...');
+      
+      this.studentService.getAllStudents().subscribe({
+        next: (studentsFromApi: any) => {
+          console.log(`✓ Backend API returned ${studentsFromApi.length} students`);
+          
+          // Search in API results
+          foundStudent = studentsFromApi.find((s: any) => 
+            s.rollNo && s.rollNo.toLowerCase() === this.rollNo.toLowerCase()
+          );
+          
+          if (!foundStudent) {
+            this.submitError = `Student with roll number ${this.rollNo} not found in database`;
+            this.subjects = [];
+            this.marksData = {};
+            this.studentClass = null;
+            this.isSearching = false;
+            console.error(`✗ Student ${this.rollNo} not found in backend`);
+            return;
+          }
+          
+          // Found in backend - process student
+          this.processStudentData(foundStudent);
+        },
+        error: (err: any) => {
+          console.error('✗ Error querying backend:', err);
+          this.submitError = 'Error searching student. Please try again.';
+          this.isSearching = false;
+        }
+      });
       return;
     }
 
-    // Student found - extract class number and load subjects
+    // Found in local cache - process immediately
+    console.log(`✓ Student found in cache: ${foundStudent.name}`);
+    this.processStudentData(foundStudent);
+  }
+
+  /**
+   * Process student data after search
+   */
+  private processStudentData(foundStudent: any): void {
+    this.student = foundStudent;
     this.submitError = '';
-    const classMatch = this.student.className.match(/Class\s(\d+)/);
+    
+    if (!this.student) {
+      this.submitError = 'Student data is invalid';
+      this.isSearching = false;
+      return;
+    }
+    
+    // Extract class number and load subjects
+    const classMatch = this.student.className?.match(/Class\s(\d+)/);
     this.studentClassNumber = classMatch ? parseInt(classMatch[1]) : 0;
     
-    // Load class-specific subjects
-    this.subjects = this.subjectService.getSubjectsByClass(this.studentClassNumber);
+    console.log(`✓ Student found: ${this.student.name}`);
+    console.log(`📚 Class Number: ${this.studentClassNumber}`);
     
-    // Initialize marks data
-    this.marksData = {};
-    this.subjects.forEach(s => {
-      this.marksData[s.subjectName] = null;
+    // Load existing marks for this student
+    this.loadExistingMarks();
+    
+    // Load class details including subject list
+    this.classesService.getClassByNumber(this.studentClassNumber).subscribe({
+      next: (response: any) => {
+        const classData = response.data;
+        this.studentClass = classData;
+        
+        console.log('✓ Class data loaded:', classData);
+        
+        // Load subjects from class definition first
+        if (classData && classData.subjectList) {
+          const subjectNames = classData.subjectList.split(',').map((s: string) => s.trim());
+          console.log('📖 Subjects from class definition:', subjectNames);
+          
+          // Convert to subject objects
+          this.subjects = subjectNames.map((name: string, idx: number) => ({
+            subjectId: idx + 1,
+            subjectName: name,
+            name: name
+          }));
+        } else {
+          // Fallback: Load subjects by class from service
+          console.log('ℹ️ No subjects in class definition, using fallback...');
+          this.loadSubjectsByClass();
+          return;
+        }
+        
+        // Initialize marks data with existing marks if available
+        this.marksData = {};
+        this.subjects.forEach((s: any) => {
+          const existingMark = this.existingMarks.find(m => m.subjectId === s.subjectId);
+          this.marksData[s.subjectName || s.name] = existingMark ? existingMark.marksObtained : null;
+        });
+        
+        console.log(`✓ Loaded ${this.subjects.length} subjects for Class ${this.studentClassNumber}`);
+        this.isSearching = false;
+      },
+      error: (err) => {
+        console.error('Error loading class details:', err);
+        // Fallback to service-based subject loading
+        this.loadSubjectsByClass();
+      }
     });
-    
-    console.log('✓ Student found:', this.student);
-    console.log(`✓ Loaded ${this.subjects.length} subjects for Class ${this.studentClassNumber}`);
+  }
+
+  /**
+   * Load existing marks for the student
+   */
+  private loadExistingMarks(): void {
+    if (!this.student || !this.student.studentId) return;
+
+    // 🔄 Fetch fresh marks from backend (not cached)
+    this.marksService.getMarksByStudentId(this.student.studentId as number).subscribe({
+      next: (response: any) => {
+        this.existingMarks = response.data || [];
+        console.log(`✓ Found ${this.existingMarks.length} existing marks for student:`, this.existingMarks);
+        
+        // Initialize marks data with existing marks and disable fields
+        this.marksData = {};
+        this.subjects.forEach((s: any) => {
+          const existingMark = this.existingMarks.find(m => m.subjectId === s.subjectId);
+          // Pre-fill with existing marks value (read-only will be enforced via [disabled])
+          this.marksData[s.subjectName || s.name] = existingMark ? existingMark.marksObtained : null;
+        });
+      },
+      error: (err) => {
+        console.warn('⚠️ Could not load existing marks:', err);
+        this.existingMarks = [];
+      }
+    });
+  }
+
+  /**
+   * Load subjects by class (fallback method)
+   */
+  private loadSubjectsByClass(): void {
+    this.subjectService.getSubjectsByClass(this.studentClassNumber).subscribe({
+      next: (response: any) => {
+        const subjectsArray = Array.isArray(response.data) ? response.data : [];
+        this.subjects = subjectsArray;
+        
+        // Initialize marks data
+        this.marksData = {};
+        this.subjects.forEach((s: any) => {
+          this.marksData[s.subjectName || s.name] = null;
+        });
+        
+        console.log('✓ Fallback: Loaded subjects from service');
+        console.log(`✓ Total ${subjectsArray.length} subjects for Class ${this.studentClassNumber}`);
+        this.isSearching = false;
+      },
+      error: (err) => {
+        console.error('Error loading subjects:', err);
+        this.submitError = 'Could not load subjects for this class';
+        this.subjects = [];
+        this.marksData = {};
+        this.isSearching = false;
+      }
+    });
   }
 
   resetForm(): void {
@@ -75,6 +232,10 @@ export class AddMarksComponent implements OnInit {
     this.submitError = '';
     this.submitSuccess = false;
     this.submittedMarks = [];
+    this.studentClass = null;
+    this.isSearching = false;
+    this.lastSubmittedRollNo = ''; // Reset on form clear
+    this.isAlreadySubmitted = false;
   }
 
   submitAllMarks(): void {
@@ -105,38 +266,69 @@ export class AddMarksComponent implements OnInit {
     this.submittedMarks = [];
     let submitted = 0;
     let failed = 0;
+    let duplicate = 0;
+    const totalSubjects = this.subjects.filter((s: any) => 
+      this.marksData[s.subjectName || s.name] !== null && 
+      this.marksData[s.subjectName || s.name] !== undefined
+    ).length;
+
+    console.log(`📊 Starting to submit ${totalSubjects} marks for student ${this.student.name}`);
 
     // Submit marks for each subject
-    Object.entries(this.marksData).forEach(([subject, marks]) => {
+    this.subjects.forEach((subject: any) => {
+      const subjectName = subject.subjectName || subject.name;
+      const marks = this.marksData[subjectName];
+      
       if (marks !== null && marks !== undefined) {
+        // Use correct subject ID (subjectId not subject name)
+        const subjectId = subject.subjectId || subject.id;
+        const studentId = this.student?.studentId;
+        
+        console.log(`📤 Submitting: Student ${studentId}, Subject ${subjectId} (${subjectName}), Marks ${marks}`);
+        
         const markRecord = {
-          studentId: String(this.student!.studentId),
-          subject: subject,
+          studentId: studentId,
+          subjectId: subjectId,
           marksObtained: marks,
           maxMarks: 100,
           term: 'Term 1',
           year: 2024
         };
 
-        this.marksService.addMark(markRecord as any).subscribe({
-          next: (response) => {
+        this.marksService.createMarks(markRecord as any).subscribe({
+          next: (response: any) => {
             submitted++;
-            this.submittedMarks.push({ subject, marks, status: 'success' });
-            console.log(`✓ Mark added for ${subject}:`, response);
+            this.submittedMarks.push({ subject: subjectName, marks, status: 'success' });
+            console.log(`✓ Mark added for ${subjectName}: ${marks}/100`, response);
 
-            // If all marks submitted successfully
-            if (submitted + failed === Object.keys(this.marksData).length) {
-              this.completeSubmission(submitted, failed);
+            // If all marks submitted/processed
+            if (submitted + failed + duplicate === totalSubjects) {
+              this.completeSubmission(submitted, failed, duplicate);
             }
           },
-          error: (err) => {
-            failed++;
-            this.submittedMarks.push({ subject, marks, status: 'failed' });
-            console.error(`Error adding mark for ${subject}:`, err);
+          error: (err: any) => {
+            const errorMessage = (err.error?.message || err.error || err.message || '').toString();
+
+            console.error(`❌ Error adding mark for ${subjectName}:`, {
+              status: err.status,
+              statusText: err.statusText,
+              message: errorMessage,
+              fullError: err
+            });
+
+            // Check if it's a "duplicate/already added" error
+            if (errorMessage.toLowerCase().includes('already added') || errorMessage.toLowerCase().includes('cannot add duplicate')) {
+              duplicate++;
+              this.submittedMarks.push({ subject: subjectName, marks, status: 'duplicate', message: 'Already added' });
+              console.warn(`⚠️ Mark already exists for ${subjectName}`);
+            } else {
+              failed++;
+              this.submittedMarks.push({ subject: subjectName, marks, status: 'failed' });
+            }
 
             // If all marks processed
-            if (submitted + failed === Object.keys(this.marksData).length) {
-              this.completeSubmission(submitted, failed);
+            if (submitted + failed + duplicate === totalSubjects) {
+              this.completeSubmission(submitted, failed, duplicate);
             }
           }
         });
@@ -144,16 +336,44 @@ export class AddMarksComponent implements OnInit {
     });
   }
 
-  private completeSubmission(submitted: number, failed: number): void {
+  private completeSubmission(submitted: number, failed: number, duplicate: number): void {
     this.isSubmitting = false;
 
-    if (failed === 0) {
+    // If at least one mark successfully saved, treat as success
+    if (submitted > 0 && failed === 0) {
+      this.lastSubmittedRollNo = this.rollNo.toLowerCase();
       this.submitSuccess = true;
+      let msg = `✓ Success! ${submitted} mark(s) added.`;
+      if (duplicate > 0) {
+        msg += ` ${duplicate} already existed (not added again).`;
+      }
+      this.submitError = '';
+      console.log(`✓ Marks submission complete for ${this.rollNo}: ${msg}`);
+
+      // 🔄 Refresh existing marks so the "Already Added" badge appears
+      this.loadExistingMarks();
+
       setTimeout(() => {
         this.resetForm();
       }, 2000);
+      return;
+    }
+
+    // If nothing saved but duplicates exist
+    if (submitted === 0 && duplicate > 0 && failed === 0) {
+      this.submitSuccess = false;
+      this.submitError = `❌ All marks were already added for this student. No new marks added.`;
+      return;
+    }
+
+    // Some failures occurred
+    this.submitSuccess = false;
+    if (failed > 0 && duplicate > 0) {
+      this.submitError = `${submitted} added, ${duplicate} already existed, ${failed} failed. Please check and try again.`;
+    } else if (failed > 0) {
+      this.submitError = `${submitted} added, ${failed} failed. Please try again.`;
     } else {
-      this.submitError = `${submitted} marks added, ${failed} failed. Please try again.`;
+      this.submitError = 'Error occurred. Please try again.';
     }
   }
 }

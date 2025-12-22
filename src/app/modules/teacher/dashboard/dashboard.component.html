@@ -13,7 +13,7 @@
       <div class="user-info-nav">
         <div class="user-welcome">
           <div class="greeting">Welcome</div>
-          <div class="teacher-name">Mrs. Sunita Mehta</div>
+          <div class="teacher-name">{{ teacherName }}</div>
         </div>
         <div class="user-avatar">
           <i class="fas fa-user-tie"></i>
@@ -31,6 +31,12 @@
         </li>
 
         <li>
+          <a routerLink="/teacher/update-marks" routerLinkActive="active">
+            <i class="fas fa-pencil-alt"></i> Update Marks
+          </a>
+        </li>
+
+        <li>
           <a routerLink="/teacher/recheck-requests" routerLinkActive="active">
             <i class="fas fa-redo-alt"></i> Recheck Requests
           </a>
@@ -38,7 +44,7 @@
 
         <li>
           <a routerLink="/teacher/profile" routerLinkActive="active">
-            <i class="fas fa-user-circle"></i> Profile
+            <i class="fas fa-user"></i> Profile
           </a>
         </li>
       </ul>
@@ -72,8 +78,8 @@
           <i class="fas fa-user-tie"></i>
         </div>
         <div>
-          <h3>Mrs. Sunita Mehta</h3>
-          <p>Class Teacher | 10th Grade</p>
+          <h3>{{ teacherName }}</h3>
+          <p>{{ teacherEmail }}</p>
         </div>
       </div>
 
@@ -99,7 +105,7 @@
 
       <li>
         <a routerLink="/teacher/profile" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="fas fa-user-circle"></i>
+          <i class="fas fa-user"></i>
           <span>Profile</span>
         </a>
       </li>

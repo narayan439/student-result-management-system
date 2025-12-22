@@ -84,7 +84,25 @@
 
     <!-- Angular Material Table -->
     <div class="table-responsive">
-      <table mat-table [dataSource]="dataSource" class="students-table">
+      
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading students from database...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && students.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">people_outline</mat-icon>
+        <h3>No Students Found</h3>
+        <p>There are no students in the database. Click "Add New Student" to get started.</p>
+        <button mat-raised-button color="primary" routerLink="/admin/manage-students/add">
+          <mat-icon>person_add</mat-icon> Add First Student
+        </button>
+      </div>
+
+      <!-- Students Table -->
+      <table *ngIf="!isLoading && students.length > 0" mat-table [dataSource]="dataSource" class="students-table">
         
         <!-- Student ID Column -->
         <ng-container matColumnDef="studentId">
@@ -202,6 +220,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
 
       </table>
+      </div>
     </div>
 
     <!-- Table Footer -->
@@ -214,4 +233,3 @@
       </div>
     </div>
   </div>
-</div>

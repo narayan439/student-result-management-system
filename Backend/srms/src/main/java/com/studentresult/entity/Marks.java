@@ -3,7 +3,9 @@ package com.studentresult.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,44 +13,59 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Marks {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "marks_id")
     private Long marksId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
-
-    @Column(name = "subject", nullable = false)
-    private String subject;
-
-    @Column(name = "marks_obtained")
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;
+    
+    @Column(nullable = false)
     private Integer marksObtained;
-
-    @Column(name = "max_marks")
-    private Integer maxMarks = 100;
-
-    @Column(name = "term")
+    
+    @Column(nullable = false)
+    private Integer maxMarks;
+    
+    @Column(length = 50)
     private String term;
-
-    @Column(name = "year")
+    
+    @Column(nullable = false)
     private Integer year;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
+    
+    @Column(nullable = false)
+    private Boolean isRecheckRequested;
+    
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
+    
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
-
+    
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
+        }
+        if (this.maxMarks == null) {
+            this.maxMarks = 100;
+        }
+        if (this.isRecheckRequested == null) {
+            this.isRecheckRequested = false;
+        }
     }
-
+    
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();

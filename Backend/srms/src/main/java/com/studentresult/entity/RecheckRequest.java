@@ -12,51 +12,49 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecheckRequest {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recheck_id")
     private Long recheckId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
-
-    @Column(name = "subject", nullable = false)
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "marks_id", nullable = false)
+    private Marks marks;
+    
+    @Column(nullable = false, length = 100)
     private String subject;
-
-    @Column(name = "reason", columnDefinition = "TEXT")
+    
+    @Column(length = 500)
     private String reason;
-
-    @Column(name = "status")
-    private String status = "pending"; // pending, approved, rejected, completed
-
-    @Column(name = "old_marks")
-    private Integer oldMarks;
-
-    @Column(name = "new_marks")
-    private Integer newMarks;
-
-    @Column(name = "admin_comments", columnDefinition = "TEXT")
-    private String adminComments;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
+    
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private RecheckStatus status;
+    
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime requestDate;
+    
+    @Column
+    private LocalDateTime resolvedDate;
+    
+    @Column(length = 500)
+    private String adminNotes;
+    
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        if (this.requestDate == null) {
+            this.requestDate = LocalDateTime.now();
+        }
         if (this.status == null) {
-            this.status = "pending";
+            this.status = RecheckStatus.PENDING;
         }
     }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    
+    public enum RecheckStatus {
+        PENDING, APPROVED, REJECTED
     }
 }

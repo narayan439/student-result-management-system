@@ -172,6 +172,38 @@
   padding: 40px;
 }
 
+/* Pending Recheck Message */
+.pending-recheck-message {
+  background: #fce4ec;
+  border: 2px solid #e91e63;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #c2185b;
+}
+
+.pending-recheck-message mat-icon {
+  color: #e91e63;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.pending-recheck-message p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.pending-recheck-message strong {
+  color: #c2185b;
+  font-weight: 700;
+}
+
 /* Form Container */
 .form-container {
   max-width: 600px;
@@ -190,6 +222,68 @@
   font-weight: 600;
   margin-bottom: 12px;
   padding-left: 5px;
+}
+
+/* Loading Message */
+.loading-message {
+  background: #e3f2fd;
+  border: 2px solid #1a237e;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #1a237e;
+  margin-bottom: 15px;
+}
+
+.loading-message mat-icon {
+  animation: spin 2s linear infinite;
+  flex-shrink: 0;
+}
+
+.loading-message p {
+  margin: 0;
+  font-weight: 500;
+}
+
+/* No Subjects with Marks Message */
+.no-subjects-message {
+  background: #fff3e0;
+  border: 2px solid #f57c00;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  color: #f57c00;
+  margin-bottom: 15px;
+}
+
+.no-subjects-message mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #f57c00;
+  flex-shrink: 0;
+}
+
+.message-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+  color: #f57c00;
+}
+
+.message-text {
+  margin: 0;
+  font-size: 14px;
+  color: #e65100;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Full Width for Material Fields */
@@ -267,6 +361,15 @@
   height: 32px;
 }
 
+.mark-card.warning {
+  background: #fff3e0;
+  border: 2px solid #f57c00;
+}
+
+.mark-card.warning mat-icon {
+  color: #f57c00;
+}
+
 .mark-label {
   color: #666;
   font-size: 14px;
@@ -279,6 +382,12 @@
   font-size: 24px;
   font-weight: 700;
   margin: 0;
+}
+
+.mark-card.warning .mark-value {
+  color: #f57c00;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 /* Button Group */

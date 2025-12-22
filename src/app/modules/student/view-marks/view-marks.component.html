@@ -24,8 +24,15 @@
     <!-- Marks Content -->
     <div class="marks-content">
       
+      <!-- No Marks Message -->
+      <div *ngIf="marks.length === 0" class="no-marks-message">
+        <mat-icon class="no-marks-icon">info</mat-icon>
+        <h4>Marks Not Added Yet</h4>
+        <p>Your marks have not been added by your teacher. Please check back later.</p>
+      </div>
+      
       <!-- Marks Table with Angular Material -->
-      <div class="marks-table-container">
+      <div *ngIf="marks.length > 0" class="marks-table-container">
         <table mat-table [dataSource]="marks" class="mat-elevation-z1">
           
           <!-- Subject Column -->
@@ -80,8 +87,8 @@
     </div>
   </mat-card>
 
-  <!-- Summary Section -->
-  <mat-card class="summary-section">
+  <!-- Summary Section (only show if marks exist) -->
+  <mat-card *ngIf="marks.length > 0" class="summary-section">
     
     <h3 class="summary-header">
       <mat-icon>analytics</mat-icon>

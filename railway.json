@@ -1,0 +1,32 @@
+{
+  "name": "Student Result Management System",
+  "description": "A complete student result management system with Angular frontend and Spring Boot backend",
+  "build": {
+    "builder": "nixpacks"
+  },
+  "deploy": {
+    "startCommand": "java -Dserver.port=$PORT -jar Backend/srms/target/srms-0.0.1-SNAPSHOT.jar",
+    "environmentVariables": {
+      "SPRING_DATASOURCE_URL": {
+        "description": "MySQL database connection URL",
+        "value": "jdbc:mysql://localhost:3306/srms_db"
+      },
+      "SPRING_DATASOURCE_USERNAME": {
+        "description": "Database username",
+        "value": "root"
+      },
+      "SPRING_DATASOURCE_PASSWORD": {
+        "description": "Database password",
+        "value": "password"
+      },
+      "SPRING_JPA_HIBERNATE_DDL_AUTO": {
+        "description": "Hibernate DDL strategy",
+        "value": "update"
+      },
+      "SPRING_JPA_SHOW_SQL": {
+        "description": "Show SQL statements",
+        "value": "false"
+      }
+    }
+  }
+}

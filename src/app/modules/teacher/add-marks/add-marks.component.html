@@ -54,6 +54,7 @@
               name="rollNo"
               placeholder="e.g., 1A01, 2A05"
               (keyup.enter)="searchStudent()"
+              [disabled]="isSearching"
             >
             <mat-icon matPrefix>badge</mat-icon>
             <mat-hint>Enter student's roll number</mat-hint>
@@ -63,10 +64,11 @@
             color="primary"
             type="button"
             (click)="searchStudent()"
+            [disabled]="isSearching"
             class="search-btn"
           >
-            <mat-icon>search</mat-icon>
-            Search
+            <mat-icon>{{ isSearching ? 'hourglass_empty' : 'search' }}</mat-icon>
+            {{ isSearching ? 'Searching...' : 'Search' }}
           </button>
         </div>
       </div>
@@ -101,10 +103,38 @@
           </div>
           <div class="detail-item">
             <div class="detail-label">
+              <mat-icon>email</mat-icon>
+              Email
+            </div>
+            <div class="detail-value">{{ student.email || 'N/A' }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">
               <mat-icon>calendar_today</mat-icon>
               Date of Birth
             </div>
             <div class="detail-value">{{ student.dob }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">
+              <mat-icon>phone</mat-icon>
+              Phone
+            </div>
+            <div class="detail-value">{{ student.phone || 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subject List Display -->
+      <div *ngIf="student && subjects.length > 0" class="subjects-list-section">
+        <h3>
+          <mat-icon>library_books</mat-icon>
+          Class Subjects ({{ subjects.length }})
+        </h3>
+        <div class="subjects-list-grid">
+          <div *ngFor="let subject of subjects" class="subject-badge">
+            <mat-icon>subject</mat-icon>
+            <span>{{ subject.subjectName }}</span>
           </div>
         </div>
       </div>
@@ -120,20 +150,31 @@
           <!-- Subjects Grid -->
           <div class="subjects-grid">
             <div *ngFor="let subject of subjects" class="subject-marks-item">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>{{ subject.subjectName }}</mat-label>
-                <input 
-                  matInput 
-                  [(ngModel)]="marksData[subject.subjectName]"
-                  [name]="'marks_' + subject.subjectId"
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="0-100"
-                >
-                <mat-icon matPrefix>grade</mat-icon>
-                <mat-hint>Max: 100</mat-hint>
-              </mat-form-field>
+              <div class="mark-input-container">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>{{ subject.subjectName }}</mat-label>
+                  <input 
+                    matInput 
+                    [(ngModel)]="marksData[subject.subjectName]"
+                    [name]="'marks_' + subject.subjectId"
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder="0-100"
+                    [disabled]="(existingMarks | getMarkForSubject: subject.subjectId) !== null"
+                  >
+                  <mat-icon matPrefix>grade</mat-icon>
+                  <mat-hint>Max: 100</mat-hint>
+                </mat-form-field>
+                
+                <!-- Existing Marks Display - Disabled Input Warning -->
+                <div *ngIf="(existingMarks | getMarkForSubject: subject.subjectId) as existingMark">
+                  <div class="existing-mark-badge">
+                    <mat-icon>lock</mat-icon>
+                    <span>Already Updated: <strong>{{ existingMark.marksObtained }}/100</strong> (Cannot Edit)</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -146,9 +187,9 @@
             <ul>
               <li *ngFor="let mark of submittedMarks">
                 <span class="subject-name">{{ mark.subject }}: {{ mark.marks }} / 100</span>
-                <span [class]="mark.status === 'success' ? 'status-success' : 'status-failed'">
-                  <mat-icon>{{ mark.status === 'success' ? 'check_circle' : 'cancel' }}</mat-icon>
-                  {{ mark.status === 'success' ? 'Success' : 'Failed' }}
+                <span [class]="mark.status === 'success' ? 'status-success' : mark.status === 'duplicate' ? 'status-duplicate' : 'status-failed'">
+                  <mat-icon>{{ mark.status === 'success' ? 'check_circle' : mark.status === 'duplicate' ? 'info' : 'cancel' }}</mat-icon>
+                  {{ mark.status === 'success' ? 'Success' : mark.status === 'duplicate' ? 'Already Added' : 'Failed' }}
                 </span>
               </li>
             </ul>
@@ -177,6 +218,15 @@
               <mat-icon>refresh</mat-icon>
               Reset
             </button>
+          </div>
+
+          <!-- Success Message After Submission -->
+          <div *ngIf="submitSuccess" class="submission-success-message">
+            <mat-icon>check_circle</mat-icon>
+            <div class="success-content">
+              <strong>✓ All marks submitted successfully!</strong>
+              <p>Marks have been saved for {{ student.name }} - {{ submittedMarks.length }} subjects updated</p>
+            </div>
           </div>
 
         </form>

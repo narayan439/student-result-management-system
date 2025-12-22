@@ -49,69 +49,217 @@ export class ViewMarksComponent implements OnInit {
    * Load current student's marks
    */
   loadStudentMarks(): void {
+    console.log('📖 ViewMarks: Loading student marks...');
+    console.log('📖 Clearing previous data...');
+    
+    // Clear previous data to ensure fresh load
+    this.marks = [];
+    this.classSubjects = [];
+    this.total = 0;
+    this.percentage = 0;
+    this.grade = 'N/A';
+    this.average = 0;
+    
     const currentUser = this.authService.getCurrentUser();
-    if (!currentUser || currentUser.role !== 'STUDENT') {
+    console.log('🔑 Current user:', currentUser);
+    
+    if (!currentUser) {
+      console.error('❌ No authenticated user - redirecting to login');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (currentUser.role !== 'STUDENT') {
+      console.error('❌ User is not a STUDENT (role:', currentUser.role, ')');
       this.router.navigate(['/login']);
       return;
     }
 
     // Get student by email
-    const students = this.studentService.getAllStudentsSync();
-    this.student = students.find(s => s.email === currentUser.email) || null;
-
-    if (this.student) {
-      this.studentName = this.student.name;
-      this.studentClass = this.student.className;
-      this.studentRollNo = this.student.rollNo;
+    try {
+      let students = this.studentService.getAllStudentsSync();
+      console.log('📚 Students loaded:', students ? students.length : 0);
       
-      // Extract class number from className (e.g., "Class 5" -> 5)
-      const classMatch = this.studentClass.match(/Class\s(\d+)/);
-      this.studentClassNumber = classMatch ? parseInt(classMatch[1]) : 0;
-      
-      // Load subjects for this class
-      this.classSubjects = this.subjectService.getSubjectsByClass(this.studentClassNumber);
-      console.log(`✓ Loaded ${this.classSubjects.length} subjects for ${this.studentClass}`);
-
-      // Get marks for this student
-      this.marksService.getAllMarks().subscribe({
-        next: (allMarks: any) => {
-          // Filter marks for current student
-          const marksArray = Array.isArray(allMarks) ? allMarks : [];
-          const studentIdStr = String(this.student?.studentId);
-          let marks = marksArray.filter(m => m.studentId === studentIdStr) || [];
-          
-          // Filter marks to only show subjects for this student's class
-          const classSubjectNames = this.classSubjects.map(s => s.subjectName);
-          this.marks = marks.filter(m => classSubjectNames.includes(m.subject));
-          
-          // Ensure marks have proper subject display
-          this.marks = this.marks.map(mark => ({
-            ...mark,
-            subject: mark.subject || 'Unknown Subject'
-          }));
-          
-          console.log(`✓ Loaded ${this.marks.length} marks for Class ${this.studentClassNumber}:`, this.marks);
-          
-          if (this.marks.length > 0) {
-            this.calculatePerformance();
-            console.log('✓ Student marks loaded (class-specific):', this.marks);
-          } else {
-            console.warn('No marks found for student in their class subjects:', this.student?.studentId);
-            console.warn('Class subjects:', classSubjectNames);
+      // If cache is empty, refresh from backend
+      if (!students || students.length === 0) {
+        console.log('⚠️ Student cache is empty, refreshing from backend...');
+        this.studentService.refreshStudents().subscribe({
+          next: (refreshedStudents) => {
+            this.findAndLoadStudentMarks(currentUser.email, refreshedStudents);
+          },
+          error: (err) => {
+            console.error('❌ Failed to refresh student data:', err);
+            this.router.navigate(['/login']);
           }
-        },
-        error: (err) => {
-          console.error('Error loading marks:', err);
-        }
-      });
-    } else {
-      console.error('✗ Student not found for email:', currentUser.email);
-      this.router.navigate(['/login']);
+        });
+        return;
+      }
+      
+      this.findAndLoadStudentMarks(currentUser.email, students);
+    } catch (error) {
+      console.error('❌ Error in loadStudentMarks:', error);
+      this.marks = [];
     }
   }
 
-  calculatePerformance() {
-    if (this.marks.length === 0) {
+  /**
+   * Find and load student marks by email
+   */
+  private findAndLoadStudentMarks(email: string, students: any[]): void {
+    this.student = students.find(s => s.email === email) || null;
+
+    if (!this.student) {
+      console.error('❌ Student not found for email:', email);
+      console.log('Available emails:', students.map(s => s.email));
+      return;
+    }
+
+    this.studentName = this.student.name;
+    this.studentClass = this.student.className;
+    this.studentRollNo = this.student.rollNo;
+    
+    console.log('✓ Student found:', { name: this.studentName, class: this.studentClass });
+    
+    // Extract class number from className (e.g., "Class 5" -> 5)
+    const classMatch = this.studentClass.match(/Class\s(\d+)/);
+    this.studentClassNumber = classMatch ? parseInt(classMatch[1]) : 0;
+    
+    // Load subjects for this class FIRST, then load marks after subjects are ready
+    console.log(`🔄 Loading subjects for class number: ${this.studentClassNumber}`);
+    
+    this.subjectService.getSubjectsByClass(this.studentClassNumber).subscribe({
+      next: (response: any) => {
+        console.log('📥 Subjects response:', response);
+        
+        const subjectsArray = Array.isArray(response) ? response : (Array.isArray(response.data) ? response.data : []);
+        this.classSubjects = subjectsArray;
+        
+        console.log(`✓ Loaded ${subjectsArray.length} subjects for Class ${this.studentClassNumber}:`);
+        subjectsArray.forEach((s: any) => {
+          console.log(`  - ${s.subjectName} (ID: ${s.subjectId})`);
+        });
+        
+        // NOW load marks after subjects are ready
+        console.log('🔄 Subjects loaded, now loading marks...');
+        this.loadMarksForStudent();
+      },
+      error: (err) => {
+        console.error('❌ Error loading subjects:', err);
+        console.log('Error details:', err.message);
+        this.classSubjects = [];
+        // Still load marks even if subjects fail
+        console.log('⚠️ Continuing without subjects...');
+        this.loadMarksForStudent();
+      }
+    });
+  }
+
+  /**
+   * Load marks for the current student (called after subjects are loaded)
+   */
+  private loadMarksForStudent(): void {
+    console.log('🔄 loadMarksForStudent() called');
+    
+    if (!this.student || !this.student.studentId) {
+      console.warn('⚠️ Cannot load marks - student or studentId not available');
+      console.log('Student:', this.student);
+      this.marks = [];
+      return;
+    }
+
+    const studentId = this.student.studentId;
+    console.log('🔄 Fetching marks for student ID:', studentId);
+    console.log('📋 Student details:', {
+      id: this.student.studentId,
+      name: this.student.name,
+      class: this.student.className,
+      email: this.student.email
+    });
+    
+    this.marksService.getMarksByStudentId(studentId).subscribe({
+      next: (response: any) => {
+        console.log('📥 Raw API response received');
+        console.log('📥 Response type:', typeof response);
+        console.log('📥 Response:', response);
+        
+        // Handle different response formats
+        let marksArray: any[] = [];
+        
+        if (Array.isArray(response)) {
+          console.log('✓ Response is direct array');
+          marksArray = response;
+        } else if (response && response.data && Array.isArray(response.data)) {
+          console.log('✓ Response has data array property');
+          marksArray = response.data;
+        } else if (response && response.data && typeof response.data === 'object') {
+          console.log('✓ Response has single data object');
+          marksArray = [response.data];
+        } else if (response && typeof response === 'object' && response.marksId) {
+          console.log('✓ Response is single mark object');
+          marksArray = [response];
+        } else if (!response) {
+          console.log('ℹ️ Response is null/empty');
+          marksArray = [];
+        } else {
+          console.log('⚠️ Unknown response format');
+          console.log('Response keys:', Object.keys(response || {}));
+          marksArray = [];
+        }
+        
+        console.log(`✅ Extracted marks array with ${marksArray.length} items`);
+        
+        if (marksArray.length === 0) {
+          console.log('⚠️ No marks received - student may not have marks yet');
+          this.marks = [];
+          return;
+        }
+        
+        // Log each mark
+        console.log('📊 Marks from backend:');
+        marksArray.forEach((m: any, i: number) => {
+          console.log(`  [${i}] ID: ${m.marksId}, Subject: ${m.subject || m.subjectName}, Marks: ${m.marksObtained}/${m.maxMarks || 100}`);
+        });
+        
+        // Assign all marks (no filtering)
+        this.marks = marksArray;
+        console.log(`✓ Assigned ${this.marks.length} marks to component`);
+        
+        // Process and format marks
+        this.marks = this.marks.map((mark: any) => ({
+          ...mark,
+          subject: mark.subject || mark.subjectName || 'Unknown Subject',
+          marksObtained: mark.marksObtained || 0,
+          maxMarks: mark.maxMarks || 100
+        }));
+      
+        console.log(`✅ Final marks ready: ${this.marks.length} marks`);
+        console.log('✅ Marks array:', this.marks);
+        
+        if (this.marks.length > 0) {
+          this.calculatePerformance();
+          console.log('✅ Performance metrics calculated');
+          console.log(`   Total: ${this.total}, Percentage: ${this.percentage}%, Grade: ${this.grade}`);
+        } else {
+          console.warn('⚠️ No marks to process');
+        }
+      },
+      error: (err: any) => {
+        console.error('❌ ERROR loading marks from API');
+        console.log('❌ Error object:', err);
+        console.log('❌ Error message:', err.message);
+        console.log('❌ Error status:', err.status);
+        console.log('❌ Error response:', err.error);
+        
+        this.marks = [];
+      }
+    });
+  }
+
+  /**
+   * Calculate student performance metrics
+   */
+  calculatePerformance(): void {
+    if (!this.marks || this.marks.length === 0) {
       this.total = 0;
       this.percentage = 0;
       this.average = 0;
@@ -120,7 +268,7 @@ export class ViewMarksComponent implements OnInit {
     }
 
     // Calculate total
-    this.total = this.marks.reduce((sum, mark) => sum + (mark.marksObtained || 0), 0);
+    this.total = this.marks.reduce((sum: number, mark: any) => sum + (mark.marksObtained || 0), 0);
     
     // Calculate percentage
     this.percentage = Math.round((this.total / (this.marks.length * 100)) * 100);

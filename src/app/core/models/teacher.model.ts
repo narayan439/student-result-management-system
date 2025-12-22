@@ -3,7 +3,6 @@ export interface Teacher {
   name: string;
   email: string;
   subjects: string[]; // Multiple subjects
-  dob: string;
   phone?: string;
   experience?: number;
   isActive?: boolean;

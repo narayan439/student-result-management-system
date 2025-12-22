@@ -10,44 +10,10 @@ export class RecheckService {
   private recheckSubject = new BehaviorSubject<Recheck[]>([]);
   private localKey = 'app_rechecks_v1';
   
-  private sampleRechecks: Recheck[] = [
-    {
-      recheckId: 1,
-      studentId: 1,
-      studentEmail: 'arjun.kumar1@student.com',
-      rollNo: '1A01',
-      studentName: 'Arjun Kumar',
-      subject: 'Mathematics',
-      reason: 'Question 5 calculation seems wrong',
-      status: 'pending',
-      marksObtained: 85,
-      maxMarks: 100,
-      requestDate: new Date().toISOString()
-    },
-    {
-      recheckId: 2,
-      studentId: 2,
-      studentEmail: 'priya.singh2@student.com',
-      rollNo: '1A02',
-      studentName: 'Priya Singh',
-      subject: 'Science',
-      reason: 'Want to review answer key',
-      status: 'completed',
-      marksObtained: 95,
-      maxMarks: 100,
-      requestDate: new Date().toISOString()
-    }
-  ];
-
-  constructor() {
-    const local = this.getRecheckFromLocal();
-    if (local && local.length) {
-      this.recheckSubject.next(local);
-    } else {
-      this.recheckSubject.next(this.sampleRechecks);
-      this.saveToLocal(this.sampleRechecks);
-    }
-  }
+  private sampleRechecks: Recheck[] = [];
+  
+  
+  
 
   /**
    * Get all recheck requests
@@ -129,7 +95,7 @@ export class RecheckService {
     const rechecks = this.getRecheckFromLocal().filter(r => r.studentEmail === studentEmail);
     return {
       pending: rechecks.filter(r => r.status === 'pending').length,
-      completed: rechecks.filter(r => r.status === 'completed').length,
+      completed: rechecks.filter(r => r.status === 'approved' || r.status === 'rejected').length,
       approved: rechecks.filter(r => r.status === 'approved').length,
       rejected: rechecks.filter(r => r.status === 'rejected').length
     };
@@ -143,10 +109,10 @@ export class RecheckService {
         return this.sampleRechecks;
       }
       const parsed = JSON.parse(raw) as Recheck[];
-      return parsed.length > 0 ? parsed : this.sampleRechecks;
+      return parsed;
     } catch (e) {
       console.error('Failed to read rechecks from local storage', e);
-      return this.sampleRechecks;
+      return [];
     }
   }
 

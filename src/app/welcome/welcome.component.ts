@@ -92,38 +92,84 @@ export class WelcomeComponent {
 
     this.isSearching = true;
 
-    // Get all students from service
-    const students = this.studentService.getAllStudentsSync();
-    console.log('Total students loaded:', students.length);
+    console.log('🔍 Searching for student with roll number:', this.rollNo);
     
-    // Search for student by roll number
-    const studentWithRoll = students.find(s => 
-      s.rollNo.toLowerCase() === this.rollNo.toLowerCase()
-    );
+    // Use getAllStudents() endpoint to fetch all students and search locally
+    // This avoids CORS issues with individual lookup endpoints
+    this.studentService.getAllStudents().subscribe({
+      next: (students) => {
+        console.log('✓ Students loaded from backend:', students.length, 'students');
+        
+        // Search for the student in the fetched list
+        const studentWithRoll = students.find(s => 
+          s.rollNo && s.rollNo.toLowerCase() === this.rollNo.toLowerCase()
+        );
+        
+        if (!studentWithRoll) {
+          this.isSearching = false;
+          this.rollNoError = `Roll Number "${this.rollNo}" not found in our system`;
+          console.error('❌ Student not found with roll number:', this.rollNo);
+          console.log('Available roll numbers:', students.map(s => s.rollNo).join(', '));
+          return;
+        }
+        
+        console.log('✓ Student found:', studentWithRoll);
+        this.validateAndNavigate(studentWithRoll);
+      },
+      error: (err) => {
+        console.error('❌ Failed to load students from backend:', err);
+        console.log('Falling back to local cached data...');
+        
+        // Fallback: Search in local cached students
+        const students = this.studentService.getAllStudentsSync();
+        console.log('Total students loaded from cache:', students.length);
+        console.log('Available roll numbers in cache:', students.map(s => s.rollNo).join(', '));
+        
+        const studentWithRoll = students.find(s => 
+          s.rollNo && s.rollNo.toLowerCase() === this.rollNo.toLowerCase()
+        );
 
-    if (!studentWithRoll) {
-      this.isSearching = false;
-      this.rollNoError = `Roll Number "${this.rollNo}" not found in our system`;
-      console.error('Student not found with roll number:', this.rollNo);
-      return;
+        if (!studentWithRoll) {
+          this.isSearching = false;
+          this.rollNoError = `Roll Number "${this.rollNo}" not found in our system. Available: ${students.map(s => s.rollNo).join(', ')}`;
+          console.error('❌ Student not found with roll number:', this.rollNo);
+          return;
+        }
+
+        console.log('✓ Student found in cache:', studentWithRoll);
+        this.validateAndNavigate(studentWithRoll);
+      }
+    });
+  }
+
+  /**
+   * Validate DOB and navigate to view result
+   */
+  private validateAndNavigate(studentWithRoll: any) {
+    console.log('Student to validate:', studentWithRoll);
+
+    // Check if DOB matches - normalize both dates to YYYY-MM-DD format
+    let inputDobNormalized = this.dob;
+    let studentDobNormalized = studentWithRoll.dob;
+
+    // If input is in DD/MM/YYYY format, convert to YYYY-MM-DD
+    if (this.dob && this.dob.includes('/')) {
+      const [day, month, year] = this.dob.split('/');
+      inputDobNormalized = `${year}-${month}-${day}`;
     }
 
-    console.log('Student found:', studentWithRoll);
-
-    // Check if DOB matches
-    // Convert HTML date format (YYYY-MM-DD) to DD/MM/YYYY for comparison
-    let dobFormatted = this.dob;
-    if (this.dob && this.dob.includes('-')) {
-      const [year, month, day] = this.dob.split('-');
-      dobFormatted = `${day}/${month}/${year}`;
+    // If student DOB is in DD/MM/YYYY format, convert to YYYY-MM-DD
+    if (studentWithRoll.dob && studentWithRoll.dob.includes('/')) {
+      const [day, month, year] = studentWithRoll.dob.split('/');
+      studentDobNormalized = `${year}-${month}-${day}`;
     }
 
-    console.log('Comparing DOB - Input formatted:', dobFormatted, 'Student DOB:', studentWithRoll.dob);
+    console.log('Comparing DOB - Input (YYYY-MM-DD):', inputDobNormalized, 'Student DOB (YYYY-MM-DD):', studentDobNormalized);
 
-    if (studentWithRoll.dob !== dobFormatted) {
+    if (inputDobNormalized !== studentDobNormalized) {
       this.isSearching = false;
       this.dobError = 'Date of Birth does not match our records';
-      console.error('DOB mismatch - Expected:', studentWithRoll.dob, 'Got:', dobFormatted);
+      console.error('DOB mismatch - Expected:', studentDobNormalized, 'Got:', inputDobNormalized);
       return;
     }
 

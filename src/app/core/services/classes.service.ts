@@ -1,139 +1,152 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { StudentService } from './student.service';
+import { tap } from 'rxjs/operators';
 
 export interface SchoolClass {
   classId: number;
   className: string;
   classNumber: number;
-  studentCount: number;
   maxCapacity: number;
   isActive: boolean;
+  subjects?: string[]; // List of subject IDs or names
+  subjectList?: string; // Comma-separated subject list
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassesService {
-  
-  private classesSubject = new BehaviorSubject<SchoolClass[]>(this.generateAllClasses());
+  private baseUrl = 'http://localhost:8080/api/classes';
+  private classesSubject = new BehaviorSubject<SchoolClass[]>([]);
   classes$ = this.classesSubject.asObservable();
 
-  constructor(private studentService: StudentService) {}
-
-  // Generate all classes (1-10) only = 10 classes total
-  private generateAllClasses(): SchoolClass[] {
-    const classes: SchoolClass[] = [];
-
-    for (let classNum = 1; classNum <= 10; classNum++) {
-      classes.push({
-        classId: classNum,
-        className: `Class ${classNum}`,
-        classNumber: classNum,
-        studentCount: this.getStudentCountInClass(classNum),
-        maxCapacity: 60,
-        isActive: true
-      });
-    }
-
-    return classes;
+  constructor(private http: HttpClient) {
   }
 
-  // Get student count in a specific class
-  private getStudentCountInClass(classNum: number): number {
-    const students = this.studentService.getAllStudentsSync();
-    return students.filter(s => {
-      const classMatch = s.className.match(/Class\s(\d+)/);
-      const studClassNum = classMatch ? parseInt(classMatch[1]) : 0;
-      return studClassNum === classNum;
-    }).length;
+  /**
+   * Load all classes from backend
+   */
+  loadClasses(): void {
+    this.getAllClasses().subscribe({
+      next: (response: any) => {
+        const classes = Array.isArray(response.data) ? response.data : [];
+        this.classesSubject.next(classes);
+      },
+      error: (err) => {
+        console.error('Error loading classes:', err);
+        this.classesSubject.next([]);
+      }
+    });
   }
 
-  // Get all classes
+  /**
+   * Get all classes
+   */
+  getAllClasses(): Observable<any> {
+    console.log('Fetching classes from:', this.baseUrl);
+    return this.http.get<any>(`${this.baseUrl}`).pipe(
+      tap((response: any) => {
+        console.log('Classes response:', response);
+        const classes = Array.isArray(response.data) ? response.data : [];
+        this.classesSubject.next(classes);
+      })
+    );
+  }
+
+  /**
+   * Get all active classes
+   */
+  getAllActiveClasses(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/active`);
+  }
+
+  /**
+   * Get class by ID
+   */
+  getClassById(classId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${classId}`);
+  }
+
+  /**
+   * Get class by name
+   */
+  getClassByName(className: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/name/${className}`);
+  }
+
+  /**
+   * Get class by number
+   */
+  getClassByNumber(classNumber: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/number/${classNumber}`);
+  }
+
+  /**
+   * Create new class
+   */
+  createClass(schoolClass: SchoolClass): Observable<any> {
+    return this.http.post(`${this.baseUrl}`, schoolClass).pipe(
+      tap(() => this.loadClasses())
+    );
+  }
+
+  /**
+   * Update class
+   */
+  updateClass(classId: number, schoolClass: SchoolClass): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${classId}`, schoolClass).pipe(
+      tap(() => this.loadClasses())
+    );
+  }
+
+  /**
+   * Delete class (soft delete)
+   */
+  deleteClass(classId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${classId}`).pipe(
+      tap(() => this.loadClasses())
+    );
+  }
+
+  /**
+   * Delete class permanently (hard delete)
+   */
+  deleteClassPermanently(classId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${classId}/permanent`).pipe(
+      tap(() => this.loadClasses())
+    );
+  }
+
+  /**
+   * Get classes synchronously from BehaviorSubject
+   */
+  getAllClassesSync(): SchoolClass[] {
+    return this.classesSubject.getValue();
+  }
+
+  /**
+   * Get classes observable
+   */
   getClasses(): Observable<SchoolClass[]> {
     return this.classes$;
   }
 
-  // Get classes as array (synchronous)
+  /**
+   * Get classes as array
+   */
   getClassesArray(): SchoolClass[] {
     return this.classesSubject.value;
   }
 
-  // Get a specific class by class number
-  getClassByNumber(classNumber: number): SchoolClass | undefined {
-    const classes = this.classesSubject.value;
-    return classes.find(c => c.classNumber === classNumber);
-  }
-
-  // Get students in a specific class
-  getStudentsInClass(classNumber: number): any[] {
-    const students = this.studentService.getAllStudentsSync();
-    return students.filter(s => {
-      const classMatch = s.className.match(/Class\s(\d+)/);
-      const studClassNum = classMatch ? parseInt(classMatch[1]) : 0;
-      return studClassNum === classNumber;
-    });
-  }
-
-  // Get class capacity and current count
-  getClassCapacity(classNumber: number): { current: number; max: number } {
-    const students = this.getStudentsInClass(classNumber);
-    const classData = this.getClassByNumber(classNumber);
-    return {
-      current: students.length,
-      max: classData?.maxCapacity || 60
-    };
-  }
-
-  // Check if class has available seats
-  hasAvailableSeats(classNumber: number): boolean {
-    const capacity = this.getClassCapacity(classNumber);
-    return capacity.current < capacity.max;
-  }
-
-  // Add a student to a class
-  addStudentToClass(classNumber: number): boolean {
-    if (!this.hasAvailableSeats(classNumber)) {
-      console.warn(`Class ${classNumber} is at full capacity`);
-      return false;
-    }
-    // Student assignment logic would be handled by StudentService
-    this.updateClassCount();
-    return true;
-  }
-
-  // Update class student counts
-  updateClassCount(): void {
-    const updatedClasses = this.generateAllClasses();
-    this.classesSubject.next(updatedClasses);
-  }
-
-  // Add a new class (manual)
-  addClass(schoolClass: SchoolClass): void {
-    const currentClasses = this.classesSubject.value;
-    const newClasses = [...currentClasses, schoolClass];
-    this.classesSubject.next(newClasses);
-  }
-
-  // Update a class
-  updateClass(updatedClass: SchoolClass): void {
-    const currentClasses = this.classesSubject.value;
-    const newClasses = currentClasses.map(c => 
-      c.classId === updatedClass.classId ? updatedClass : c
-    );
-    this.classesSubject.next(newClasses);
-  }
-
-  // Delete a class
-  deleteClass(classId: number): void {
-    const currentClasses = this.classesSubject.value;
-    const newClasses = currentClasses.filter(c => c.classId !== classId);
-    this.classesSubject.next(newClasses);
-  }
-
-  // Set all classes
+  /**
+   * Set all classes
+   */
   setClasses(classes: SchoolClass[]): void {
     this.classesSubject.next(classes);
   }
 }
+
 

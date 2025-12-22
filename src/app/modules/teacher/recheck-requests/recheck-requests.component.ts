@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { RequestRecheckService } from '../../../core/services/request-recheck.service';
+import { MarksService } from '../../../core/services/marks.service';
+import { StudentService } from '../../../core/services/student.service';
 
 @Component({
   selector: 'app-recheck-requests',
@@ -11,7 +13,7 @@ import { RequestRecheckService } from '../../../core/services/request-recheck.se
 export class RecheckRequestsComponent implements OnInit {
   
   // Table configuration
-  displayedColumns: string[] = ['rollNo', 'studentName', 'subject', 'reason', 'status', 'date', 'action'];
+  displayedColumns: string[] = ['studentName', 'subject', 'reason', 'marksObtained', 'status', 'action'];
   dataSource: any;
   pageSize = 10;
   resolvedRequests = 0;
@@ -19,10 +21,19 @@ export class RecheckRequestsComponent implements OnInit {
   inReviewRequests = 0;
   totalRequests = 0;
 
+  // Edit mode
+  editingMarkId: number | null = null;
+  editedMarks: { [key: number]: number } = {};
+  isSubmitting = false;
+  submitError = '';
+  submitSuccess = '';
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
-    private requestRecheckService: RequestRecheckService
+    private requestRecheckService: RequestRecheckService,
+    private marksService: MarksService,
+    private studentService: StudentService
   ) {}
 
   ngOnInit(): void {
@@ -42,18 +53,73 @@ export class RecheckRequestsComponent implements OnInit {
     this.requestRecheckService.getAllRechecks().subscribe({
       next: (requests: any) => {
         const requestsArray = Array.isArray(requests) ? requests : [];
-        this.dataSource = new MatTableDataSource(requestsArray);
-        if (this.paginator) {
-          this.dataSource.paginator = this.paginator;
-        }
         
-        this.calculateStatistics(requestsArray);
-        console.log('✓ Recheck requests loaded:', requestsArray);
+        // Fetch fresh student data from backend
+        this.studentService.getAllStudents().subscribe({
+          next: (studentsResponse: any) => {
+            const students = Array.isArray(studentsResponse) ? studentsResponse : (studentsResponse.data || []);
+            
+            // Enrich with student names and class
+            const enrichedRequests = this.enrichStudentDataFresh(requestsArray, students);
+            
+            this.dataSource = new MatTableDataSource(enrichedRequests);
+            if (this.paginator) {
+              this.dataSource.paginator = this.paginator;
+            }
+            
+            this.calculateStatistics(enrichedRequests);
+            console.log('✓ Recheck requests loaded:', enrichedRequests);
+          },
+          error: (err) => {
+            console.error('Error loading students:', err);
+            // Fallback to cached data if fresh fetch fails
+            const enrichedRequests = this.enrichStudentData(requestsArray);
+            this.dataSource = new MatTableDataSource(enrichedRequests);
+            if (this.paginator) {
+              this.dataSource.paginator = this.paginator;
+            }
+            this.calculateStatistics(enrichedRequests);
+          }
+        });
       },
       error: (err) => {
         console.error('Error loading recheck requests:', err);
         this.dataSource = new MatTableDataSource([]);
       }
+    });
+  }
+
+  /**
+   * Enrich recheck requests with fresh student data from backend
+   */
+  private enrichStudentDataFresh(requests: any[], students: any[]): any[] {
+    return requests.map(request => {
+      const student = students.find(s => s.studentId === request.studentId);
+      return {
+        ...request,
+        studentName: student?.name || 'Unknown',
+        rollNo: student?.rollNo || 'N/A',
+        className: student?.className || 'N/A',
+        marksObtained: request.marksObtained || 0
+      };
+    });
+  }
+
+  /**
+   * Enrich recheck requests with student data (cached fallback)
+   */
+  private enrichStudentData(requests: any[]): any[] {
+    const students = this.studentService.getAllStudentsSync();
+    
+    return requests.map(request => {
+      const student = students.find(s => s.studentId === request.studentId);
+      return {
+        ...request,
+        studentName: student?.name || 'Unknown',
+        rollNo: student?.rollNo || 'N/A',
+        className: student?.className || 'N/A',
+        marksObtained: request.marksObtained || 0
+      };
     });
   }
 
@@ -111,6 +177,74 @@ export class RecheckRequestsComponent implements OnInit {
       'rejected': 'Rejected'
     };
     return textMap[status] || status;
+  }
+
+  /**
+   * Start editing mark
+   */
+  editMark(request: any): void {
+    this.editingMarkId = request.marksId;
+    this.editedMarks[request.marksId] = request.marksObtained;
+    this.submitError = '';
+  }
+
+  /**
+   * Cancel editing
+   */
+  cancelEdit(): void {
+    this.editingMarkId = null;
+    this.editedMarks = {};
+  }
+
+  /**
+   * Save updated mark
+   */
+  saveMark(request: any): void {
+    const newMarks = this.editedMarks[request.marksId];
+
+    if (newMarks === undefined || newMarks === null) {
+      this.submitError = 'Please enter a valid mark value';
+      return;
+    }
+
+    if (newMarks < 0 || newMarks > 100) {
+      this.submitError = 'Marks must be between 0 and 100';
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.submitError = '';
+
+    const updateRequest = {
+      marksObtained: newMarks,
+      maxMarks: request.maxMarks || 100,
+      term: request.term || 'Term 1',
+      year: request.year || new Date().getFullYear(),
+      isRecheckRequested: false // Mark recheck as resolved
+    };
+
+    this.marksService.updateMarks(request.marksId, updateRequest).subscribe({
+      next: (response: any) => {
+        console.log(`✓ Mark updated for ${request.studentName}`, response);
+        this.submitSuccess = `✓ Mark updated successfully for ${request.studentName}`;
+        this.editingMarkId = null;
+        this.editedMarks = {};
+        this.isSubmitting = false;
+
+        // Reload data
+        this.loadRecheckRequests();
+
+        setTimeout(() => {
+          this.submitSuccess = '';
+        }, 3000);
+      },
+      error: (err: any) => {
+        console.error('❌ Error updating mark:', err);
+        const errorMsg = err.error?.message || err.message || 'Failed to update mark';
+        this.submitError = `Error: ${errorMsg}`;
+        this.isSubmitting = false;
+      }
+    });
   }
 
   /**
@@ -177,8 +311,6 @@ export class RecheckRequestsComponent implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
-
-  
 
   /**
    * Change page size

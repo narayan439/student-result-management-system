@@ -1,83 +1,289 @@
 <div class="update-marks-container">
-  <div class="update-card">
+  
+  <!-- Header -->
+  <div class="marks-header">
+    <h2>Update Student Marks</h2>
+    <p>View and update marks for students</p>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="submitSuccess" class="success-message">
+    <mat-icon>check_circle</mat-icon>
+    <div>
+      <strong>Success!</strong>
+      <p>{{ submitSuccess }}</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="submitError" class="error-message">
+    <mat-icon>error</mat-icon>
+    <div>
+      <strong>Error!</strong>
+      <p>{{ submitError }}</p>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <mat-card class="marks-card">
     
     <!-- Card Header -->
     <div class="card-header">
       <div class="header-icon">
         <mat-icon>edit_note</mat-icon>
       </div>
-      <h1>Update Marks</h1>
-      <p>Update student marks for re-evaluation</p>
+      <h1>Manage Marks</h1>
+      <p>Update or delete existing student marks</p>
     </div>
 
-    <!-- Form Container -->
-    <div class="form-container">
-      
-      <!-- Student Information -->
-      <div class="student-info">
-        <div class="student-info-header">
-          <mat-icon>person</mat-icon>
-          <h3>Student Information</h3>
-        </div>
-        <div class="student-details">
-          <div class="detail-item">
-            <mat-icon>badge</mat-icon>
-            <span>Roll Number:</span>
-          </div>
-          <div class="roll-no">
-            <mat-icon>numbers</mat-icon>
-            {{ rollNo }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Form -->
-      <form>
-        
-        <!-- Marks Field -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Updated Marks</mat-label>
-          <input 
-            matInput 
-            type="number" 
-            [(ngModel)]="updatedMarks" 
-            name="updatedMarks"
-            placeholder="Enter updated marks"
-            min="0"
-            max="100"
-          >
-          <mat-icon matPrefix>grade</mat-icon>
-          <span matSuffix>/100</span>
-          <mat-hint>Enter marks between 0-100</mat-hint>
-          <span class="marks-range">Valid range: 0 - 100</span>
-        </mat-form-field>
-
-        <!-- Save Button -->
-        <button 
-          mat-raised-button 
-          color="primary" 
-          class="full-width" 
-          (click)="save()"
-          [disabled]="updatedMarks === null || updatedMarks < 0 || updatedMarks > 100"
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <!-- Search Input -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search students or subjects</mat-label>
+        <input 
+          matInput 
+          [(ngModel)]="searchTerm"
+          (keyup)="filterMarks()"
+          placeholder="Type to search..."
         >
-          <mat-icon>save</mat-icon>
-          Save Updated Marks
+        <mat-icon matPrefix>search</mat-icon>
+        <button 
+          *ngIf="searchTerm" 
+          matSuffix 
+          mat-icon-button 
+          aria-label="Clear" 
+          (click)="clearSearch()"
+        >
+          <mat-icon>close</mat-icon>
         </button>
+      </mat-form-field>
 
-      </form>
-
-      <!-- Info Section -->
-      <div class="info-section">
-        <h3>
-          <mat-icon>info</mat-icon>
-          Important Note
-        </h3>
-        <p>
-          This update will permanently modify the student's marks record. 
-          Ensure the updated marks are accurate before saving.
-        </p>
+      <!-- Filter Buttons -->
+      <div class="filter-buttons">
+        <button 
+          mat-stroked-button 
+          class="filter-btn"
+          [class.active]="!searchTerm"
+          (click)="clearSearch()"
+        >
+          <mat-icon>filter_alt_off</mat-icon>
+          All
+        </button>
+        <button 
+          mat-stroked-button 
+          class="filter-btn"
+          (click)="toggleFilter('pending')"
+        >
+          <mat-icon>pending</mat-icon>
+          Pending
+        </button>
+        <button 
+          mat-stroked-button 
+          class="filter-btn"
+          (click)="toggleFilter('pass')"
+        >
+          <mat-icon>check_circle</mat-icon>
+          Pass
+        </button>
       </div>
 
+      <!-- Refresh Button -->
+      <button 
+        mat-raised-button 
+        color="primary"
+        (click)="refreshMarks()"
+        [disabled]="isLoading"
+        class="refresh-btn"
+      >
+        <mat-icon>refresh</mat-icon>
+        {{ isLoading ? 'Loading...' : 'Refresh' }}
+      </button>
     </div>
-  </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading marks...</p>
+    </div>
+
+    <!-- Marks Table -->
+    <div *ngIf="!isLoading && filteredStudents.length > 0" class="table-container">
+      
+      <!-- Student Groups -->
+      <div *ngFor="let student of filteredStudents; let i = index" 
+           class="student-group" 
+           [class.filtered]="searchTerm">
+        
+        <!-- Student Header -->
+        <div class="student-header">
+          <div class="student-info-header">
+            <!-- Arrow Button -->
+            <button 
+              mat-icon-button 
+              class="expand-btn"
+              (click)="toggleStudentExpansion(student.studentId)"
+            >
+              <mat-icon>
+                {{ expandedStudents[student.studentId] ? 'expand_less' : 'expand_more' }}
+              </mat-icon>
+            </button>
+
+            <!-- Student Basic Info -->
+            <div class="student-basic">
+              <h4>{{ student.studentName }}</h4>
+              <span class="roll-badge">{{ student.rollNo }}</span>
+              <span class="class-badge">{{ student.className }}</span>
+            </div>
+
+            <!-- Marks Count -->
+            <div class="marks-count">
+              <mat-icon>done_all</mat-icon>
+              {{ student.marks.length }} subject(s)
+            </div>
+          </div>
+        </div>
+
+        <!-- Marks Details (Collapsible) -->
+        <div *ngIf="expandedStudents[student.studentId]" class="student-marks-section">
+          
+          <!-- Table Header -->
+          <div class="table-header">
+            <div class="col-subject">Subject</div>
+            <div class="col-marks">Marks</div>
+            <div class="col-actions">Actions</div>
+          </div>
+
+          <!-- Marks Rows -->
+          <div *ngFor="let mark of student.marks" 
+               class="table-row" 
+               [class.editing]="editingMarkId === mark.marksId"
+               [class.filtered]="searchTerm && (mark.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || mark.subjectName.toLowerCase().includes(searchTerm.toLowerCase()))">
+            
+            <!-- Subject Column -->
+            <div class="col-subject">
+              <div class="subject-info">
+                <mat-icon class="subject-icon">book</mat-icon>
+                {{ mark.subjectName }}
+              </div>
+            </div>
+            
+            <!-- Marks Column -->
+            <div class="col-marks">
+              <!-- Edit Mode -->
+              <div *ngIf="editingMarkId === mark.marksId" class="edit-marks-input">
+                <mat-form-field appearance="outline" class="input-field">
+                  <mat-label>Marks</mat-label>
+                  <input 
+                    matInput 
+                    type="number"
+                    [(ngModel)]="editedMarks[mark.marksId]"
+                    min="0"
+                    max="100"
+                    [name]="'marks_' + mark.marksId"
+                    #markInput
+                  >
+                  <mat-icon matPrefix>grade</mat-icon>
+                  <span matSuffix>/100</span>
+                  <mat-hint>Enter marks between 0-100</mat-hint>
+                  <mat-error *ngIf="markInput.value && (+markInput.value < 0 || +markInput.value > 100)">
+                    Marks must be between 0-100
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <!-- View Mode -->
+              <div *ngIf="editingMarkId !== mark.marksId" class="view-marks">
+                <div class="mark-display">
+                  <span class="mark-value">{{ mark.marksObtained }}</span>
+                  <span class="mark-total">/100</span>
+                </div>
+                <div class="mark-status" [ngClass]="mark.marksObtained >= 33 ? 'pass' : 'fail'">
+                  {{ mark.marksObtained >= 33 ? 'Pass' : 'Fail' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions Column -->
+            <div class="col-actions">
+              <!-- View Mode Actions -->
+              <div *ngIf="editingMarkId !== mark.marksId" class="action-buttons">
+                <button 
+                  mat-icon-button 
+                  color="primary"
+                  (click)="editMark(mark)"
+                  matTooltip="Edit marks"
+                  [disabled]="isSubmitting"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="warn"
+                  (click)="deleteMark(mark)"
+                  matTooltip="Delete marks"
+                  [disabled]="isSubmitting"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+
+              <!-- Edit Mode Actions -->
+              <div *ngIf="editingMarkId === mark.marksId" class="edit-actions">
+                <button 
+                  mat-icon-button 
+                  color="primary"
+                  (click)="saveMark(mark)"
+                  matTooltip="Save changes"
+                  [disabled]="isSubmitting"
+                >
+                  <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="accent"
+                  (click)="cancelEdit()"
+                  matTooltip="Cancel edit"
+                  [disabled]="isSubmitting"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredStudents.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>folder_open</mat-icon>
+      </div>
+      <h4>No Marks Found</h4>
+      <p *ngIf="searchTerm">No results found for "{{ searchTerm }}". Try a different search term.</p>
+      <p *ngIf="!searchTerm">There are no marks added yet. Go to "Add Marks" to add student marks.</p>
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+      <h3>
+        <mat-icon>info</mat-icon>
+        Quick Guide
+      </h3>
+      <ul>
+        <li><strong>Search:</strong> Use search box to find specific students or subjects</li>
+        <li><strong>Filters:</strong> Use filter buttons to view by status</li>
+        <li><strong>Expand:</strong> Click arrow button to view marks for each student</li>
+        <li><strong>Edit:</strong> Click edit icon to modify marks</li>
+        <li><strong>Save:</strong> Click save to confirm changes</li>
+        <li><strong>Delete:</strong> Click delete icon to remove marks</li>
+        <li><strong>Refresh:</strong> Click refresh button to get latest data</li>
+      </ul>
+    </div>
+
+  </mat-card>
+
 </div>

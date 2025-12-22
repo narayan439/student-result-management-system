@@ -20,6 +20,11 @@ import { MatIconModule } from '@angular/material/icon';
 // MINIMAL NEW IMPORTS for RecheckRequestsComponent
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+// Custom Pipes
+import { GetMarkForSubjectPipe } from '../../shared/pipes/get-mark-for-subject.pipe';
 
 @NgModule({
   declarations: [
@@ -44,8 +49,13 @@ import { MatChipsModule } from '@angular/material/chips';
     MatCardModule,
     
     // MINIMAL: Only essential modules for RecheckRequestsComponent
-    MatPaginatorModule,  // Required for pagination
-    MatChipsModule       // Required for chips (subject/status badges)
+    MatPaginatorModule,      // Required for pagination
+    MatChipsModule,          // Required for chips (subject/status badges)
+    MatProgressSpinnerModule, // Required for loading spinner
+    MatTooltipModule,        // Required for tooltips
+    
+    // Custom Pipes
+    GetMarkForSubjectPipe
   ]
 })
 export class TeacherModule { }

@@ -324,6 +324,37 @@ form {
   gap: 8px;
 }
 
+.mark-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.existing-mark-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #e8f5e9;
+  border-radius: 6px;
+  border-left: 3px solid #4caf50;
+  font-size: 13px;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.existing-mark-badge mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #4caf50;
+}
+
+.existing-mark-badge strong {
+  color: #1b5e20;
+  font-weight: 600;
+}
+
 /* Submitted Marks Summary */
 .submitted-summary {
   padding: 20px;
@@ -390,8 +421,17 @@ form {
   gap: 4px;
 }
 
+.status-duplicate {
+  color: #ff9800;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .status-success mat-icon,
-.status-failed mat-icon {
+.status-failed mat-icon,
+.status-duplicate mat-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
@@ -582,11 +622,189 @@ button[disabled] {
     padding: 16px;
   }
   
+  .subjects-list-section {
+    padding: 16px;
+  }
+
+  .subjects-list-grid {
+    gap: 12px;
+  }
+  
   .submitted-summary {
     padding: 16px;
   }
   
   .info-section {
     padding: 16px;
+  }
+}
+
+/* Subjects List Section */
+.subjects-list-section {
+  margin: 24px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+}
+
+.subjects-list-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #1a237e;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.subjects-list-section mat-icon {
+  color: #667eea;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.subjects-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.subject-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: white;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #667eea;
+  transition: all 0.3s ease;
+}
+
+.subject-badge:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.subject-badge mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+/* Success Message After Submission */
+.submission-success-message {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-left: 5px solid #4caf50;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 24px;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+  animation: slideInUp 0.4s ease;
+}
+
+.submission-success-message mat-icon {
+  color: #4caf50;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  flex-shrink: 0;
+}
+
+.submission-success-message .success-content {
+  flex: 1;
+}
+
+.submission-success-message strong {
+  color: #2e7d32;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.submission-success-message p {
+  color: #558b2f;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Already Submitted Warning Message */
+.already-submitted-message {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe0b2 100%);
+  border-left: 5px solid #ff9800;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.15);
+  animation: slideInDown 0.4s ease;
+}
+
+.already-submitted-message mat-icon {
+  color: #ff9800;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  flex-shrink: 0;
+}
+
+.already-submitted-message .message-content {
+  flex: 1;
+}
+
+.already-submitted-message strong {
+  color: #e65100;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.already-submitted-message p {
+  color: #bf360c;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.already-submitted-message .sub-text {
+  color: #d84315;
+  font-size: 12px;
+  margin: 0 !important;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -192,6 +192,29 @@ table {
   color: #d32f2f;
 }
 
+/* Admin Notes Cell */
+.mat-column-adminNotes {
+  width: 250px;
+}
+
+.mat-column-adminNotes .mat-cell {
+  color: #4a5568;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Resolved Date Cell */
+.mat-column-resolvedDate {
+  width: 180px;
+}
+
+.mat-column-resolvedDate .mat-cell {
+  color: #718096;
+  font-size: 14px;
+}
+
 /* Actions Cell */
 .mat-column-actions {
   width: 200px;

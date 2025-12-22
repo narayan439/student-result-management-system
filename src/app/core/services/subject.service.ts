@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { tap, catchError, map } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { Subject, SubjectResponse, SubjectListResponse } from '../models/subject.model';
 
 @Injectable({
@@ -9,158 +9,156 @@ import { Subject, SubjectResponse, SubjectListResponse } from '../models/subject
 })
 export class SubjectService {
   private baseUrl = 'http://localhost:8080/api/subjects';
-  private localKey = 'app_subjects_v1';
 
   private subjectsSubject = new BehaviorSubject<Subject[]>([]);
   public subjects$ = this.subjectsSubject.asObservable();
 
-  private sampleSubjects: Subject[] = [
-    { subjectId: 1, subjectName: 'Mathematics', subjectCode: 'MATH', isActive: true },
-    { subjectId: 2, subjectName: 'Science', subjectCode: 'SCI', isActive: true },
-    { subjectId: 3, subjectName: 'English', subjectCode: 'ENG', isActive: true },
-    { subjectId: 4, subjectName: 'MIL Odia', subjectCode: 'MIL', isActive: true },
-    { subjectId: 5, subjectName: 'Music', subjectCode: 'MUS', isActive: true },
-    { subjectId: 6, subjectName: 'Drawing', subjectCode: 'ART', isActive: true },
-    { subjectId: 7, subjectName: 'History', subjectCode: 'HIS', isActive: true },
-    { subjectId: 8, subjectName: 'Geography', subjectCode: 'GEO', isActive: true },
-    { subjectId: 9, subjectName: 'Hindi', subjectCode: 'HINDI', isActive: true }
-  ];
-
-  // Class-specific subjects mapping
-  private classSubjectsMap: { [key: number]: number[] } = {
-    1: [1, 2, 3, 4, 5, 6], // Class 1: Math, Science, English, MIL Odia, Music, Drawing
-    2: [1, 2, 3, 4, 5, 6], // Class 2: Math, Science, English, MIL Odia, Music, Drawing
-    3: [1, 2, 3, 4, 7, 8], // Class 3: Math, Science, English, MIL Odia, History, Geography
-    4: [1, 2, 3, 4, 7, 8], // Class 4: Math, Science, English, MIL Odia, History, Geography
-    5: [1, 2, 3, 4, 7, 8], // Class 5: Math, Science, English, MIL Odia, History, Geography
-    6: [1, 2, 3, 9, 7, 8], // Class 6: Math, Science, English, Hindi, History, Geography
-    7: [1, 2, 3, 9, 7, 8], // Class 7: Math, Science, English, Hindi, History, Geography
-    8: [1, 2, 3, 9, 7, 8], // Class 8: Math, Science, English, Hindi, History, Geography
-    9: [1, 2, 3, 9, 7, 8], // Class 9: Math, Science, English, Hindi, History, Geography
-    10: [1, 2, 3, 9, 7, 8] // Class 10: Math, Science, English, Hindi, History, Geography
-  };
-
   constructor(private http: HttpClient) {
-    // Clear old data and initialize with fresh sample subjects
-    this.saveToLocal(this.sampleSubjects);
-    this.subjectsSubject.next(this.sampleSubjects);
+    // Don't auto-load in constructor to avoid timing issues
   }
 
-  getAllSubjects(): Observable<Subject[]> {
-    const local = this.getSubjectsFromLocal();
-    
-    // Always return local data (which is initialized with all 15 sample subjects)
-    this.subjectsSubject.next(local);
+  /**
+   * Load all subjects from backend
+   */
+  loadSubjects(): void {
+    this.getAllSubjects().subscribe({
+      next: (response: any) => {
+        const subjects = Array.isArray(response.data) ? response.data : [];
+        this.subjectsSubject.next(subjects);
+        console.log('Subjects loaded:', subjects);
+      },
+      error: (err) => {
+        console.error('Error loading subjects:', err);
+        this.subjectsSubject.next([]);
+      }
+    });
+  }
 
-    // Try to fetch from API, but use local as fallback
-    return this.http.get<SubjectListResponse>(this.baseUrl).pipe(
-      map(response => {
-        if (response && response.data && response.data.length > 0) {
-          return response.data;
-        }
-        return local;
-      }),
-      tap(subjects => {
-        if (subjects && subjects.length > 0) {
-          this.subjectsSubject.next(subjects);
-          this.saveToLocal(subjects);
-        }
+  /**
+   * Get all subjects from backend
+   */
+  getAllSubjects(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/all`).pipe(
+      tap((response: any) => {
+        const subjects = Array.isArray(response.data) ? response.data : [];
+        this.subjectsSubject.next(subjects);
       }),
       catchError(err => {
-        console.warn('Subjects API error, using local data', err);
-        return of(local);
+        console.error('Error fetching subjects:', err);
+        return of({ data: [] });
       })
     );
   }
 
   /**
-   * Get subjects for a specific class
+   * Get all active subjects
    */
-  getSubjectsByClass(classNumber: number): Subject[] {
-    const allSubjects = this.getSubjectsFromLocal();
-    const subjectIds = this.classSubjectsMap[classNumber] || [];
-    return allSubjects.filter(s => subjectIds.includes(s.subjectId || 0));
+  getAllActiveSubjects(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/active`).pipe(
+      tap((response: any) => {
+        const subjects = Array.isArray(response.data) ? response.data : [];
+        this.subjectsSubject.next(subjects);
+      }),
+      catchError(err => {
+        console.error('Error fetching active subjects:', err);
+        return of({ data: [] });
+      })
+    );
   }
 
   /**
-   * Get all subjects for a specific class as Observable
+   * Get subjects synchronously from BehaviorSubject
    */
-  getSubjectsByClassObservable(classNumber: number): Observable<Subject[]> {
-    const subjects = this.getSubjectsByClass(classNumber);
-    return of(subjects);
+  getSubjectsSync(): Subject[] {
+    return this.subjectsSubject.getValue();
   }
 
-  addSubject(subject: Subject): Observable<Subject> {
-    return this.http.post<SubjectResponse>(this.baseUrl, subject).pipe(
-      map(response => {
-        if (response && response.data) {
-          return response.data;
-        }
-        return subject;
-      }),
-      tap(addedSubject => {
-        const current = this.getSubjectsFromLocal();
-        if (!addedSubject.subjectId) {
-          addedSubject.subjectId = this.getNextSubjectId();
-        }
-        current.push(addedSubject);
-        this.saveToLocal(current);
-        this.subjectsSubject.next(current);
-      }),
+  /**
+   * Get subject by ID
+   */
+  getSubjectById(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${id}`).pipe(
       catchError(err => {
-        console.warn('Add subject failed, saving locally', err);
-        const current = this.getSubjectsFromLocal();
-        const newSubject = { 
-          ...subject, 
-          subjectId: this.getNextSubjectId() 
-        } as Subject;
-        current.push(newSubject);
-        this.saveToLocal(current);
-        this.subjectsSubject.next(current);
-        return of(newSubject);
+        console.error('Error fetching subject:', err);
+        return of({ data: null });
       })
     );
   }
 
-  deleteSubject(subjectId: number): Observable<any> {
-    const url = `${this.baseUrl}/${subjectId}`;
-    return this.http.delete<any>(url).pipe(
-      tap(() => {
-        const current = this.getSubjectsFromLocal().filter(s => s.subjectId !== subjectId);
-        this.saveToLocal(current);
-        this.subjectsSubject.next(current);
+  /**
+   * Get subjects for a specific class (by class name like 'Class 10', 'Class 11' or number)
+   */
+  getSubjectsByClass(className: string | number): Observable<any> {
+    const classNameStr = typeof className === 'number' ? `Class ${className}` : className;
+    return this.http.get(`${this.baseUrl}/class/${classNameStr}`).pipe(
+      tap((response: any) => {
+        console.log(`Subjects loaded for ${classNameStr}:`, response.data);
       }),
       catchError(err => {
-        console.warn('Delete subject failed, deleting locally', err);
-        const current = this.getSubjectsFromLocal().filter(s => s.subjectId !== subjectId);
-        this.saveToLocal(current);
-        this.subjectsSubject.next(current);
-        return of({ success: true });
+        console.error('Error fetching subjects for class:', err);
+        return of({ data: [] });
       })
     );
   }
 
-  private getSubjectsFromLocal(): Subject[] {
-    try {
-      const raw = localStorage.getItem(this.localKey);
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      console.error('Failed to read subjects from local storage', e);
-      return this.sampleSubjects;
-    }
+  /**
+   * Get subjects for a specific class (synchronously)
+   */
+  getSubjectsByClassSync(className: string | number): Subject[] {
+    const classNameStr = typeof className === 'number' ? `Class ${className}` : className;
+    const allSubjects = this.subjectsSubject.getValue();
+    return allSubjects.filter(s => s.className === classNameStr);
   }
 
-  private saveToLocal(subjects: Subject[]) {
-    try {
-      localStorage.setItem(this.localKey, JSON.stringify(subjects));
-    } catch (e) {
-      console.error('Failed to save subjects to local storage', e);
-    }
+  /**
+   * Add new subject
+   */
+  addSubject(subject: Subject): Observable<any> {
+    return this.http.post(`${this.baseUrl}/add`, subject).pipe(
+      tap(() => this.loadSubjects()),
+      catchError(err => {
+        console.error('Error adding subject:', err);
+        return of({ success: false });
+      })
+    );
   }
 
-  private getNextSubjectId(): number {
-    const current = this.getSubjectsFromLocal();
-    const maxId = current.reduce((max, s) => Math.max(max, s.subjectId || 0), 0);
-    return maxId + 1;
+  /**
+   * Update subject
+   */
+  updateSubject(id: number, subject: Subject): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${id}`, subject).pipe(
+      tap(() => this.loadSubjects()),
+      catchError(err => {
+        console.error('Error updating subject:', err);
+        return of({ success: false });
+      })
+    );
+  }
+
+  /**
+   * Delete subject (soft delete)
+   */
+  deleteSubject(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
+      tap(() => this.loadSubjects()),
+      catchError(err => {
+        console.error('Error deleting subject:', err);
+        return of({ success: false });
+      })
+    );
+  }
+
+  /**
+   * Delete subject permanently (hard delete)
+   */
+  deleteSubjectPermanently(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}/permanent`).pipe(
+      tap(() => this.loadSubjects()),
+      catchError(err => {
+        console.error('Error deleting subject permanently:', err);
+        return of({ success: false });
+      })
+    );
   }
 }

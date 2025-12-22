@@ -36,14 +36,38 @@ export class ProfileComponent implements OnInit {
     }
 
     // Get student by email
-    const students = this.studentService.getAllStudentsSync();
-    this.student = students.find(s => s.email === currentUser.email) || null;
+    let students = this.studentService.getAllStudentsSync();
+    
+    // If cache is empty, refresh from backend
+    if (!students || students.length === 0) {
+      console.log('⚠️ Student cache is empty, refreshing from backend...');
+      this.studentService.refreshStudents().subscribe({
+        next: (refreshedStudents) => {
+          this.findAndLoadStudent(currentUser.email, refreshedStudents);
+        },
+        error: (err) => {
+          console.error('❌ Failed to refresh student data:', err);
+          alert('Student profile not found. Please login again.');
+          this.router.navigate(['/login']);
+        }
+      });
+      return;
+    }
+    
+    this.findAndLoadStudent(currentUser.email, students);
+  }
+
+  /**
+   * Find and load student profile by email
+   */
+  private findAndLoadStudent(email: string, students: any[]): void {
+    this.student = students.find(s => s.email === email) || null;
 
     if (this.student) {
       this.editData = { ...this.student };
       console.log('✓ Student profile loaded:', this.student);
     } else {
-      console.error('✗ Student not found for email:', currentUser.email);
+      console.error('✗ Student not found for email:', email);
       alert('Student profile not found. Please login again.');
       this.router.navigate(['/login']);
     }

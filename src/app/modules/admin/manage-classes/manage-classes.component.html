@@ -19,6 +19,15 @@
     <div class="card-header">
       <h2>All Classes</h2>
       <div class="header-actions">
+        <span class="count-badge">{{activeClassesCount}} Active Classes</span>
+        <button 
+          mat-icon-button 
+          (click)="toggleShowDeletedClasses()"
+          [color]="showDeletedClasses ? 'warn' : 'primary'"
+          matTooltip="Show/Hide Deleted Classes"
+        >
+          <mat-icon>{{ showDeletedClasses ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
         <button 
           mat-raised-button 
           color="primary" 
@@ -58,6 +67,46 @@
             </mat-option>
           </mat-select>
           <mat-icon matPrefix>school</mat-icon>
+        </mat-form-field>
+
+        <!-- Subject Selection Panel -->
+        <div class="form-field full-width">
+          <button 
+            mat-stroked-button 
+            color="accent"
+            (click)="toggleSubjectSelector()"
+            class="subject-selector-btn"
+          >
+            <mat-icon>{{ showSubjectSelector ? 'expand_less' : 'expand_more' }}</mat-icon>
+            {{ selectedSubjectIds.length }} Subject(s) Selected - Click to {{ showSubjectSelector ? 'Hide' : 'Show' }} Options
+          </button>
+          
+          <!-- Subject Checkboxes -->
+          <div *ngIf="showSubjectSelector" class="subject-selector-panel">
+            <div class="subject-list">
+              <mat-checkbox
+                *ngFor="let subject of allSubjects"
+                [checked]="isSubjectSelected(subject.subjectId)"
+                (change)="onSubjectChange(subject.subjectId, $event)"
+                class="subject-checkbox"
+              >
+                {{ subject.subjectName }}
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <!-- Display Selected Subjects -->
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Selected Subjects</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="newSubjectList" 
+            name="subjectList"
+            placeholder="Subjects will appear here"
+            readonly
+          >
+          <mat-icon matPrefix>library_books</mat-icon>
         </mat-form-field>
       </div>
 
@@ -109,6 +158,46 @@
             </mat-option>
           </mat-select>
           <mat-icon matPrefix>school</mat-icon>
+        </mat-form-field>
+
+        <!-- Subject Selection Panel for Edit -->
+        <div class="form-field full-width">
+          <button 
+            mat-stroked-button 
+            color="accent"
+            (click)="toggleSubjectSelector()"
+            class="subject-selector-btn"
+          >
+            <mat-icon>{{ showSubjectSelector ? 'expand_less' : 'expand_more' }}</mat-icon>
+            {{ selectedSubjectIds.length }} Subject(s) Selected - Click to {{ showSubjectSelector ? 'Hide' : 'Show' }} Options
+          </button>
+          
+          <!-- Subject Checkboxes -->
+          <div *ngIf="showSubjectSelector" class="subject-selector-panel">
+            <div class="subject-list">
+              <mat-checkbox
+                *ngFor="let subject of allSubjects"
+                [checked]="isSubjectSelected(subject.subjectId)"
+                (change)="onSubjectChange(subject.subjectId, $event)"
+                class="subject-checkbox"
+              >
+                {{ subject.subjectName }}
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <!-- Display Selected Subjects -->
+        <mat-form-field appearance="outline" class="form-field full-width">
+          <mat-label>Selected Subjects</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="newSubjectList" 
+            name="subjectList"
+            placeholder="Subjects will appear here"
+            readonly
+          >
+          <mat-icon matPrefix>library_books</mat-icon>
         </mat-form-field>
       </div>
 
@@ -209,23 +298,18 @@
         <ng-container matColumnDef="studentCount">
           <th mat-header-cell *matHeaderCellDef> Students </th>
           <td mat-cell *matCellDef="let schoolClass">
-            <mat-chip class="student-chip">{{ schoolClass.studentCount }} / {{ schoolClass.maxCapacity }}</mat-chip>
+            <mat-chip class="student-chip">{{ getStudentCountForClass(schoolClass.classNumber) }} / {{ schoolClass.maxCapacity }}</mat-chip>
           </td>
         </ng-container>
 
-        <!-- Status Column -->
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef> Status </th>
+        <!-- Subjects Column -->
+        <ng-container matColumnDef="subjects">
+          <th mat-header-cell *matHeaderCellDef> Subjects </th>
           <td mat-cell *matCellDef="let schoolClass">
-            <div class="status-container">
-              <mat-slide-toggle 
-                [checked]="schoolClass.isActive"
-                (change)="toggleStatus(schoolClass)"
-                color="accent"
-              ></mat-slide-toggle>
-              <span [ngClass]="schoolClass.isActive ? 'status-active' : 'status-inactive'">
-                {{ getStatusText(schoolClass.isActive) }}
-              </span>
+            <div class="subjects-cell">
+              <mat-icon class="subjects-icon">library_books</mat-icon>
+              <span *ngIf="schoolClass.subjectList">{{ schoolClass.subjectList }}</span>
+              <span *ngIf="!schoolClass.subjectList" class="no-subjects">—</span>
             </div>
           </td>
         </ng-container>
@@ -242,14 +326,6 @@
                 (click)="toggleEditForm(schoolClass)"
               >
                 <mat-icon>edit</mat-icon>
-              </button>
-              <button 
-                mat-icon-button 
-                color="warn"
-                matTooltip="Delete Class"
-                (click)="deleteClass(schoolClass)"
-              >
-                <mat-icon>delete</mat-icon>
               </button>
             </div>
           </td>
@@ -292,7 +368,7 @@
                 <h3 class="class-name">{{ schoolClass.className }}</h3>
                 <p class="class-meta">
                   <mat-chip class="class-chip">Class {{ schoolClass.classNumber }}</mat-chip>
-                  <mat-chip class="student-chip">{{ schoolClass.studentCount }} / {{ schoolClass.maxCapacity }}</mat-chip>
+                  <mat-chip class="student-chip">Max Capacity: {{ schoolClass.maxCapacity }}</mat-chip>
                 </p>
               </div>
             </div>
@@ -300,29 +376,26 @@
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="toggleEditForm(schoolClass)">
+              <button mat-menu-item (click)="toggleEditForm(schoolClass)" *ngIf="schoolClass.isActive !== false">
                 <mat-icon>edit</mat-icon>
                 <span>Edit</span>
               </button>
-              <button mat-menu-item (click)="deleteClass(schoolClass)">
-                <mat-icon color="warn">delete</mat-icon>
-                <span>Delete</span>
-              </button>
+              <ng-container *ngIf="schoolClass.isActive !== false; else deletedMenu">
+              </ng-container>
+              <ng-template #deletedMenu>
+                <button mat-menu-item (click)="reactivateClass(schoolClass)">
+                  <mat-icon color="accent">restore</mat-icon>
+                  <span>Reactivate</span>
+                </button>
+              </ng-template>
             </mat-menu>
           </mat-card-header>
 
           <mat-card-content>
             <div class="card-stats">
               <div class="stat">
-                <span class="stat-label">Status:</span>
-                <mat-slide-toggle 
-                  [checked]="schoolClass.isActive"
-                  (change)="toggleStatus(schoolClass)"
-                  color="accent"
-                ></mat-slide-toggle>
-                <span [ngClass]="schoolClass.isActive ? 'status-active' : 'status-inactive'">
-                  {{ getStatusText(schoolClass.isActive) }}
-                </span>
+                <span class="stat-label">Class Number:</span>
+                <span class="stat-value">{{ schoolClass.classNumber }}</span>
               </div>
             </div>
           </mat-card-content>
@@ -334,13 +407,6 @@
               (click)="toggleEditForm(schoolClass)"
             >
               <mat-icon>edit</mat-icon> Edit
-            </button>
-            <button 
-              mat-button 
-              color="warn"
-              (click)="deleteClass(schoolClass)"
-            >
-              <mat-icon>delete</mat-icon> Delete
             </button>
           </mat-card-actions>
         </mat-card>

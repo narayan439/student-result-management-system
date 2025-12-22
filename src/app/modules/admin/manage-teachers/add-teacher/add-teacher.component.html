@@ -87,26 +87,6 @@
           </div>
         </div>
 
-        <!-- Date of Birth Field -->
-        <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Date of Birth</mat-label>
-          <input 
-            matInput 
-            [matDatepicker]="picker" 
-            [(ngModel)]="teacher.dob" 
-            name="dob" 
-            required
-            placeholder="MM/DD/YYYY"
-          >
-          <mat-icon matPrefix>calendar_today</mat-icon>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-          <mat-hint>Teacher's date of birth</mat-hint>
-          <mat-error *ngIf="teacherForm.controls['dob']?.invalid && teacherForm.controls['dob']?.touched">
-            Date of birth is required
-          </mat-error>
-        </mat-form-field>
-
         <!-- Phone Number Field -->
         <mat-form-field appearance="outline" class="form-field">
           <mat-label>Phone Number</mat-label>
@@ -114,11 +94,34 @@
             matInput 
             [(ngModel)]="teacher.phone" 
             name="phone"
+            (ngModelChange)="generatePasswordPreview()"
             placeholder="+91 9876543210"
           >
           <mat-icon matPrefix>phone</mat-icon>
           <mat-hint>Contact number (optional)</mat-hint>
         </mat-form-field>
+
+        <!-- Auto-Generated Password Preview -->
+        <div class="form-field full-width password-preview" *ngIf="generatedPassword">
+          <div class="password-info-box">
+            <div class="password-header">
+              <mat-icon>vpn_key</mat-icon>
+              <strong>Auto-Generated Login Password</strong>
+            </div>
+            <div class="password-format-info">
+              <p><strong>Format:</strong> First 3 letters of name (UPPERCASE) + Last 4 digits of phone</p>
+              <p><strong>Example:</strong> Name "Sharma" + Phone "9876543210" = <code>SHA3210</code></p>
+            </div>
+            <div class="password-display">
+              <span class="label">Generated Password:</span>
+              <span class="password-value">{{ generatedPassword }}</span>
+              <button type="button" mat-icon-button matTooltip="Copy password" (click)="copyToClipboard(generatedPassword)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </div>
+            <p class="password-note">⚠️ Share this password with the teacher. It will be automatically stored during registration.</p>
+          </div>
+        </div>
 
         <!-- Experience Field -->
         <mat-form-field appearance="outline" class="form-field">

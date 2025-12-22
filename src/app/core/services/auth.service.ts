@@ -10,7 +10,7 @@ export class AuthService {
 
   private readonly ADMIN_EMAIL = 'admin@gmail.com';
   private readonly PASSWORD = '123456';
-  private readonly API_URL = 'http://localhost:8080/api/auth';
+  private readonly API_URL = 'https://srms-backend-production.up.railway.app/api/auth';
 
   constructor(
     private studentService: StudentService,

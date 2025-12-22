@@ -8,7 +8,7 @@ import { Subject, SubjectResponse, SubjectListResponse } from '../models/subject
   providedIn: 'root'
 })
 export class SubjectService {
-  private baseUrl = 'http://localhost:8080/api/subjects';
+  private baseUrl = 'https://srms-backend-production.up.railway.app/api/subjects';
 
   private subjectsSubject = new BehaviorSubject<Subject[]>([]);
   public subjects$ = this.subjectsSubject.asObservable();

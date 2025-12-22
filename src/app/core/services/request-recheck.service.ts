@@ -13,7 +13,7 @@ import { Recheck } from '../models/recheck.model';
 })
 export class RequestRecheckService {
 
-  private baseUrl = 'http://localhost:8080/api/rechecks';
+  private baseUrl = 'https://srms-backend-production.up.railway.app/api/rechecks';
   private recheckSubject = new BehaviorSubject<Recheck[]>([]);
   private localKey = 'app_request_rechecks_v1';
 

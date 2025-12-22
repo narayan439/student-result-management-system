@@ -19,7 +19,7 @@ export interface SchoolClass {
   providedIn: 'root'
 })
 export class ClassesService {
-  private baseUrl = 'http://localhost:8080/api/classes';
+  private baseUrl = 'https://srms-backend-production.up.railway.app/api/classes';
   private classesSubject = new BehaviorSubject<SchoolClass[]>([]);
   classes$ = this.classesSubject.asObservable();
 

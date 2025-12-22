@@ -8,7 +8,7 @@ import { Mark, MarkResponse, MarkListResponse } from '../models/marks.model';
   providedIn: 'root'
 })
 export class MarksService {
-  private baseUrl = 'http://localhost:8080/api/marks';
+  private baseUrl = 'https://srms-backend-production.up.railway.app/api/marks';
   private marksSubject = new BehaviorSubject<Mark[]>([]);
   public marks$ = this.marksSubject.asObservable();
 

@@ -7,8 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class AdminService {
 
-  private baseUrl = 'http://localhost:8080/api/admin';
-  private apiUrl = 'http://localhost:8080/admin';
+  private baseUrl = 'https://srms-backend-production.up.railway.app/api/admin';
+  private apiUrl = 'https://srms-backend-production.up.railway.app/admin';
 
   constructor(private http: HttpClient) {}
 

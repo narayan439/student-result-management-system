@@ -9,7 +9,7 @@ import { Student, StudentResponse, StudentListResponse } from '../models/student
 })
 export class StudentService {
 
-  private baseUrl = 'http://localhost:8080/api/students';
+  private baseUrl = 'https://srms-backend-production.up.railway.app/api/students';
   private studentsSubject = new BehaviorSubject<Student[]>([]);
   public students$ = this.studentsSubject.asObservable();
 

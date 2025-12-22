@@ -9,7 +9,7 @@ import { Teacher, TeacherResponse, TeacherListResponse } from '../models/teacher
 })
 export class TeacherService {
 
-  private baseUrl = 'http://localhost:8080/api/teachers';
+  private baseUrl = 'https://srms-backend-production.up.railway.app/api/teachers';
   private teachersSubject = new BehaviorSubject<Teacher[]>([]);
   public teachers$ = this.teachersSubject.asObservable();
 

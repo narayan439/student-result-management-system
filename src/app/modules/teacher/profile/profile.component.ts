@@ -14,18 +14,15 @@ export class ProfileComponent implements OnInit {
     name: 'Loading...',
     email: 'Loading...',
     subject: 'Loading...',
-    dob: 'Loading...',
-    experience: 0,
     phone: 'Loading...',
-    address: 'Loading...',
-    qualifications: 'Loading...',
-    employmentStatus: 'Loading...',
-    dateOfJoining: 'Loading...'
+    experience: 0,
+    isActive: true
   };
 
   isLoading = true;
   errorMessage = '';
   currentUserEmail = '';
+  showLogoutConfirm = false;
 
   constructor(
     private teacherService: TeacherService,
@@ -44,81 +41,64 @@ export class ProfileComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Get current logged-in user's email from localStorage (stored as 'currentUser')
+    // Get current logged-in user's email from localStorage
     const currentUser = localStorage.getItem('currentUser');
-    console.log('📦 Current user from localStorage:', currentUser);
-
+    
     if (currentUser) {
       try {
         const userData = JSON.parse(currentUser);
         this.currentUserEmail = userData.email || '';
-        console.log(`📋 Extracted email from currentUser: "${this.currentUserEmail}"`);
       } catch (e) {
-        console.error('❌ Error parsing currentUser:', e);
+        console.error('Error parsing currentUser:', e);
         this.errorMessage = 'Error reading user session data. Please login again.';
         this.isLoading = false;
         return;
       }
     } else {
-      // Fallback: Check other storage locations
+      // Fallback: Check session storage
       this.currentUserEmail = sessionStorage.getItem('userEmail') || 
                              sessionStorage.getItem('email') || '';
-      console.log(`📋 Fallback email from session storage: "${this.currentUserEmail}"`);
     }
 
     if (!this.currentUserEmail) {
       this.errorMessage = 'No teacher email found in session. Please login again.';
       this.isLoading = false;
-      console.warn('⚠️ No email found in any storage location');
       return;
     }
 
     // Fetch all teachers and find current one
     this.teacherService.getAllTeachers().subscribe({
       next: (teachers: any[]) => {
-        console.log(`✓ Fetched ${teachers.length} teachers from backend:`, teachers);
-        
-        // Debug: Log all emails for comparison
-        console.log('📧 All teacher emails in backend:', teachers.map(t => t.email));
-        console.log(`🔍 Looking for email: "${this.currentUserEmail}"`);
-
         // Find current teacher by email (case-insensitive)
         const currentTeacher = teachers.find(t => {
           const backendEmail = (t.email || '').toLowerCase().trim();
           const currentEmail = this.currentUserEmail.toLowerCase().trim();
-          console.log(`   Comparing: "${backendEmail}" === "${currentEmail}" ? ${backendEmail === currentEmail}`);
           return backendEmail === currentEmail;
         });
 
         if (currentTeacher) {
           // Map backend fields to component properties
           this.teacher = {
-            teacherId: currentTeacher.teacherId || currentTeacher.id,
+            teacherId: currentTeacher.teacherId || currentTeacher.id || 'N/A',
             name: currentTeacher.name || 'N/A',
             email: currentTeacher.email || 'N/A',
             subject: Array.isArray(currentTeacher.subjects) 
               ? currentTeacher.subjects.join(', ') 
               : (currentTeacher.subject || 'N/A'),
             phone: currentTeacher.phone || 'N/A',
-            dob: currentTeacher.dob || 'N/A',
             experience: currentTeacher.experience || 0,
-            address: currentTeacher.address || 'N/A',
-            qualifications: currentTeacher.qualifications || 'N/A',
-            employmentStatus: currentTeacher.employmentStatus || 'Active',
-            dateOfJoining: currentTeacher.dateOfJoining || 'N/A',
             isActive: currentTeacher.isActive !== false
           };
 
-          console.log(`✅ Teacher profile loaded:`, this.teacher);
+          console.log('Teacher profile loaded:', this.teacher);
         } else {
-          this.errorMessage = `Teacher with email "${this.currentUserEmail}" not found in backend. Available emails: ${teachers.map(t => t.email).join(', ')}`;
-          console.warn(this.errorMessage);
+          this.errorMessage = `Teacher with email "${this.currentUserEmail}" not found.`;
         }
 
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('❌ Error loading teacher profile:', err);
+        console.error('Error loading teacher profile:', err);
         this.errorMessage = 'Failed to load teacher profile. Please refresh the page.';
         this.isLoading = false;
       }
@@ -133,12 +113,25 @@ export class ProfileComponent implements OnInit {
   }
 
   /**
-   * Logout user
+   * Show logout confirmation
    */
   logout(): void {
-    console.log('🔓 Teacher logout initiated');
+    this.showLogoutConfirm = true;
+  }
+
+  /**
+   * Cancel logout
+   */
+  cancelLogout(): void {
+    this.showLogoutConfirm = false;
+  }
+
+  /**
+   * Confirm and perform logout
+   */
+  confirmLogout(): void {
+    console.log('Teacher logout confirmed');
     this.authService.logout();
     this.router.navigate(['/login']);
   }
-
 }

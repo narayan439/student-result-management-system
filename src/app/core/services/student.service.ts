@@ -79,6 +79,26 @@ export class StudentService {
   }
 
   /**
+   * Get all students from backend for roll number generation
+   * Used when adding new students to auto-generate roll numbers based on class
+   */
+  getAllStudentsFromBackend(): Observable<Student[]> {
+    console.log('📥 Fetching all students from backend for roll number generation...');
+    return this.http.get<StudentListResponse>(`${this.baseUrl}/all`)
+      .pipe(
+        map(response => {
+          const students = response.data || [];
+          console.log(`✅ Fetched ${students.length} students from backend`);
+          return students;
+        }),
+        catchError(err => {
+          console.warn('⚠️  Failed to fetch from backend, using cache:', err);
+          return of(this.studentsSubject.value || []);
+        })
+      );
+  }
+
+  /**
    * Get students from local data (for offline support)
    */
   getStudentsFromLocal(): Student[] {

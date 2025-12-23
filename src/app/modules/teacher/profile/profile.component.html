@@ -44,11 +44,11 @@
         </div>
       </div>
 
-      <!-- Profile Info - Contact Information -->
+      <!-- Profile Info - Personal Information -->
       <div class="profile-info">
         <h3 class="section-title">
-          <mat-icon>contact_mail</mat-icon>
-          Contact Information
+          <mat-icon>person</mat-icon>
+          Personal Information
         </h3>
         
         <div class="info-grid">
@@ -57,7 +57,7 @@
               <mat-icon>email</mat-icon>
               Email
             </div>
-            <div class="info-value">{{ teacher.email }}</div>
+            <div class="info-value email-value">{{ teacher.email }}</div>
           </div>
 
           <div class="info-item">
@@ -65,23 +65,10 @@
               <mat-icon>phone</mat-icon>
               Phone
             </div>
-            <div class="info-value">{{ teacher.phone }}</div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-label">
-              <mat-icon>location_on</mat-icon>
-              Address
+            <div class="info-value phone-value">
+              <mat-icon class="phone-icon">phone</mat-icon>
+              {{ teacher.phone }}
             </div>
-            <div class="info-value">{{ teacher.address }}</div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-label">
-              <mat-icon>calendar_today</mat-icon>
-              Date of Birth
-            </div>
-            <div class="info-value">{{ teacher.dob }}</div>
           </div>
         </div>
       </div>
@@ -94,62 +81,85 @@
         </h3>
         
         <div class="info-grid">
-          <div class="info-item">
+          <!-- <div class="info-item">
             <div class="info-label">
-              <mat-icon>school</mat-icon>
-              Subject(s)
+              <mat-icon>subject</mat-icon>
+              Subject
             </div>
-            <div class="info-value">{{ teacher.subject }}</div>
-          </div>
+            <div class="info-value subject-value">
+              <span class="subject-badge">{{ teacher.subject }}</span>
+            </div>
+          </div> -->
 
           <div class="info-item">
             <div class="info-label">
-              <mat-icon>timeline</mat-icon>
-              Years of Experience
+              <mat-icon>schedule</mat-icon>
+              Experience
             </div>
-            <div class="info-value">{{ teacher.experience }} years</div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-label">
-              <mat-icon>card_membership</mat-icon>
-              Qualifications
+            <div class="info-value experience-value">
+              <span class="experience-badge">{{ teacher.experience }} years</span>
             </div>
-            <div class="info-value">{{ teacher.qualifications }}</div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-label">
-              <mat-icon>assignment</mat-icon>
-              Employment Status
-            </div>
-            <div class="info-value">{{ teacher.employmentStatus }}</div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-label">
-              <mat-icon>date_range</mat-icon>
-              Date of Joining
-            </div>
-            <div class="info-value">{{ teacher.dateOfJoining }}</div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-label">
-              <mat-icon>badge</mat-icon>
-              Teacher ID
-            </div>
-            <div class="info-value">{{ teacher.teacherId }}</div>
           </div>
         </div>
       </div>
+
+      <!-- Stats Section -->
+      <!-- <div class="profile-info stats-section">
+        <h3 class="section-title">
+          <mat-icon>assessment</mat-icon>
+          Quick Stats
+        </h3>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <mat-icon>group</mat-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">156</div>
+              <div class="stat-label">Students</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <mat-icon>class</mat-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">24</div>
+              <div class="stat-label">Classes</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <mat-icon>star</mat-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">4.8</div>
+              <div class="stat-label">Rating</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <mat-icon>event_available</mat-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">95%</div>
+              <div class="stat-label">Attendance</div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
     </div>
 
     <!-- Action Card -->
     <div class="action-card">
       <h3>
-        <mat-icon>refresh</mat-icon>
-        Actions
+        <mat-icon>settings</mat-icon>
+        Account Actions
       </h3>
       <div class="action-buttons">
         <button 
@@ -162,15 +172,21 @@
           Refresh Profile
         </button>
         
-        <button mat-stroked-button class="action-btn">
+        <!-- <button mat-stroked-button class="action-btn">
           <mat-icon>password</mat-icon>
           Change Password
-        </button>
+        </button> -->
         
-        <button mat-stroked-button class="action-btn delete" (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          Logout
-        </button>
+        
+      </div>
+
+      <!-- Logout Confirmation -->
+      <div *ngIf="showLogoutConfirm" class="logout-confirm">
+        <p>Are you sure you want to logout?</p>
+        <div class="confirm-buttons">
+          <button mat-stroked-button (click)="cancelLogout()">Cancel</button>
+          <button mat-raised-button color="warn" (click)="confirmLogout()">Yes, Logout</button>
+        </div>
       </div>
     </div>
     

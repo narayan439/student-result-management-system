@@ -119,8 +119,8 @@ export class ViewResultComponent implements OnInit {
     this.classNumber = classMatch ? parseInt(classMatch[1]) : 1;
     console.log('📚 Class number:', this.classNumber);
 
-    // Generate QR data
-    this.qrData = `ROLL:${this.student.rollNo},EMAIL:${this.student.email},CLASS:${this.student.className}`;
+    // Generate QR data with student details
+    this.generateQRData();
     console.log('✓ QR data generated');
 
     // Load marks and subjects in parallel
@@ -329,6 +329,9 @@ export class ViewResultComponent implements OnInit {
       hasMarks: validMarks.length > 0
     };
 
+    // Update QR code with total marks after result is processed
+    this.updateQRDataWithMarks();
+
     console.log('✅ Result processed successfully:');
     console.log('  Total marks:', totalMarks);
     console.log('  Max total:', maxTotal);
@@ -354,40 +357,63 @@ export class ViewResultComponent implements OnInit {
   }
 
   downloadPDF() {
+    console.log('📄 Starting PDF download for', this.result.name);
     const DATA: any = document.querySelector('.result-container');
+    
+    if (!DATA) {
+      alert('Error: Result container not found. Please refresh the page.');
+      return;
+    }
     
     html2canvas(DATA, {
       scale: 2,
       useCORS: true,
       logging: false,
-      allowTaint: true
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      windowHeight: DATA.scrollHeight,
+      windowWidth: DATA.scrollWidth
     }).then((canvas: HTMLCanvasElement) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
+      try {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
 
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth - 10;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let heightLeft = imgHeight;
+        let position = 0;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= 297;
+        pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight - 10;
+        position = 0;
 
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= 297;
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight - 10;
+        }
+
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `Result_${this.result.rollNo}_${this.result.name}_${timestamp}.pdf`;
+        
+        pdf.save(filename);
+        console.log('✅ PDF downloaded successfully:', filename);
+        alert(`✅ PDF downloaded: ${filename}`);
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
       }
-
-      pdf.save(`Result_${this.result.rollNo}.pdf`);
     }).catch((error: any) => {
       console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please try again.');
+      alert('Error capturing result image. Please try again.');
     });
   }
 
@@ -432,5 +458,31 @@ export class ViewResultComponent implements OnInit {
   // Method to check if marks are available
   hasMarksAvailable(): boolean {
     return this.result.marks && this.result.marks.length > 0;
+  }
+
+  /**
+   * Generate QR code data with student information
+   * QR includes: Name, Roll No, Date of Birth, Email, and Class
+   */
+  private generateQRData(): void {
+    if (!this.student) return;
+    
+    this.qrData = `NAME:${this.student.name}|ROLL:${this.student.rollNo}|DOB:${this.student.dob}|EMAIL:${this.student.email}|CLASS:${this.student.className}`;
+    console.log('✓ QR Data Generated:', this.qrData);
+  }
+
+  /**
+   * Update QR code after result is processed
+   * QR now includes: Name, Roll No, DOB, Total Marks, Percentage, Status
+   */
+  private updateQRDataWithMarks(): void {
+    if (!this.student || !this.result) return;
+    
+    const totalMarks = this.result.total || 0;
+    const percentage = this.result.percentage || '0.00';
+    const status = this.result.status || 'PENDING';
+    
+    this.qrData = `NAME:${this.student.name}|ROLL:${this.student.rollNo}|DOB:${this.student.dob}|TOTAL:${totalMarks}|PERCENT:${percentage}|STATUS:${status}|CLASS:${this.student.className}`;
+    console.log('✓ QR Data Updated with Marks:', this.qrData);
   }
 }

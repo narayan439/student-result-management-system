@@ -116,6 +116,7 @@
   background: linear-gradient(135deg, #1a237e, #304ffe);
   padding: 40px;
   text-align: center;
+  position: relative;
 }
 
 .profile-avatar {
@@ -188,13 +189,13 @@
 .info-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 24px;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .info-label {
@@ -219,334 +220,126 @@
   font-size: 16px;
   color: #2d3748;
   font-weight: 500;
-  padding: 8px 0;
 }
 
-/* Action Card */
-.action-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  padding: 24px;
-}
-
-.action-card h3 {
-  font-size: 18px;
-  font-weight: 600;
+/* Special value styles */
+.email-value {
   color: #1a237e;
-  margin: 0 0 20px 0;
+  font-weight: 600;
+}
+
+.phone-value {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.action-card h3 mat-icon {
-  color: #304ffe;
-}
-
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #4a5568;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  width: 100%;
-}
-
-.action-btn:hover {
-  background: #f7fafc;
-  border-color: #cbd5e0;
-}
-
-.action-btn mat-icon {
-  color: #718096;
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-.action-btn.delete {
-  color: #d32f2f;
-  border-color: #ffebee;
-}
-
-.action-btn.delete:hover {
-  background: #ffebee;
-  border-color: #ffcdd2;
-}
-
-.action-btn.delete mat-icon {
-  color: #d32f2f;
-}
-
-/* ========================= */
-/* RESPONSIVE BREAKPOINTS */
-/* ========================= */
-
-/* Tablet Devices (768px - 1024px) */
-@media (max-width: 1024px) {
-  .profile-container {
-    padding: 20px;
-  }
-  
-  .profile-content {
-    max-width: 600px;
-  }
-  
-  .profile-header {
-    padding: 30px;
-  }
-  
-  .profile-avatar {
-    width: 90px;
-    height: 90px;
-    font-size: 36px;
-  }
-  
-  .profile-info {
-    padding: 24px;
-  }
-}
-
-/* Large Mobile (600px - 768px) */
-@media (max-width: 768px) {
-  .profile-container {
-    padding: 16px;
-  }
-  
-  .page-header {
-    margin-bottom: 24px;
-  }
-  
-  .header-left .page-title {
-    font-size: 24px;
-  }
-  
-  .profile-header {
-    padding: 24px;
-  }
-  
-  .profile-avatar {
-    width: 80px;
-    height: 80px;
-    font-size: 32px;
-  }
-  
-  .profile-header h1 {
-    font-size: 20px;
-  }
-  
-  .profile-title {
-    font-size: 14px;
-  }
-  
-  .profile-info {
-    padding: 20px;
-  }
-  
-  .action-card {
-    padding: 20px;
-  }
-}
-
-/* Mobile Devices (480px - 600px) */
-@media (max-width: 600px) {
-  .profile-container {
-    padding: 12px;
-  }
-  
-  .page-header {
-    margin-bottom: 20px;
-  }
-  
-  .header-left .page-title {
-    font-size: 22px;
-  }
-  
-  .header-left .page-subtitle {
-    font-size: 14px;
-  }
-  
-  .profile-header {
-    padding: 20px;
-  }
-  
-  .profile-avatar {
-    width: 70px;
-    height: 70px;
-    font-size: 28px;
-    border-width: 3px;
-  }
-  
-  .profile-header h1 {
-    font-size: 18px;
-  }
-  
-  .profile-title {
-    font-size: 13px;
-  }
-  
-  .status-badge {
-    padding: 4px 12px;
-    font-size: 12px;
-  }
-  
-  .profile-info {
-    padding: 16px;
-  }
-  
-  .section-title {
-    font-size: 16px;
-    margin-bottom: 20px;
-  }
-  
-  .action-card {
-    padding: 16px;
-  }
-  
-  .action-card h3 {
-    font-size: 16px;
-    margin-bottom: 16px;
-  }
-  
-  .action-btn {
-    padding: 12px 16px;
-    font-size: 14px;
-  }
-  
-  .action-btn mat-icon {
-    font-size: 18px;
-  }
-}
-
-/* Small Mobile Devices (Below 480px) */
-@media (max-width: 480px) {
-  .profile-container {
-    padding: 8px;
-  }
-  
-  .page-header {
-    margin-bottom: 16px;
-  }
-  
-  .header-left .page-title {
-    font-size: 20px;
-    margin-bottom: 4px;
-  }
-  
-  .profile-header {
-    padding: 16px;
-  }
-  
-  .profile-avatar {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-    margin-bottom: 16px;
-  }
-  
-  .profile-header h1 {
-    font-size: 18px;
-  }
-  
-  .profile-title {
-    font-size: 12px;
-    margin-bottom: 12px;
-  }
-  
-  .profile-info {
-    padding: 12px;
-  }
-  
-  .section-title {
-    font-size: 15px;
-    margin-bottom: 16px;
-  }
-  
-  .info-grid {
-    gap: 16px;
-  }
-  
-  .info-label {
-    font-size: 11px;
-  }
-  
-  .info-value {
-    font-size: 15px;
-    padding: 6px 0;
-  }
-  
-  .action-card {
-    padding: 12px;
-  }
-  
-  .action-btn {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-}
-
-
-.section-title {
+.phone-icon {
+  color: #4caf50;
   font-size: 18px;
-  font-weight: 600;
-  color: #1a237e;
-  margin: 0 0 24px 0;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #e8eaf6;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  width: 18px;
+  height: 18px;
 }
 
-.info-grid {
+/* Badges */
+.subject-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.subject-badge::before {
+  content: "📚";
+  font-size: 16px;
+}
+
+.experience-badge {
+  background: #e8f5e9;
+  color: #388e3c;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.experience-badge::before {
+  content: "⏳";
+  font-size: 16px;
+}
+
+/* Stats Section */
+.stats-section {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.stats-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.info-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #718096;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
 }
 
-.info-label mat-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  color: #a0aec0;
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-.info-value {
-  font-size: 16px;
-  color: #2d3748;
-  font-weight: 500;
-  padding: 8px 0;
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e3f2fd;
+}
+
+.stat-icon mat-icon {
+  color: #1976d2;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a237e;
+  margin: 0 0 4px 0;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #718096;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
 }
 
 /* Action Card */
@@ -608,15 +401,56 @@
 .action-btn.delete {
   color: #d32f2f;
   border-color: #ffebee;
+  background: #ffebee;
 }
 
 .action-btn.delete:hover {
-  background: #ffebee;
-  border-color: #ffcdd2;
+  background: #ffcdd2;
+  border-color: #d32f2f;
 }
 
 .action-btn.delete mat-icon {
   color: #d32f2f;
+}
+
+/* Logout Confirmation */
+.logout-confirm {
+  margin-top: 20px;
+  padding: 20px;
+  background: #fff3e0;
+  border-radius: 8px;
+  border-left: 4px solid #f57c00;
+}
+
+.logout-confirm p {
+  color: #2d3748;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 16px 0;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.confirm-buttons button {
+  flex: 1;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.confirm-buttons button:first-child {
+  background: white;
+  border: 1px solid #cbd5e0;
+  color: #4a5568;
+}
+
+.confirm-buttons button:last-child {
+  background: #d32f2f;
+  color: white;
+  border: none;
 }
 
 /* ========================= */
@@ -645,6 +479,10 @@
   
   .profile-info {
     padding: 24px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -740,6 +578,10 @@
     margin-bottom: 20px;
   }
   
+  .info-grid {
+    gap: 20px;
+  }
+  
   .action-card {
     padding: 16px;
   }
@@ -756,6 +598,19 @@
   
   .action-btn mat-icon {
     font-size: 18px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
   }
 }
 
@@ -813,7 +668,6 @@
   
   .info-value {
     font-size: 15px;
-    padding: 6px 0;
   }
   
   .action-card {
@@ -823,5 +677,9 @@
   .action-btn {
     padding: 10px 12px;
     font-size: 13px;
+  }
+  
+  .confirm-buttons {
+    flex-direction: column;
   }
 }

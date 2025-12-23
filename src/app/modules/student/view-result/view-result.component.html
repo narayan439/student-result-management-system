@@ -12,7 +12,7 @@
   <div class="content-section" *ngIf="!isLoading">
 
     <!-- Data Source Indicator -->
-    <div class="data-source-indicator" *ngIf="marksSource && marksSource !== 'unknown'">
+    <!-- <div class="data-source-indicator" *ngIf="marksSource && marksSource !== 'unknown'">
       <div class="indicator-content" [ngClass]="{
         'backend': marksSource.includes('backend'),
         'sample': marksSource.includes('sample') || marksSource.includes('fallback')
@@ -27,7 +27,7 @@
           <span *ngIf="marksMessage"> - {{ marksMessage }}</span>
         </span>
       </div>
-    </div>
+    </div> -->
 
     <!-- Header Section -->
     <div class="header-section">

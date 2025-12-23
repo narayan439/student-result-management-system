@@ -1,4 +1,5 @@
 export interface Recheck {
+  studentRoll: any;
   recheckId?: number;
   studentId: number;
   marksId: number;  // New field from schema

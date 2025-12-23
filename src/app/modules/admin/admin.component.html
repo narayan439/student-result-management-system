@@ -7,7 +7,7 @@
     <div class="nav-left">
       <div class="logo">
         <i class="fas fa-user-shield"></i>
-        Admin Panel
+        Admin
       </div>
     </div>
 
@@ -43,16 +43,17 @@
 
         <!-- Rechecks -->
         <li><a routerLink="/admin/manage-rechecks" routerLinkActive="active">Rechecks</a></li>
-
-        <!-- Logout -->
-        <li class="logout">
-          <a (click)="logout()" style="cursor: pointer;">Logout</a>
-        </li>
       </ul>
     </div>
 
-    <!-- Right Section: Mobile Menu -->
+    <!-- Right Section: Logout & Mobile Menu -->
     <div class="nav-right">
+      <!-- Logout Button (Desktop) -->
+      <a (click)="logout()" class="logout-btn" style="cursor: pointer;">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+      
+      <!-- Mobile Menu Toggle -->
       <button class="menu-toggle" (click)="toggleMobileMenu()">
         <span class="menu-icon" [class.open]="mobileMenuOpen"></span>
       </button>
@@ -73,7 +74,7 @@
           <i class="fas fa-user-shield"></i>
         </div>
         <div>
-          <h3>Admin Portal</h3>
+          <h3>Admin</h3>
           <p>System Administrator</p>
         </div>
       </div>
@@ -150,6 +151,8 @@
         <i class="fas fa-sign-out-alt"></i> Logout
       </a>
     </div>
+
+
   </div>
 
   <!-- Page Content -->

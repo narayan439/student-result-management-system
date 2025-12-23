@@ -1,9 +1,9 @@
 <div class="manage-rechecks-container">
-  <!-- Header Section -->
+  <!-- Header -->
   <div class="page-header">
     <div class="header-left">
-      <h1 class="page-title">Recheck Requests</h1>
-      <p class="page-subtitle">Manage student recheck requests and evaluations</p>
+      <h1 class="page-title">Manage Recheck Requests</h1>
+      <p class="page-subtitle">Review and process student re-evaluation requests</p>
     </div>
   </div>
 
@@ -11,7 +11,7 @@
   <div class="stats-container">
     <div class="stat-card">
       <div class="stat-icon pending-icon">
-        <mat-icon>schedule</mat-icon>
+        <mat-icon>pending_actions</mat-icon>
       </div>
       <div class="stat-content">
         <h3>{{getPendingCount()}}</h3>
@@ -45,86 +45,224 @@
       <h2>All Recheck Requests</h2>
     </div>
 
-    <!-- Rechecks Table -->
+    <!-- Filter Controls -->
+    <div class="filter-controls">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search requests...</mat-label>
+        <input matInput (input)="onSearch($event.target)" placeholder="Search by subject, reason, or roll no">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="status-field">
+        <mat-label>Filter by Status</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusFilter($event.value)">
+          <mat-option value="all">All Status</mat-option>
+          <mat-option value="PENDING">Pending</mat-option>
+          <mat-option value="APPROVED">Approved</mat-option>
+          <mat-option value="REJECTED">Rejected</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>filter_list</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- Table Container -->
     <div class="table-container">
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-
-        <!-- Student Name -->
+        
+        <!-- Student Name Column -->
         <ng-container matColumnDef="studentName">
-          <th mat-header-cell *matHeaderCellDef> Student Name </th>
-          <td mat-cell *matCellDef="let r"> {{ r.studentName }} </td>
+          <th mat-header-cell *matHeaderCellDef> Student </th>
+          <td mat-cell *matCellDef="let recheck">
+            <div class="student-info">
+              <div class="student-avatar">{{recheck.studentName?.charAt(0) || 'S'}}</div>
+              <div class="student-details">
+                <div class="student-name">{{recheck.studentName || 'Unknown Student'}}</div>
+                <div class="student-roll">Roll No: {{ recheck.rollNo || 'N/A' }}</div>
+              </div>
+            </div>
+          </td>
         </ng-container>
 
-        <!-- Subject -->
+        <!-- Subject Column -->
         <ng-container matColumnDef="subject">
           <th mat-header-cell *matHeaderCellDef> Subject </th>
-          <td mat-cell *matCellDef="let r"> {{ r.subject }} </td>
+          <td mat-cell *matCellDef="let recheck">
+            <div class="subject-badge" [ngClass]="getSubjectClass(recheck.subject)">
+              <mat-icon class="subject-icon">book</mat-icon>
+              {{ recheck.subject }}
+            </div>
+          </td>
         </ng-container>
 
-        <!-- Reason -->
+        <!-- Reason Column -->
         <ng-container matColumnDef="reason">
-          <th mat-header-cell *matHeaderCellDef> Reason </th>
-          <td mat-cell *matCellDef="let r"> {{ r.reason }} </td>
+          <th mat-header-cell *matHeaderCellDef> Reason for Recheck </th>
+          <td mat-cell *matCellDef="let recheck" class="reason-cell">
+            <div class="reason-content">
+              <mat-icon>description</mat-icon>
+              <div class="reason-text">{{ recheck.reason }}</div>
+            </div>
+          </td>
         </ng-container>
 
-        <!-- Status -->
+        <!-- Status Column -->
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef> Status </th>
-          <td mat-cell *matCellDef="let r">
-            <span class="status-badge status-{{r.status.toLowerCase()}}">
-              {{ r.status }}
+          <td mat-cell *matCellDef="let recheck">
+            <span class="status-badge" 
+                  [ngClass]="{
+                    'status-pending': recheck.status === 'PENDING',
+                    'status-approved': recheck.status === 'APPROVED',
+                    'status-rejected': recheck.status === 'REJECTED'
+                  }">
+              <mat-icon class="status-icon">
+                {{ 
+                  recheck.status === 'PENDING' ? 'pending' :
+                  recheck.status === 'APPROVED' ? 'check_circle' : 'cancel'
+                }}
+              </mat-icon>
+              {{ recheck.status }}
             </span>
           </td>
         </ng-container>
 
-        <!-- Actions -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef> Actions </th>
-          <td mat-cell *matCellDef="let r">
-            <div class="action-buttons">
-              <button 
-                mat-icon-button
-                matTooltip="Approve Request"
-                class="approve-btn"
-                (click)="updateStatus(r, 'APPROVED')"
-                [disabled]="r.status === 'APPROVED' || r.status === 'approved'">
-                <mat-icon>check_circle</mat-icon>
-              </button>
-
-              <button 
-                mat-icon-button
-                matTooltip="Reject Request"
-                class="reject-btn"
-                (click)="updateStatus(r, 'REJECTED')"
-                [disabled]="r.status === 'REJECTED' || r.status === 'rejected'">
-                <mat-icon>cancel</mat-icon>
+        <!-- Admin Notes Column -->
+        <ng-container matColumnDef="adminNotes">
+          <th mat-header-cell *matHeaderCellDef> Admin Notes </th>
+          <td mat-cell *matCellDef="let recheck">
+            <div class="admin-notes-cell">
+              <div class="notes-content" *ngIf="recheck.adminNotes; else noNotes">
+                <mat-icon>notes</mat-icon>
+                <span>{{ recheck.adminNotes }}</span>
+              </div>
+              <ng-template #noNotes>
+                <div class="no-notes">
+                  <mat-icon>notes</mat-icon>
+                  <span>No notes added</span>
+                </div>
+              </ng-template>
+              <button mat-button color="primary" class="add-note-btn" 
+                      (click)="openNoteModal(recheck)"
+                      *ngIf="recheck.status === 'PENDING'">
+                <mat-icon>add</mat-icon> Add Note
               </button>
             </div>
           </td>
         </ng-container>
 
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let recheck" class="actions-cell">
+            <div class="action-buttons">
+              <!-- Pending Status Actions -->
+              <div class="pending-actions" *ngIf="recheck.status === 'PENDING'">
+                <button mat-raised-button color="primary" class="approve-btn"
+                        (click)="approveWithNote(recheck)">
+                  <mat-icon>check</mat-icon> Approve
+                </button>
+                <button mat-raised-button color="warn" class="reject-btn"
+                        (click)="rejectWithNote(recheck)">
+                  <mat-icon>close</mat-icon> Reject
+                </button>
+              </div>
+              
+              <!-- Resolved Status Message -->
+              <div class="resolved-message" *ngIf="recheck.status !== 'PENDING'">
+                <span class="resolved-text">
+                  {{ recheck.status === 'APPROVED' ? '✓ Approved' : '✗ Rejected' }}
+                  <span class="resolved-date" *ngIf="recheck.resolvedDate">
+                    on {{ formatDate(recheck.resolvedDate) }}
+                  </span>
+                </span>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Header Row -->
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
         <!-- Empty State -->
-        <tr *ngIf="dataSource.data.length === 0" class="empty-row">
-          <td [attr.colspan]="displayedColumns.length">
+        <tr *ngIf="dataSource.data.length === 0 && !isLoading">
+          <td colspan="6">
             <div class="empty-state">
-              <mat-icon>assignment</mat-icon>
+              <mat-icon>inbox</mat-icon>
               <h3>No Recheck Requests</h3>
-              <p>All recheck requests have been processed</p>
+              <p *ngIf="selectedStatus !== 'all'">No {{selectedStatus.toLowerCase()}} requests found</p>
+              <p *ngIf="selectedStatus === 'all'">No recheck requests available</p>
             </div>
           </td>
         </tr>
 
       </table>
+    </div>
 
-      <!-- Paginator -->
-      <mat-paginator 
-        #paginator
-        [pageSizeOptions]="[5, 10, 20]" 
-        showFirstLastButtons>
-      </mat-paginator>
+    <!-- Paginator -->
+    <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons 
+                   *ngIf="dataSource.data.length > 0">
+    </mat-paginator>
+
+  </div>
+
+  <!-- Admin Note Modal -->
+  <div class="modal-overlay" *ngIf="showNoteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>
+          <mat-icon>
+            {{ currentAction === 'APPROVE' ? 'check_circle' : 
+               currentAction === 'REJECT' ? 'cancel' : 'notes' }}
+          </mat-icon>
+          {{ getModalTitle() }}
+        </h3>
+        <button mat-icon-button class="close-btn" (click)="closeNoteModal()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="info-section" *ngIf="selectedRecheck">
+          <p><strong>Student:</strong> {{ selectedRecheck.studentName }}</p>
+          <p><strong>Roll No:</strong> {{ selectedRecheck.rollNo }}</p>
+          <p><strong>Subject:</strong> {{ selectedRecheck.subject }}</p>
+          <p><strong>Reason:</strong> {{ selectedRecheck.reason }}</p>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Admin Notes</mat-label>
+          <textarea matInput 
+                    [(ngModel)]="adminNote" 
+                    rows="5"
+                    placeholder="Add notes for this recheck request...">
+          </textarea>
+          <mat-hint *ngIf="currentAction !== 'NOTE'">
+            Required for {{ currentAction === 'APPROVE' ? 'approval' : 'rejection' }}
+          </mat-hint>
+        </mat-form-field>
+      </div>
+
+    
+
+
+
+
+
+
+      <div class="modal-footer">
+        <button mat-button (click)="closeNoteModal()">Cancel</button>
+        <button mat-raised-button 
+                [color]="currentAction === 'APPROVE' ? 'primary' : 'warn'"
+                [disabled]="!adminNote.trim() && currentAction !== 'NOTE'"
+                (click)="submitNote()">
+          <mat-icon>
+            {{ currentAction === 'APPROVE' ? 'check' : 
+               currentAction === 'REJECT' ? 'close' : 'save' }}
+          </mat-icon>
+          {{ getModalButtonText() }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

@@ -7,8 +7,8 @@
   <!-- Header Section -->
   <div class="page-header">
     <div class="header-left">
-      <h1 class="page-title">Manage Classes & Sections</h1>
-      <p class="page-subtitle">Add, view, and manage all classes and sections in the system</p>
+      <h1 class="page-title">Manage Classes</h1>
+      <p class="page-subtitle">View, and manage all classes in the system</p>
     </div>
   </div>
 
@@ -19,23 +19,23 @@
     <div class="card-header">
       <h2>All Classes</h2>
       <div class="header-actions">
-        <span class="count-badge">{{activeClassesCount}} Active Classes</span>
+        <!-- <span class="count-badge">{{activeClassesCount}} Active Classes</span> -->
         <button 
           mat-icon-button 
           (click)="toggleShowDeletedClasses()"
           [color]="showDeletedClasses ? 'warn' : 'primary'"
           matTooltip="Show/Hide Deleted Classes"
         >
-          <mat-icon>{{ showDeletedClasses ? 'visibility' : 'visibility_off' }}</mat-icon>
+          <!-- <mat-icon>{{ showDeletedClasses ? 'visibility' : 'visibility_off' }}</mat-icon> -->
         </button>
-        <button 
+        <!-- <button 
           mat-raised-button 
           color="primary" 
           (click)="toggleAddForm()"
           class="add-btn"
-        >
-          <mat-icon>add</mat-icon> Add Class
-        </button>
+        > 
+           <mat-icon>add</mat-icon> Add Class
+       </button> -->
       </div>
     </div>
 

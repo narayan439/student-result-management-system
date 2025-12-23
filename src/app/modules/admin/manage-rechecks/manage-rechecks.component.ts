@@ -13,7 +13,7 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  displayedColumns: string[] = ['studentName', 'subject', 'reason', 'status', 'actions'];
+  displayedColumns: string[] = ['studentName', 'subject', 'reason', 'status', 'adminNotes', 'actions'];
   dataSource = new MatTableDataSource<Recheck>([]);
 
   rechecks: Recheck[] = [];
@@ -26,45 +26,17 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
   // Loading state
   isLoading = false;
 
-  constructor(private recheckService: RequestRecheckService) {}
+  // Admin note modal state
+  showNoteModal = false;
+  currentAction: 'APPROVE' | 'REJECT' | 'NOTE' = 'NOTE';
+  selectedRecheck: Recheck | null = null;
+  adminNote = '';
+
+  constructor(
+    private recheckService: RequestRecheckService
+  ) {}
 
   ngOnInit(): void {
-    // Initialize with sample data first for immediate display
-    this.rechecks = [
-      {
-        recheckId: 1,
-        studentId: 1,
-        marksId: 1,
-        studentEmail: 'arjun.kumar1@student.com',
-        rollNo: '1A01',
-        studentName: 'Arjun Kumar',
-        subject: 'Mathematics',
-        reason: 'Question 5 calculation seems wrong. The answer key shows 25 but my calculation is correct.',
-        adminNotes: 'Reviewed - calculation is correct, marks adjusted',
-        status: 'APPROVED',
-        requestDate: new Date().toISOString(),
-        resolvedDate: new Date().toISOString(),
-        marksObtained: 85,
-        maxMarks: 100
-      },
-      {
-        recheckId: 2,
-        studentId: 2,
-        marksId: 2,
-        studentEmail: 'priya.singh2@student.com',
-        rollNo: '1A02',
-        studentName: 'Priya Singh',
-        subject: 'Science',
-        reason: 'Want to review answer key for section B',
-        adminNotes: '',
-        status: 'PENDING',
-        requestDate: new Date().toISOString(),
-        marksObtained: 95,
-        maxMarks: 100
-      }
-    ];
-    this.applyFilters();
-    // Then load from backend
     this.loadRechecks();
   }
 
@@ -76,21 +48,16 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
 
   loadRechecks(): void {
     this.isLoading = true;
-
-    // Load from backend API
+    
     this.recheckService.getAllRechecks().subscribe({
       next: (rechecks: Recheck[]) => {
-        // If we get valid data from backend, use it; otherwise keep sample data
-        if (rechecks && rechecks.length > 0) {
-          this.rechecks = rechecks;
-        }
+        this.rechecks = rechecks || [];
         this.applyFilters();
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading rechecks:', err);
-        // Keep the sample data on error instead of clearing
-        console.log('Using sample data. Current rechecks count:', this.rechecks.length);
+        this.rechecks = [];
         this.applyFilters();
         this.isLoading = false;
       }
@@ -102,26 +69,34 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
 
     // Filter by status
     if (this.selectedStatus !== 'all') {
-      filtered = filtered.filter(r => r.status === this.selectedStatus || r.status === this.selectedStatus.toUpperCase());
+      filtered = filtered.filter(r => 
+        r.status === this.selectedStatus || 
+        r.status === this.selectedStatus.toUpperCase()
+      );
     }
 
     // Filter by search term
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(r =>
-        r.subject?.toLowerCase().includes(term) ||
-        r.reason?.toLowerCase().includes(term) ||
-        r.rollNo?.toLowerCase().includes(term) ||
-        r.studentId?.toString().includes(term)
+        (r.subject?.toLowerCase().includes(term)) ||
+        (r.reason?.toLowerCase().includes(term)) ||
+        (r.rollNo?.toLowerCase().includes(term)) ||
+        (r.studentName?.toLowerCase().includes(term))
       );
     }
 
     this.filteredRechecks = filtered;
     this.dataSource.data = this.filteredRechecks;
+    
+    // Update paginator
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
   }
 
   onSearch(searchValue: any): void {
-    this.searchTerm = (searchValue || '').toLowerCase();
+    this.searchTerm = (searchValue?.value || '').toLowerCase();
     this.applyFilters();
   }
 
@@ -130,31 +105,137 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
     this.applyFilters();
   }
 
-  updateStatus(recheck: Recheck, status: 'PENDING' | 'APPROVED' | 'REJECTED'): void {
-    if (confirm(`Update recheck status to ${status}?`)) {
-      this.recheckService.updateRecheckStatus(recheck.recheckId!, status).subscribe({
-        next: (response: any) => {
-          alert('✓ Status updated successfully!');
-          // Update the recheck in the array immediately for real-time count update
-          const index = this.rechecks.findIndex(r => r.recheckId === recheck.recheckId);
-          if (index > -1) {
-            this.rechecks[index].status = status;
-            if (status === 'APPROVED' || status === 'REJECTED') {
-              this.rechecks[index].resolvedDate = new Date().toISOString();
-            }
-            this.applyFilters(); // Reapply filters to update display and counts
-          }
-        },
-        error: (err: any) => {
-          const errorMsg = err.error?.message || 'Failed to update status';
-          alert('✗ Error: ' + errorMsg);
-          console.error('Error updating status:', err);
-        }
-      });
-    }
+  // Get subject class for dynamic coloring
+  getSubjectClass(subject: string): string {
+    if (!subject) return 'subject-other';
+    
+    const subjectMap: {[key: string]: string} = {
+      'mathematics': 'mathematics',
+      'maths': 'mathematics',
+      'physics': 'physics',
+      'chemistry': 'chemistry',
+      'english': 'english',
+      'hindi': 'hindi',
+      'history': 'history',
+      'geography': 'geography',
+      'science': 'science',
+      'odia': 'odia',
+      'drawing': 'drawing',
+      'environmental studies': 'env-studies',
+      'env studies': 'env-studies',
+      'music': 'music',
+      'general science': 'gen-science',
+      'biology': 'biology',
+      'social science': 'social-science',
+      'social studies': 'social-science'
+    };
+    
+    const normalizedSubject = subject.toLowerCase().trim();
+    return `subject-${subjectMap[normalizedSubject] || 'other'}`;
   }
 
-  // Helper methods for stats - use ALL rechecks array for total counts
+  // Open modal to add admin note and then approve
+  approveWithNote(recheck: Recheck): void {
+    this.selectedRecheck = recheck;
+    this.currentAction = 'APPROVE';
+    this.adminNote = recheck.adminNotes || '';
+    this.showNoteModal = true;
+  }
+
+  // Open modal to add admin note and then reject
+  rejectWithNote(recheck: Recheck): void {
+    this.selectedRecheck = recheck;
+    this.currentAction = 'REJECT';
+    this.adminNote = recheck.adminNotes || '';
+    this.showNoteModal = true;
+  }
+
+  // Open modal to add/edit admin note
+  openNoteModal(recheck: Recheck): void {
+    this.selectedRecheck = recheck;
+    this.currentAction = 'NOTE';
+    this.adminNote = recheck.adminNotes || '';
+    this.showNoteModal = true;
+  }
+
+  // Close note modal
+  closeNoteModal(): void {
+    this.showNoteModal = false;
+    this.selectedRecheck = null;
+    this.adminNote = '';
+    this.currentAction = 'NOTE';
+  }
+
+  // Submit admin note and update recheck
+  submitNote(): void {
+    if (!this.selectedRecheck) {
+      alert('No recheck selected');
+      return;
+    }
+
+    // For approve/reject, require note
+    if ((this.currentAction === 'APPROVE' || this.currentAction === 'REJECT') && !this.adminNote.trim()) {
+      alert('Please enter a note for ' + (this.currentAction === 'APPROVE' ? 'approval' : 'rejection'));
+      return;
+    }
+
+    if (this.currentAction === 'NOTE') {
+      // Just update the note
+      this.updateAdminNote(this.selectedRecheck, this.adminNote);
+    } else if (this.currentAction === 'APPROVE') {
+      // Update with approval
+      this.updateRecheckWithNote(this.selectedRecheck, 'APPROVED', this.adminNote);
+    } else if (this.currentAction === 'REJECT') {
+      // Update with rejection
+      this.updateRecheckWithNote(this.selectedRecheck, 'REJECTED', this.adminNote);
+    }
+
+    this.closeNoteModal();
+  }
+
+  // Update recheck with status and admin note
+  updateRecheckWithNote(recheck: Recheck, status: 'APPROVED' | 'REJECTED', note: string): void {
+    const updatedRecheck: Recheck = {
+      ...recheck,
+      status: status,
+      adminNotes: note,
+      resolvedDate: new Date().toISOString()
+    };
+
+    this.recheckService.updateRecheck(updatedRecheck).subscribe({
+      next: (response: Recheck) => {
+        alert(`✓ Recheck ${status.toLowerCase()} successfully!`);
+        this.loadRechecks(); // Reload to get updated data
+      },
+      error: (err: any) => {
+        const errorMsg = err?.error?.message || 'Failed to update recheck';
+        alert(`✗ Error: ${errorMsg}`);
+        console.error('Error updating recheck:', err);
+      }
+    });
+  }
+
+  // Update only admin note
+  updateAdminNote(recheck: Recheck, note: string): void {
+    const updatedRecheck: Recheck = {
+      ...recheck,
+      adminNotes: note
+    };
+
+    this.recheckService.updateRecheck(updatedRecheck).subscribe({
+      next: () => {
+        alert('✓ Admin note updated successfully!');
+        this.loadRechecks(); // Reload to get updated data
+      },
+      error: (err: any) => {
+        const errorMsg = err?.error?.message || 'Failed to update note';
+        alert(`✗ Error: ${errorMsg}`);
+        console.error('Error updating note:', err);
+      }
+    });
+  }
+
+  // Helper methods for stats
   getPendingCount(): number {
     return this.rechecks.filter(r => r.status === 'PENDING' || r.status === 'pending').length;
   }
@@ -165,5 +246,42 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
 
   getRejectedCount(): number {
     return this.rechecks.filter(r => r.status === 'REJECTED' || r.status === 'rejected').length;
+  }
+
+  // Format date for display
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+
+  // Get modal title
+  getModalTitle(): string {
+    if (!this.selectedRecheck) return '';
+    
+    switch (this.currentAction) {
+      case 'APPROVE': return `Approve Recheck - ${this.selectedRecheck.subject}`;
+      case 'REJECT': return `Reject Recheck - ${this.selectedRecheck.subject}`;
+      case 'NOTE': return `Add Note - ${this.selectedRecheck.subject}`;
+      default: return 'Admin Action';
+    }
+  }
+
+  // Get modal button text
+  getModalButtonText(): string {
+    switch (this.currentAction) {
+      case 'APPROVE': return 'Approve with Note';
+      case 'REJECT': return 'Reject with Note';
+      case 'NOTE': return 'Save Note';
+      default: return 'Submit';
+    }
   }
 }

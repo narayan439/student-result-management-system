@@ -82,9 +82,10 @@
             name="rollNo" 
             required
             placeholder="e.g., 001, 023"
+            disabled
           >
           <mat-icon matPrefix>badge</mat-icon>
-          <mat-hint>Enter unique roll number</mat-hint>
+          <mat-hint>Roll number cannot be edited</mat-hint>
           <mat-error *ngIf="studentForm.controls['rollNo']?.invalid && studentForm.controls['rollNo']?.touched">
             Roll number is required
           </mat-error>

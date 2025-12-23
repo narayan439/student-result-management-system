@@ -7,14 +7,17 @@ import { RequestRecheckComponent } from './request-recheck/request-recheck.compo
 import { TrackRecheckComponent } from './track-recheck/track-recheck.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ViewResultComponent } from './view-result/view-result.component';
+import { StudentGuard } from '../../core/guards/student.guard';
 
 const routes: Routes = [
+  // PUBLIC ROUTE - No guard required
+  { path: 'view-result/:rollNo/:email', component: ViewResultComponent },
 
-        { path: 'view-result/:rollNo/:email', component: ViewResultComponent },
-
+  // PROTECTED ROUTES - Requires student login
   {
     path: '',
     component: StudentDashboardComponent,   // Navbar + router-outlet 
+    canActivate: [StudentGuard],
     children: [
       { path: '', component: ViewMarksComponent },  // Default page
       { path: 'view-marks', component: ViewMarksComponent },

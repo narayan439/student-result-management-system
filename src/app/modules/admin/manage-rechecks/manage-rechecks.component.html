@@ -184,28 +184,14 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-        <!-- Loading State -->
-        <tr *ngIf="isLoading">
-          <td colspan="6">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <p>Loading recheck requests...</p>
-            </div>
-          </td>
-        </tr>
-
-        <!-- Empty State with Reload Button -->
+        <!-- Empty State -->
         <tr *ngIf="dataSource.data.length === 0 && !isLoading">
           <td colspan="6">
             <div class="empty-state">
-              <mat-icon class="empty-icon">inbox</mat-icon>
-              <h3>No Recheck Requests Found</h3>
-              <p *ngIf="selectedStatus !== 'all'">No {{selectedStatus.toLowerCase()}} requests found for your search.</p>
-              <p *ngIf="selectedStatus === 'all'">No recheck requests available at the moment.</p>
-              <button mat-raised-button color="primary" class="reload-button" (click)="loadRechecks()">
-                <mat-icon>refresh</mat-icon>
-                Reload Requests
-              </button>
+              <mat-icon>inbox</mat-icon>
+              <h3>No Recheck Requests</h3>
+              <p *ngIf="selectedStatus !== 'all'">No {{selectedStatus.toLowerCase()}} requests found</p>
+              <p *ngIf="selectedStatus === 'all'">No recheck requests available</p>
             </div>
           </td>
         </tr>
@@ -213,7 +199,7 @@
       </table>
     </div>
 
-    <!-- Paginator - Simplified -->
+    <!-- Paginator -->
     <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons 
                    *ngIf="dataSource.data.length > 0">
     </mat-paginator>
@@ -256,6 +242,13 @@
           </mat-hint>
         </mat-form-field>
       </div>
+
+    
+
+
+
+
+
 
       <div class="modal-footer">
         <button mat-button (click)="closeNoteModal()">Cancel</button>

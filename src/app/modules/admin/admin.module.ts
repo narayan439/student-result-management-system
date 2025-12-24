@@ -7,7 +7,6 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { AdminProfileComponent } from './profile/admin-profile.component';
 import { ManageStudentsComponent } from './manage-students/manage-students.component';
 import { AddStudentComponent } from './manage-students/add-student/add-student.component';
 import { EditStudentComponent } from './manage-students/edit-student/edit-student.component';
@@ -41,7 +40,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 @NgModule({
   declarations: [
     DashboardComponent,
-    AdminProfileComponent,
     ManageStudentsComponent,
     AddStudentComponent,
     EditStudentComponent,

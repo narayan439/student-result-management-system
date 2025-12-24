@@ -9,11 +9,7 @@ import { Injectable } from '@angular/core';
 })
 export class ConfigService {
   // Backend API Configuration
-  // private apiBaseUrl = 'https://srms-backend-production.up.railway.app';
-  // private apiUrl = 'https://srms-backend-production.up.railway.app/api';
-
   private apiBaseUrl = 'https://srms-backend-production.up.railway.app';
-  // private apiUrl = 'http://localhost:8080/api';
   private apiUrl = 'https://srms-backend-production.up.railway.app/api';
 
   constructor() {

@@ -30,23 +30,6 @@ export class AddMarksComponent implements OnInit {
   marksData: { [key: string]: number | null } = {};
   rollNo: string = '';
 
-  private normalizeSubjectKey(value: string | null | undefined): string {
-    return (value || '').toString().trim().toLowerCase();
-  }
-
-  private findExistingMarkForSubject(subject: any): any {
-    const subjectId = subject?.subjectId ?? subject?.id;
-    if (subjectId != null) {
-      const byId = this.existingMarks.find((m: any) => (m?.subjectId ?? m?.id) === subjectId);
-      if (byId) return byId;
-    }
-
-    const subjectKey = subject?.subjectName || subject?.name;
-    return this.existingMarks.find((m: any) =>
-      this.normalizeSubjectKey(m?.subject) === this.normalizeSubjectKey(subjectKey)
-    );
-  }
-
   constructor(
     private studentService: StudentService,
     private subjectService: SubjectService,
@@ -149,62 +132,33 @@ export class AddMarksComponent implements OnInit {
         
         console.log('✓ Class data loaded:', classData);
         
-        // Load subjects from backend so we get REAL subjectId values.
-        // (Do NOT fabricate IDs from the class's comma-separated list.)
+        // Load subjects from class definition first
         if (classData && classData.subjectList) {
-          const subjectNames = classData.subjectList.split(',').map((s: string) => s.trim()).filter(Boolean);
+          const subjectNames = classData.subjectList.split(',').map((s: string) => s.trim());
           console.log('📖 Subjects from class definition:', subjectNames);
-
-          this.subjectService.getSubjectsByClass(this.studentClassNumber).subscribe({
-            next: (subjectsResponse: any) => {
-              const subjectsArray = Array.isArray(subjectsResponse?.data) ? subjectsResponse.data : [];
-
-              // If backend returns nothing, fall back to showing names (but submission will be blocked without IDs)
-              if (!subjectsArray || subjectsArray.length === 0) {
-                console.warn('⚠️ No subjects returned from backend; falling back to class subject names without IDs');
-                this.subjects = subjectNames.map((name: string) => ({
-                  subjectId: null,
-                  subjectName: name,
-                  name
-                }));
-              } else {
-                // Backend might return more than this class needs; enforce class subjectList order strictly.
-                const subjectByName = new Map<string, any>();
-                subjectsArray.forEach((s: any) => {
-                  const key = this.normalizeSubjectKey(s?.subjectName || s?.name);
-                  if (key && !subjectByName.has(key)) {
-                    subjectByName.set(key, s);
-                  }
-                });
-
-                this.subjects = subjectNames.map((name: string) => {
-                  const key = this.normalizeSubjectKey(name);
-                  return subjectByName.get(key) || { subjectId: null, subjectName: name, name };
-                });
-              }
-
-              // Initialize marks data with existing marks if available (match by subject name)
-              this.marksData = {};
-              this.subjects.forEach((s: any) => {
-                const subjectKey = s.subjectName || s.name;
-                const existingMark = this.findExistingMarkForSubject(s);
-                this.marksData[subjectKey] = existingMark ? existingMark.marksObtained : null;
-              });
-
-              console.log(`✓ Loaded ${this.subjects.length} subjects for Class ${this.studentClassNumber}`);
-              this.isSearching = false;
-            },
-            error: (err: any) => {
-              console.error('Error loading subjects by class:', err);
-              this.loadSubjectsByClass();
-            }
-          });
+          
+          // Convert to subject objects
+          this.subjects = subjectNames.map((name: string, idx: number) => ({
+            subjectId: idx + 1,
+            subjectName: name,
+            name: name
+          }));
+        } else {
+          // Fallback: Load subjects by class from service
+          console.log('ℹ️ No subjects in class definition, using fallback...');
+          this.loadSubjectsByClass();
           return;
         }
-
-        // Fallback: Load subjects by class from service
-        console.log('ℹ️ No subjects in class definition, using fallback...');
-        this.loadSubjectsByClass();
+        
+        // Initialize marks data with existing marks if available
+        this.marksData = {};
+        this.subjects.forEach((s: any) => {
+          const existingMark = this.existingMarks.find(m => m.subjectId === s.subjectId);
+          this.marksData[s.subjectName || s.name] = existingMark ? existingMark.marksObtained : null;
+        });
+        
+        console.log(`✓ Loaded ${this.subjects.length} subjects for Class ${this.studentClassNumber}`);
+        this.isSearching = false;
       },
       error: (err) => {
         console.error('Error loading class details:', err);
@@ -229,10 +183,9 @@ export class AddMarksComponent implements OnInit {
         // Initialize marks data with existing marks and disable fields
         this.marksData = {};
         this.subjects.forEach((s: any) => {
-          const subjectKey = s.subjectName || s.name;
-          const existingMark = this.findExistingMarkForSubject(s);
+          const existingMark = this.existingMarks.find(m => m.subjectId === s.subjectId);
           // Pre-fill with existing marks value (read-only will be enforced via [disabled])
-          this.marksData[subjectKey] = existingMark ? existingMark.marksObtained : null;
+          this.marksData[s.subjectName || s.name] = existingMark ? existingMark.marksObtained : null;
         });
       },
       error: (err) => {
@@ -330,16 +283,6 @@ export class AddMarksComponent implements OnInit {
         // Use correct subject ID (subjectId not subject name)
         const subjectId = subject.subjectId || subject.id;
         const studentId = this.student?.studentId;
-
-        if (!subjectId) {
-          failed++;
-          this.submittedMarks.push({ subject: subjectName, marks, status: 'failed', message: 'Missing subject ID' });
-          console.error(`❌ Cannot submit marks: missing subjectId for ${subjectName}`);
-          if (submitted + failed + duplicate === totalSubjects) {
-            this.completeSubmission(submitted, failed, duplicate);
-          }
-          return;
-        }
         
         console.log(`📤 Submitting: Student ${studentId}, Subject ${subjectId} (${subjectName}), Marks ${marks}`);
         

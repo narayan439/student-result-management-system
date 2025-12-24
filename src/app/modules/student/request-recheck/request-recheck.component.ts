@@ -25,8 +25,6 @@ export class RequestRecheckComponent implements OnInit {
   canRequestMessage: string = '';
   statusSummary: any = {};
   subjectsWithPendingRecheck: Set<string> = new Set();
-
-  private inFlightRecheckKey: string | null = null;
   
   recheck = {
     rollNo: '',
@@ -554,12 +552,6 @@ export class RequestRecheckComponent implements OnInit {
 
   submitRecheck(): void {
     console.log('🔄 ===== STARTING RECHECK SUBMISSION =====');
-
-    // Hard guard against double-submit (fast clicks / double taps)
-    if (this.isSubmitting) {
-      console.warn('⚠️ Submission already in progress - ignoring duplicate submit');
-      return;
-    }
     
     if (!this.canRequest) {
       this.submitError = this.canRequestMessage || 'You cannot request recheck at this time.';
@@ -583,12 +575,6 @@ export class RequestRecheckComponent implements OnInit {
     if (!this.recheck.subject) {
       this.submitError = 'Please select a subject';
       console.error('❌ No subject selected');
-      return;
-    }
-
-    const currentKey = `${(this.recheck.rollNo || '').trim().toLowerCase()}|${(this.recheck.subject || '').trim().toLowerCase()}`;
-    if (this.inFlightRecheckKey === currentKey) {
-      console.warn('⚠️ Same recheck request already in-flight - ignoring');
       return;
     }
 
@@ -653,7 +639,6 @@ export class RequestRecheckComponent implements OnInit {
     });
 
     this.isSubmitting = true;
-    this.inFlightRecheckKey = currentKey;
     this.submitError = '';
 
     const recheckRequest: any = {
@@ -678,22 +663,9 @@ export class RequestRecheckComponent implements OnInit {
       next: (response) => {
         console.log('✅ Recheck request submitted successfully');
         console.log('📥 Backend response:', response);
-
-        // Immediately block re-submitting the same subject (before any async refresh finishes)
-        if (this.recheck.subject) {
-          this.subjectsWithPendingRecheck.add(this.recheck.subject);
-        }
         
         this.submitSuccess = true;
         this.isSubmitting = false;
-        this.inFlightRecheckKey = null;
-
-        // Make sure the success message is visible on mobile (user may be scrolled down)
-        try {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } catch {
-          window.scrollTo(0, 0);
-        }
         
         // Update status summary
         this.loadStatusSummary();
@@ -747,14 +719,6 @@ export class RequestRecheckComponent implements OnInit {
         
         this.submitError = errorMessage;
         this.isSubmitting = false;
-        this.inFlightRecheckKey = null;
-
-        // Make sure the error message is visible on mobile
-        try {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } catch {
-          window.scrollTo(0, 0);
-        }
         console.log('📌 User-friendly error message:', this.submitError);
       }
     });

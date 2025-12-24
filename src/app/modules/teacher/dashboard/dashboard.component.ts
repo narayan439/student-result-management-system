@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { TeacherService } from '../../../core/services/teacher.service';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -26,13 +25,8 @@ export class DashboardComponent implements OnInit {
     subject: '',
     score: ''
   };
-teacher: any;
 
-  constructor(
-    private router: Router,
-    private authService: AuthService,
-    private teacherService: TeacherService
-  ) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadTeacherInfo();
@@ -42,28 +36,25 @@ teacher: any;
    * Load teacher info from localStorage
    */
   loadTeacherInfo(): void {
-    const currentUser = this.authService.getCurrentUser();
-    this.teacherEmail = currentUser?.email || '';
-
-    if (!this.teacherEmail) {
-      console.warn('⚠️ No teacher email found in session');
-      this.teacherName = 'Teacher';
-      return;
-    }
-
-    // Fast fallback (offline): show formatted email name
-    this.teacherName = this.formatNameFromEmail(this.teacherEmail);
-
-    // Preferred: load real name from backend
-    this.teacherService.getTeacherByEmail(this.teacherEmail).subscribe({
-      next: (teacher: any) => {
-        this.teacherName = teacher?.name?.trim() || this.teacherName;
-        this.teacherEmail = teacher?.email?.trim() || this.teacherEmail;
-      },
-      error: (err) => {
-        console.warn('⚠️ Failed to load teacher details from API; using fallback name.', err);
+    const currentUser = localStorage.getItem('currentUser');
+    
+    if (currentUser) {
+      try {
+        const userData = JSON.parse(currentUser);
+        this.teacherEmail = userData.email || '';
+        
+        
+        // Extract name from email (before @) for display
+        if (this.teacherEmail) {
+          this.teacherName = this.formatNameFromEmail(this.teacherEmail);
+          console.log(`👤 Teacher name formatted: ${this.teacherName}`);
+        }
+      } catch (e) {
+        console.error('❌ Error parsing currentUser:', e);
       }
-    });
+    } else {
+      console.warn('⚠️ No currentUser found in localStorage');
+    }
   }
 
   /**

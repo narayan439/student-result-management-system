@@ -11,23 +11,7 @@
   <!-- Content Section (ALWAYS shown when not loading, even if no marks) -->
   <div class="content-section" *ngIf="!isLoading">
 
-    <!-- Data Source Indicator -->
-    <!-- <div class="data-source-indicator" *ngIf="marksSource && marksSource !== 'unknown'">
-      <div class="indicator-content" [ngClass]="{
-        'backend': marksSource.includes('backend'),
-        'sample': marksSource.includes('sample') || marksSource.includes('fallback')
-      }">
-        <mat-icon *ngIf="marksSource.includes('backend')">cloud_done</mat-icon>
-        <mat-icon *ngIf="marksSource.includes('sample') || marksSource.includes('fallback')">computer</mat-icon>
-        <span>
-          Data Source: 
-          <strong>{{ marksSource === 'backend-404' ? 'No marks found in backend' : 
-                    marksSource === 'sample-fallback' ? 'Using sample data' : 
-                    marksSource.includes('backend') ? 'Backend' : marksSource }}</strong>
-          <span *ngIf="marksMessage"> - {{ marksMessage }}</span>
-        </span>
-      </div>
-    </div> -->
+    
 
     <!-- Header Section -->
     <div class="header-section">

@@ -173,6 +173,12 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    const recheckId = this.selectedRecheck.recheckId;
+    if (typeof recheckId !== 'number') {
+      alert('Invalid recheck ID');
+      return;
+    }
+
     // For approve/reject, require note
     if ((this.currentAction === 'APPROVE' || this.currentAction === 'REJECT') && !this.adminNote.trim()) {
       alert('Please enter a note for ' + (this.currentAction === 'APPROVE' ? 'approval' : 'rejection'));
@@ -182,50 +188,56 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
     if (this.currentAction === 'NOTE') {
       // Just update the note
       this.updateAdminNote(this.selectedRecheck, this.adminNote);
-    } else if (this.currentAction === 'APPROVE') {
-      // Update with approval
-      this.updateRecheckWithNote(this.selectedRecheck, 'APPROVED', this.adminNote);
-    } else if (this.currentAction === 'REJECT') {
-      // Update with rejection
-      this.updateRecheckWithNote(this.selectedRecheck, 'REJECTED', this.adminNote);
+      this.closeNoteModal();
+    } else if (this.currentAction === 'APPROVE' || this.currentAction === 'REJECT') {
+      // Robust: update note, then status
+      const status = this.currentAction === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+      this.recheckService.updateAdminNotes(recheckId, this.adminNote).subscribe({
+        next: () => {
+          this.recheckService.updateRecheckStatus(recheckId, status).subscribe({
+            next: () => {
+              alert(`✓ Recheck ${status.toLowerCase()} with note!`);
+              this.loadRechecks();
+              this.closeNoteModal();
+            },
+            error: (err: any) => {
+              alert('Failed to update status: ' + (err?.error?.message || 'Unknown error'));
+              this.closeNoteModal();
+            }
+          });
+        },
+        error: (err: any) => {
+          alert('Failed to update note: ' + (err?.error?.message || 'Unknown error'));
+          this.closeNoteModal();
+        }
+      });
     }
-
-    this.closeNoteModal();
   }
 
   // Update recheck with status and admin note
   updateRecheckWithNote(recheck: Recheck, status: 'APPROVED' | 'REJECTED', note: string): void {
-    const updatedRecheck: Recheck = {
-      ...recheck,
-      status: status,
-      adminNotes: note,
-      resolvedDate: new Date().toISOString()
-    };
-
-    this.recheckService.updateRecheck(updatedRecheck).subscribe({
-      next: (response: Recheck) => {
-        alert(`✓ Recheck ${status.toLowerCase()} successfully!`);
-        this.loadRechecks(); // Reload to get updated data
-      },
-      error: (err: any) => {
-        const errorMsg = err?.error?.message || 'Failed to update recheck';
-        alert(`✗ Error: ${errorMsg}`);
-        console.error('Error updating recheck:', err);
-      }
-    });
+    // Deprecated: now handled in submitNote() as a two-step process
+    // (kept for backward compatibility, but not used)
   }
 
   // Update only admin note
   updateAdminNote(recheck: Recheck, note: string): void {
-    const updatedRecheck: Recheck = {
-      ...recheck,
-      adminNotes: note
-    };
+    if (!recheck.recheckId) {
+      alert('❌ Invalid recheck ID');
+      return;
+    }
 
-    this.recheckService.updateRecheck(updatedRecheck).subscribe({
-      next: () => {
-        alert('✓ Admin note updated successfully!');
-        this.loadRechecks(); // Reload to get updated data
+    console.log(`📝 Updating admin note for recheck ${recheck.recheckId}`);
+    
+    this.recheckService.updateAdminNotes(recheck.recheckId, note).subscribe({
+      next: (updatedRecheck: Recheck | undefined) => {
+        if (updatedRecheck) {
+          console.log('✅ Admin note updated successfully');
+          alert('✓ Admin note updated successfully!');
+          this.loadRechecks(); // Reload to get updated data
+        } else {
+          alert('⚠️ Failed to update note');
+        }
       },
       error: (err: any) => {
         const errorMsg = err?.error?.message || 'Failed to update note';

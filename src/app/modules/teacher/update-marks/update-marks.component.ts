@@ -24,6 +24,10 @@ export class UpdateMarksComponent implements OnInit {
   searchTerm: string = '';
   expandedStudents: { [key: number]: boolean } = {};
 
+  // Class-wise filter
+  selectedClassName: string = '';
+  classOptions: string[] = [];
+
   displayedColumns: string[] = ['studentName', 'subjectName', 'marksObtained', 'actions'];
 
   constructor(
@@ -122,7 +126,15 @@ export class UpdateMarksComponent implements OnInit {
     });
 
     // Initially filter and expand all
-    this.filteredStudents = [...this.studentsList];
+    this.classOptions = Array.from(
+      new Set(
+        this.studentsList
+          .map((s: any) => (s?.className || '').toString().trim())
+          .filter((v: string) => !!v && v !== 'N/A')
+      )
+    ).sort((a, b) => a.localeCompare(b));
+
+    this.applyFilters();
     this.studentsList.forEach(student => {
       this.expandedStudents[student.studentId] = false;
     });
@@ -132,22 +144,7 @@ export class UpdateMarksComponent implements OnInit {
    * Filter marks based on search term
    */
   filterMarks(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredStudents = [...this.studentsList];
-      return;
-    }
-
-    const search = this.searchTerm.toLowerCase().trim();
-    this.filteredStudents = this.studentsList.filter(student => {
-      return (
-        student.studentName.toLowerCase().includes(search) ||
-        student.rollNo.toLowerCase().includes(search) ||
-        student.className.toLowerCase().includes(search) ||
-        student.marks.some((mark: any) => 
-          mark.subjectName.toLowerCase().includes(search)
-        )
-      );
-    });
+    this.applyFilters();
   }
 
   /**
@@ -155,7 +152,42 @@ export class UpdateMarksComponent implements OnInit {
    */
   clearSearch(): void {
     this.searchTerm = '';
+    this.applyFilters();
+  }
+
+  /**
+   * Clear ALL filters
+   */
+  clearAllFilters(): void {
+    this.searchTerm = '';
+    this.selectedClassName = '';
     this.filteredStudents = [...this.studentsList];
+  }
+
+  /**
+   * Apply class + search filters together
+   */
+  applyFilters(): void {
+    let list = [...this.studentsList];
+
+    if (this.selectedClassName) {
+      const selected = this.selectedClassName.toLowerCase();
+      list = list.filter((s: any) => (s?.className || '').toString().toLowerCase() === selected);
+    }
+
+    const search = this.searchTerm.toLowerCase().trim();
+    if (search) {
+      list = list.filter(student => {
+        return (
+          student.studentName.toLowerCase().includes(search) ||
+          student.rollNo.toLowerCase().includes(search) ||
+          student.className.toLowerCase().includes(search) ||
+          student.marks.some((mark: any) => mark.subjectName.toLowerCase().includes(search))
+        );
+      });
+    }
+
+    this.filteredStudents = list;
   }
 
   /**
@@ -204,7 +236,10 @@ export class UpdateMarksComponent implements OnInit {
 
     const updateRequest = {
       marksObtained: newMarks,
-      maxMarks: mark.maxMarks || 100
+      maxMarks: mark.maxMarks ?? 100,
+      term: mark.term ?? 'Term 1',
+      year: mark.year ?? new Date().getFullYear(),
+      isRecheckRequested: mark.isRecheckRequested ?? false
     };
 
     this.marksService.updateMarks(mark.marksId, updateRequest).subscribe({

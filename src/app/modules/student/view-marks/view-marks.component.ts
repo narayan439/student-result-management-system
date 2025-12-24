@@ -33,6 +33,11 @@ export class ViewMarksComponent implements OnInit {
   grade: string = '';
   average: number = 0;
 
+  // Pass/fail
+  passMark: number = 33;
+  passedSubjects: number = 0;
+  isOverallPass: boolean = true;
+
   constructor(
     private studentService: StudentService,
     private marksService: MarksService,
@@ -59,6 +64,8 @@ export class ViewMarksComponent implements OnInit {
     this.percentage = 0;
     this.grade = 'N/A';
     this.average = 0;
+    this.passedSubjects = 0;
+    this.isOverallPass = true;
     
     const currentUser = this.authService.getCurrentUser();
     console.log('🔑 Current user:', currentUser);
@@ -231,6 +238,56 @@ export class ViewMarksComponent implements OnInit {
           marksObtained: mark.marksObtained || 0,
           maxMarks: mark.maxMarks || 100
         }));
+
+        // If class subjects are available, show only subjects configured for that class
+        if (this.classSubjects && this.classSubjects.length > 0) {
+          const allowedSubjects = new Set(
+            this.classSubjects
+              .map((s: any) => (s?.subjectName || s?.name || '').toString().trim().toLowerCase())
+              .filter((s: string) => !!s)
+          );
+
+          const subjectOrder = new Map<string, number>();
+          this.classSubjects.forEach((s: any, idx: number) => {
+            const key = (s?.subjectName || s?.name || '').toString().trim().toLowerCase();
+            if (key) subjectOrder.set(key, idx);
+          });
+
+          if (allowedSubjects.size > 0) {
+            const beforeCount = this.marks.length;
+            this.marks = this.marks.filter((m: any) => {
+              const subjectName = (m?.subject || '').toString().trim().toLowerCase();
+              return allowedSubjects.has(subjectName);
+            });
+
+            // De-duplicate by subject (keep the latest/highest marksId)
+            const bySubject = new Map<string, any>();
+            for (const m of this.marks) {
+              const key = (m?.subject || '').toString().trim().toLowerCase();
+              if (!key) continue;
+              const existing = bySubject.get(key);
+              const existingId = typeof existing?.marksId === 'number' ? existing.marksId : -1;
+              const currentId = typeof m?.marksId === 'number' ? m.marksId : -1;
+              if (!existing || currentId >= existingId) {
+                bySubject.set(key, m);
+              }
+            }
+            this.marks = Array.from(bySubject.values());
+
+            // Sort by class subject order (if available)
+            if (subjectOrder.size > 0) {
+              this.marks.sort((a: any, b: any) => {
+                const ak = (a?.subject || '').toString().trim().toLowerCase();
+                const bk = (b?.subject || '').toString().trim().toLowerCase();
+                const ai = subjectOrder.has(ak) ? (subjectOrder.get(ak) as number) : 9999;
+                const bi = subjectOrder.has(bk) ? (subjectOrder.get(bk) as number) : 9999;
+                return ai - bi;
+              });
+            }
+
+            console.log(`✅ Filtered + deduped marks by class subjects: ${beforeCount} -> ${this.marks.length}`);
+          }
+        }
       
         console.log(`✅ Final marks ready: ${this.marks.length} marks`);
         console.log('✅ Marks array:', this.marks);
@@ -255,6 +312,17 @@ export class ViewMarksComponent implements OnInit {
     });
   }
 
+
+  getRemarks(percentage: number): string {
+    if (!this.isOverallPass) return 'Result: FAIL';
+    if (percentage >= 90) return 'Outstanding Performance!';
+    if (percentage >= 80) return 'Excellent Work!';
+    if (percentage >= 70) return 'Very Good Performance';
+    if (percentage >= 60) return 'Good Performance';
+    if (percentage >= 33) return 'Satisfactory';
+    return 'Needs Improvement';
+  }
+
   /**
    * Calculate student performance metrics
    */
@@ -264,6 +332,8 @@ export class ViewMarksComponent implements OnInit {
       this.percentage = 0;
       this.average = 0;
       this.grade = 'N/A';
+      this.passedSubjects = 0;
+      this.isOverallPass = true;
       return;
     }
 
@@ -275,6 +345,16 @@ export class ViewMarksComponent implements OnInit {
     
     // Calculate average
     this.average = Math.round((this.total / this.marks.length) * 100) / 100;
+
+    // Count passed subjects
+    this.passedSubjects = this.marks.filter((m: any) => (m?.marksObtained ?? 0) >= this.passMark).length;
+
+    // Overall result: if any subject failed -> overall FAIL and grade F
+    this.isOverallPass = this.passedSubjects === this.marks.length;
+    if (!this.isOverallPass) {
+      this.grade = 'F';
+      return;
+    }
     
     // Determine grade
     if (this.percentage >= 90) {

@@ -4,6 +4,7 @@ import { AdminGuard } from '../../core/guards/admin.guard';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AdminComponent } from './admin.component';
+import { AdminProfileComponent } from './profile/admin-profile.component';
 
 import { ManageStudentsComponent } from './manage-students/manage-students.component';
 import { AddStudentComponent } from './manage-students/add-student/add-student.component';
@@ -72,6 +73,12 @@ const routes: Routes = [
       { 
         path: 'manage-rechecks', 
         component: ManageRechecksComponent,
+        canActivate: [AdminGuard]
+      },
+
+      { 
+        path: 'profile', 
+        component: AdminProfileComponent,
         canActivate: [AdminGuard]
       }
     ]

@@ -13,13 +13,19 @@ import { StudentService } from '../../../core/services/student.service';
 export class RecheckRequestsComponent implements OnInit {
   
   // Table configuration
-  displayedColumns: string[] = ['studentName', 'subject', 'reason', 'marksObtained', 'status', 'action'];
+  displayedColumns: string[] = ['studentName', 'subject', 'marksObtained', 'status', 'action'];
+  displayedColumnsWithExpand: string[] = ['expand', ...this.displayedColumns];
   dataSource: any;
   pageSize = 10;
   resolvedRequests = 0;
   pendingRequests = 0;
   inReviewRequests = 0;
+  approvedRequests = 0;
+  rejectedRequests = 0;
   totalRequests = 0;
+
+  // Expanded row state
+  expandedRow: number | null = null;
 
   // Edit mode
   editingMarkId: number | null = null;
@@ -47,6 +53,13 @@ export class RecheckRequestsComponent implements OnInit {
   }
 
   /**
+   * Toggle expanded row
+   */
+  toggleRow(request: any): void {
+    this.expandedRow = this.expandedRow === request.recheckId ? null : request.recheckId;
+  }
+
+  /**
    * Load all recheck requests
    */
   loadRecheckRequests(): void {
@@ -61,14 +74,50 @@ export class RecheckRequestsComponent implements OnInit {
             
             // Enrich with student names and class
             const enrichedRequests = this.enrichStudentDataFresh(requestsArray, students);
-            
-            this.dataSource = new MatTableDataSource(enrichedRequests);
-            if (this.paginator) {
-              this.dataSource.paginator = this.paginator;
-            }
-            
-            this.calculateStatistics(enrichedRequests);
-            console.log('✓ Recheck requests loaded:', enrichedRequests);
+
+            // Also enrich with latest marks details (marksObtained/maxMarks/term/year)
+            this.marksService.getAllMarks().subscribe({
+              next: (marksResponse: any) => {
+                const marksList = Array.isArray(marksResponse)
+                  ? marksResponse
+                  : (Array.isArray(marksResponse?.data) ? marksResponse.data : []);
+
+                const marksById = new Map<number, any>();
+                for (const m of marksList) {
+                  const id = Number((m as any)?.marksId);
+                  if (Number.isFinite(id) && id > 0) {
+                    marksById.set(id, m);
+                  }
+                }
+
+                const finalRequests = enrichedRequests.map(r => {
+                  const mark = marksById.get(Number((r as any)?.marksId));
+                  return {
+                    ...r,
+                    marksObtained: mark?.marksObtained ?? r.marksObtained ?? 0,
+                    maxMarks: mark?.maxMarks ?? r.maxMarks ?? 100,
+                    term: mark?.term ?? r.term,
+                    year: mark?.year ?? r.year
+                  };
+                });
+
+                this.dataSource = new MatTableDataSource(finalRequests);
+                if (this.paginator) {
+                  this.dataSource.paginator = this.paginator;
+                }
+
+                this.calculateStatistics(finalRequests);
+                console.log('✓ Recheck requests loaded:', finalRequests);
+              },
+              error: (err) => {
+                console.error('Error loading marks:', err);
+                this.dataSource = new MatTableDataSource(enrichedRequests);
+                if (this.paginator) {
+                  this.dataSource.paginator = this.paginator;
+                }
+                this.calculateStatistics(enrichedRequests);
+              }
+            });
           },
           error: (err) => {
             console.error('Error loading students:', err);
@@ -128,22 +177,28 @@ export class RecheckRequestsComponent implements OnInit {
    */
   calculateStatistics(requests: any[]): void {
     this.totalRequests = requests.length;
-    this.pendingRequests = requests.filter(r => r.status === 'pending').length;
-    this.inReviewRequests = requests.filter(r => r.status === 'completed' || r.status === 'approved').length;
-    this.resolvedRequests = requests.filter(r => r.status === 'completed').length;
+    const normalizedStatus = (status: any) => String(status || '').toLowerCase();
+    this.pendingRequests = requests.filter(r => normalizedStatus(r.status) === 'pending').length;
+    this.approvedRequests = requests.filter(r => normalizedStatus(r.status) === 'approved').length;
+    this.rejectedRequests = requests.filter(r => normalizedStatus(r.status) === 'rejected').length;
+    this.resolvedRequests = requests.filter(r => normalizedStatus(r.status) === 'completed').length;
+
+    // Kept for backward compatibility (if any template still references it)
+    this.inReviewRequests = this.approvedRequests;
   }
 
   /**
    * Get status class for styling
    */
   getStatusClass(status: string): string {
+    const key = String(status || '').toLowerCase();
     const statusMap: { [key: string]: string } = {
       'pending': 'status-pending',
       'completed': 'status-completed',
       'approved': 'status-approved',
       'rejected': 'status-rejected'
     };
-    return statusMap[status] || 'status-pending';
+    return statusMap[key] || 'status-pending';
   }
 
   /**
@@ -157,32 +212,39 @@ export class RecheckRequestsComponent implements OnInit {
    * Get status icon
    */
   getStatusIcon(status: string): string {
+    const key = String(status || '').toLowerCase();
     const iconMap: { [key: string]: string } = {
       'pending': 'schedule',
       'completed': 'check_circle',
       'approved': 'thumb_up',
       'rejected': 'cancel'
     };
-    return iconMap[status] || 'help';
+    return iconMap[key] || 'help';
   }
 
   /**
    * Get status display text
    */
   getStatusText(status: string): string {
+    const key = String(status || '').toLowerCase();
     const textMap: { [key: string]: string } = {
       'pending': 'Pending',
       'completed': 'Completed',
       'approved': 'Approved',
       'rejected': 'Rejected'
     };
-    return textMap[status] || status;
+    return textMap[key] || String(status ?? '');
   }
 
   /**
    * Start editing mark
    */
   editMark(request: any): void {
+    const status = String(request?.status || '').toLowerCase();
+    if (status !== 'approved') {
+      this.submitError = 'You can update marks only after admin approves the recheck.';
+      return;
+    }
     this.editingMarkId = request.marksId;
     this.editedMarks[request.marksId] = request.marksObtained;
     this.submitError = '';
@@ -200,6 +262,11 @@ export class RecheckRequestsComponent implements OnInit {
    * Save updated mark
    */
   saveMark(request: any): void {
+    const status = String(request?.status || '').toLowerCase();
+    if (status !== 'approved') {
+      this.submitError = 'You can update marks only after admin approves the recheck.';
+      return;
+    }
     const newMarks = this.editedMarks[request.marksId];
 
     if (newMarks === undefined || newMarks === null) {
@@ -275,6 +342,15 @@ export class RecheckRequestsComponent implements OnInit {
       `Reason: ${request.reason}\n` +
       `Marks: ${request.marksObtained}/${request.maxMarks}`
     );
+  }
+
+  /**
+   * Send notification to student
+   */
+  sendNotification(request: any): void {
+    if (confirm(`Send notification to ${request.studentName} about recheck status?`)) {
+      alert(`Notification sent to ${request.studentName}`);
+    }
   }
 
   /**

@@ -50,7 +50,9 @@ export class RequestRecheckService {
     return this.http.get<any>(`${this.baseUrl}/all`)
       .pipe(
         map((response: any) => {
-          const recheckArray = Array.isArray(response?.data) ? response.data : [];
+          const recheckArray = Array.isArray(response)
+            ? response
+            : (Array.isArray(response?.data) ? response.data : []);
           this.recheckSubject.next(recheckArray);
           this.saveToLocal(recheckArray);
           return recheckArray;
@@ -78,7 +80,12 @@ export class RequestRecheckService {
   getRecheckById(id: number): Observable<Recheck | undefined> {
     return this.http.get<any>(`${this.baseUrl}/${id}`)
       .pipe(
-        map((response: any) => response.data as Recheck),
+        map((response: any) => {
+          if (response && typeof response === 'object' && 'data' in response) {
+            return response.data as Recheck;
+          }
+          return response as Recheck;
+        }),
         catchError((error) => {
           console.error('Error loading recheck:', error);
           const local = this.getRecheckFromLocal().find(r => r.recheckId === id);
@@ -94,7 +101,9 @@ export class RequestRecheckService {
     return this.http.get<any>(`${this.baseUrl}/student/${studentId}`)
       .pipe(
         map((response: any) => {
-          const recheckArray = Array.isArray(response?.data) ? response.data : [];
+          const recheckArray = Array.isArray(response)
+            ? response
+            : (Array.isArray(response?.data) ? response.data : []);
           return recheckArray;
         }),
         catchError((error) => {
@@ -122,7 +131,9 @@ export class RequestRecheckService {
     return this.http.get<any>(`${this.baseUrl}/status/${status}`)
       .pipe(
         map((response: any) => {
-          const recheckArray = Array.isArray(response?.data) ? response.data : [];
+          const recheckArray = Array.isArray(response)
+            ? response
+            : (Array.isArray(response?.data) ? response.data : []);
           return recheckArray;
         }),
         catchError((error) => {
@@ -309,6 +320,56 @@ export class RequestRecheckService {
           this.saveToLocal(all);
           this.recheckSubject.next(all);
           
+          return of(updated);
+        })
+      );
+  }
+
+  /**
+   * Update admin notes for a recheck request
+   */
+  updateAdminNotes(recheckId: number, adminNotes: string): Observable<Recheck | undefined> {
+    console.log(`📝 Updating admin notes for recheck ${recheckId}:`, adminNotes);
+    
+    return this.http.put<any>(`${this.baseUrl}/${recheckId}/notes`, adminNotes)
+      .pipe(
+        tap((response: any) => {
+          console.log('✅ Admin notes updated successfully');
+          const updatedRecheck = response.data as Recheck;
+          const currentRechecks = this.recheckSubject.value;
+          const updated = currentRechecks.map(r => 
+            r.recheckId === recheckId ? updatedRecheck : r
+          );
+          this.recheckSubject.next(updated);
+          this.saveToLocal(updated);
+          console.log(`✓ Admin notes for recheck ${recheckId} updated:`, adminNotes);
+        }),
+        map((response: any) => {
+          return response.data as Recheck;
+        }),
+        catchError((error) => {
+          console.error('❌ Error updating admin notes:', error);
+          // Fallback to local storage
+          const currentRechecks = this.getRecheckFromLocal();
+          const recheck = currentRechecks.find(r => r.recheckId === recheckId);
+          
+          if (!recheck) {
+            return of(undefined);
+          }
+
+          const updated = {
+            ...recheck,
+            adminNotes: adminNotes
+          };
+
+          const all = currentRechecks.map(r => 
+            r.recheckId === recheckId ? updated : r
+          );
+          
+          this.saveToLocal(all);
+          this.recheckSubject.next(all);
+          
+          console.log('⚠️ Admin notes saved to local storage');
           return of(updated);
         })
       );

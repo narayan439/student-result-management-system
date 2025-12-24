@@ -37,7 +37,9 @@
           {{ teacher.name ? teacher.name.charAt(0) : 'T' }}
         </div>
         <h1>{{ teacher.name }}</h1>
-        <p class="profile-title">{{ teacher.subject }} Teacher</p>
+        <p class="profile-title">
+          {{ (teacher.subjects && teacher.subjects.length) ? (teacher.subjects.join(', ') + ' Teacher') : 'Teacher' }}
+        </p>
         <div class="status-badge" [class.active]="teacher.isActive">
           <mat-icon>{{ teacher.isActive ? 'check_circle' : 'cancel' }}</mat-icon>
           {{ teacher.isActive ? 'Active' : 'Inactive' }}
@@ -60,7 +62,7 @@
             <div class="info-value email-value">{{ teacher.email }}</div>
           </div>
 
-          <div class="info-item">
+          <div class="info-item" *ngIf="teacher.phone">
             <div class="info-label">
               <mat-icon>phone</mat-icon>
               Phone
@@ -81,15 +83,17 @@
         </h3>
         
         <div class="info-grid">
-          <!-- <div class="info-item">
+          <div class="info-item" *ngIf="teacher.subjects && teacher.subjects.length">
             <div class="info-label">
               <mat-icon>subject</mat-icon>
-              Subject
+              Subjects
             </div>
             <div class="info-value subject-value">
-              <span class="subject-badge">{{ teacher.subject }}</span>
+              <div class="subject-list">
+                <span class="subject-badge" *ngFor="let s of teacher.subjects">{{ s }}</span>
+              </div>
             </div>
-          </div> -->
+          </div>
 
           <div class="info-item">
             <div class="info-label">
@@ -161,6 +165,23 @@
         <mat-icon>settings</mat-icon>
         Account Actions
       </h3>
+
+      <div *ngIf="changePasswordSuccess" class="success-message">
+        <mat-icon>check_circle</mat-icon>
+        <div>
+          <strong>Success!</strong>
+          <p>{{ changePasswordSuccess }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="changePasswordError" class="error-message">
+        <mat-icon>error</mat-icon>
+        <div>
+          <strong>Error!</strong>
+          <p>{{ changePasswordError }}</p>
+        </div>
+      </div>
+
       <div class="action-buttons">
         <button 
           mat-raised-button 
@@ -172,12 +193,49 @@
           Refresh Profile
         </button>
         
-        <!-- <button mat-stroked-button class="action-btn">
+        <button mat-stroked-button class="action-btn" (click)="toggleChangePassword()">
           <mat-icon>password</mat-icon>
-          Change Password
-        </button> -->
+          {{ showChangePassword ? 'Cancel' : 'Change Password' }}
+        </button>
         
         
+      </div>
+
+      <div *ngIf="showChangePassword" class="change-password">
+        <mat-form-field appearance="outline" class="password-field">
+          <mat-label>Current Password</mat-label>
+          <input matInput type="password" [(ngModel)]="currentPassword" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="password-field">
+          <mat-label>New Password</mat-label>
+          <input matInput type="password" [(ngModel)]="newPassword" (ngModelChange)="onNewPasswordChange()" />
+        </mat-form-field>
+
+        <div class="password-strength" *ngIf="newPassword">
+          <div class="strength-label" [class.strong]="passwordStrengthLabel === 'Strong'" [class.medium]="passwordStrengthLabel === 'Medium'" [class.weak]="passwordStrengthLabel === 'Weak'">
+            Strength: {{ passwordStrengthLabel }}
+          </div>
+          <ul class="strength-issues" *ngIf="passwordStrengthIssues.length">
+            <li *ngFor="let issue of passwordStrengthIssues">{{ issue }}</li>
+          </ul>
+        </div>
+
+        <mat-form-field appearance="outline" class="password-field">
+          <mat-label>Confirm New Password</mat-label>
+          <input matInput type="password" [(ngModel)]="confirmPassword" />
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          class="action-btn"
+          (click)="submitChangePassword()"
+          [disabled]="!canSubmitPasswordChange()"
+        >
+          <mat-icon>{{ isChangingPassword ? 'hourglass_empty' : 'save' }}</mat-icon>
+          {{ isChangingPassword ? 'Updating...' : 'Update Password' }}
+        </button>
       </div>
 
       <!-- Logout Confirmation -->

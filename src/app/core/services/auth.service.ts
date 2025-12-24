@@ -235,4 +235,19 @@ export class AuthService {
     
     console.log('✓ Session cleared and history reset');
   }
+
+  /**
+   * Change password for authenticated user
+   * @param currentPassword Current password for verification
+   * @param newPassword New password
+   */
+  changePassword(currentPassword: string, newPassword: string) {
+    console.log('🔐 Attempting to change password...');
+    const currentUser = this.getCurrentUser();
+    return this.http.post(`${this.apiAuthUrl}/change-password`, {
+      email: currentUser?.email,
+      currentPassword,
+      newPassword
+    });
+  }
 }

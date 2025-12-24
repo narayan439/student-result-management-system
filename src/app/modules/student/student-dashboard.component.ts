@@ -110,7 +110,7 @@ export class StudentDashboardComponent implements OnInit {
   // Logout function
   logout() {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   // Navigation methods

@@ -9,12 +9,8 @@ import { Injectable } from '@angular/core';
 })
 export class ConfigService {
   // Backend API Configuration
-  // private apiBaseUrl = 'https://srms-backend-production.up.railway.app';
-  // private apiUrl = 'https://srms-backend-production.up.railway.app/api';
-
-  private apiBaseUrl = 'http://localhost:8080';
-  // private apiUrl = 'http://localhost:8080/api';
-  private apiUrl = 'http://localhost:8080/api';
+  private apiBaseUrl = 'https://srms-backend-production.up.railway.app';
+  private apiUrl = 'https://srms-backend-production.up.railway.app/api';
 
   constructor() {
     this.initializeConfig();
@@ -25,8 +21,8 @@ export class ConfigService {
    */
   private initializeConfig(): void {
     // Try to get from window object or environment variables
-    const backendUrl = this.getConfigValue('BACKEND_URL', 'http://localhost:8080/api');
-    const apiBase = this.getConfigValue('API_BASE_URL', 'http://localhost:8080');
+    const backendUrl = this.getConfigValue('BACKEND_URL', 'https://srms-backend-production.up.railway.app/api');
+    const apiBase = this.getConfigValue('API_BASE_URL', 'https://srms-backend-production.up.railway.app');
     
     this.apiUrl = backendUrl;
     this.apiBaseUrl = apiBase;

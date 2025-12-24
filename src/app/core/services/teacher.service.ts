@@ -53,22 +53,9 @@ export class TeacherService {
    * Get single teacher by email
    */
   getTeacherByEmail(email: string): Observable<Teacher> {
-    return this.http.get<TeacherResponse>(`${this.baseUrl}/email/${encodeURIComponent(email)}`)
+    return this.http.get<TeacherResponse>(`${this.baseUrl}/${email}`)
       .pipe(
-        map((response: any) => {
-          const teacher = (response?.data || {}) as any;
-          const subjectsRaw = teacher.subjects;
-          const subjects = Array.isArray(subjectsRaw)
-            ? subjectsRaw
-            : typeof subjectsRaw === 'string'
-              ? subjectsRaw.split(',').map((s: string) => s.trim()).filter(Boolean)
-              : [];
-
-          return {
-            ...teacher,
-            subjects
-          } as Teacher;
-        }),
+        map((response: any) => response.data as Teacher),
         catchError(this.handleError)
       );
   }

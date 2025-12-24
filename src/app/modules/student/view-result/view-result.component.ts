@@ -282,61 +282,11 @@ export class ViewResultComponent implements OnInit {
     }
 
     // Validate and extract marks data
-    let validMarks = this.marks.filter((m: any) => {
+    const validMarks = this.marks.filter((m: any) => {
       const hasMarks = m.marksObtained !== undefined && m.marksObtained !== null;
       const hasSubject = m.subject || m.subjectName;
       return hasMarks && hasSubject;
     });
-
-    // If class subjects are available, show only subjects configured for that class
-    if (this.classSubjects && this.classSubjects.length > 0) {
-      const allowedSubjects = new Set(
-        this.classSubjects
-          .map((s: any) => (s?.subjectName || s?.name || '').toString().trim().toLowerCase())
-          .filter((s: string) => !!s)
-      );
-
-      const subjectOrder = new Map<string, number>();
-      this.classSubjects.forEach((s: any, idx: number) => {
-        const key = (s?.subjectName || s?.name || '').toString().trim().toLowerCase();
-        if (key) subjectOrder.set(key, idx);
-      });
-
-      if (allowedSubjects.size > 0) {
-        const beforeCount = validMarks.length;
-        validMarks = validMarks.filter((m: any) => {
-          const subjectName = (m.subject || m.subjectName || '').toString().trim().toLowerCase();
-          return allowedSubjects.has(subjectName);
-        });
-
-        // De-duplicate by subject (keep the latest/highest marksId)
-        const bySubject = new Map<string, any>();
-        for (const m of validMarks) {
-          const key = (m.subject || m.subjectName || '').toString().trim().toLowerCase();
-          if (!key) continue;
-          const existing = bySubject.get(key);
-          const existingId = typeof existing?.marksId === 'number' ? existing.marksId : -1;
-          const currentId = typeof m?.marksId === 'number' ? m.marksId : -1;
-          if (!existing || currentId >= existingId) {
-            bySubject.set(key, m);
-          }
-        }
-        validMarks = Array.from(bySubject.values());
-
-        // Sort by class subject order (if available)
-        if (subjectOrder.size > 0) {
-          validMarks.sort((a: any, b: any) => {
-            const ak = (a?.subject || a?.subjectName || '').toString().trim().toLowerCase();
-            const bk = (b?.subject || b?.subjectName || '').toString().trim().toLowerCase();
-            const ai = subjectOrder.has(ak) ? (subjectOrder.get(ak) as number) : 9999;
-            const bi = subjectOrder.has(bk) ? (subjectOrder.get(bk) as number) : 9999;
-            return ai - bi;
-          });
-        }
-
-        console.log(`✅ Filtered + deduped result marks by class subjects: ${beforeCount} -> ${validMarks.length}`);
-      }
-    }
 
     console.log('  Valid marks count:', validMarks.length);
 
@@ -350,16 +300,10 @@ export class ViewResultComponent implements OnInit {
       ? ((totalMarks / maxTotal) * 100).toFixed(2)
       : '0.00';
     
-    // Determine result status - if no marks, show "PENDING".
-    // Business rule: if ANY subject is failed, overall result is FAIL.
-    const passMark = 33;
+    // Determine result status - if no marks, show "PENDING" instead of "FAIL"
     let resultStatus = "PENDING";
     if (validMarks.length > 0) {
-      const hasAnyFailedSubject = validMarks.some((m: any) => {
-        const obtained = parseInt(m?.marksObtained) || 0;
-        return obtained < passMark;
-      });
-      resultStatus = hasAnyFailedSubject ? "FAIL" : "PASS";
+      resultStatus = parseFloat(percentage) >= 33 ? "PASS" : "FAIL";
     }
     
     this.result = {

@@ -562,94 +562,31 @@ table {
   background: #f7fafc;
 }
 
-/* Empty State with Reload Button */
+/* Empty State */
 .empty-state {
-  padding: 60px 24px;
+  padding: 60px;
   text-align: center;
   color: #718096;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
 }
 
-.empty-icon {
+.empty-state mat-icon {
   font-size: 48px;
   width: 48px;
   height: 48px;
   color: #cbd5e0;
+  margin-bottom: 16px;
 }
 
 .empty-state h3 {
   font-size: 18px;
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 8px 0;
   color: #4a5568;
 }
 
 .empty-state p {
-  margin: 0 0 16px 0;
-  font-size: 14px;
-  max-width: 300px;
-  line-height: 1.5;
-}
-
-.reload-button {
-  background: linear-gradient(135deg, #1a237e, #304ffe);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
-}
-
-.reload-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(26, 35, 126, 0.3);
-}
-
-.reload-button:active {
-  transform: translateY(0);
-}
-
-.reload-button mat-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-}
-
-/* Loading State */
-.loading-state {
-  padding: 60px;
-  text-align: center;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #1a237e;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-state p {
-  color: #4a5568;
-  font-size: 14px;
   margin: 0;
+  font-size: 14px;
 }
 
 /* Info Section in Modal */
@@ -751,85 +688,11 @@ table {
   gap: 16px;
 }
 
-/* Paginator Styling - Remove "Items per page" */
-::ng-deep .mat-paginator-page-size {
-  display: none !important;
-}
-
-::ng-deep .mat-paginator-page-size-label {
-  display: none !important;
-}
-
-::ng-deep .mat-paginator-range-label {
-  display: none !important;
-}
-
-/* Custom Paginator Styling */
+/* Paginator Styling */
 mat-paginator {
   padding: 16px 24px;
   border-top: 1px solid #e2e8f0;
   background: #f8fafc;
-  display: flex;
-  justify-content: center;
-}
-
-::ng-deep .mat-paginator-container {
-  justify-content: center !important;
-  min-height: auto !important;
-}
-
-::ng-deep .mat-paginator-navigation-previous,
-::ng-deep .mat-paginator-navigation-next {
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-::ng-deep .mat-paginator-navigation-previous:hover,
-::ng-deep .mat-paginator-navigation-next:hover {
-  background: #f7fafc;
-  border-color: #cbd5e0;
-}
-
-::ng-deep .mat-paginator-navigation-first,
-::ng-deep .mat-paginator-navigation-last {
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-::ng-deep .mat-paginator-navigation-first:hover,
-::ng-deep .mat-paginator-navigation-last:hover {
-  background: #f7fafc;
-  border-color: #cbd5e0;
-}
-
-::ng-deep .mat-paginator-navigation-previous .mat-button-wrapper,
-::ng-deep .mat-paginator-navigation-next .mat-button-wrapper,
-::ng-deep .mat-paginator-navigation-first .mat-button-wrapper,
-::ng-deep .mat-paginator-navigation-last .mat-button-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-::ng-deep .mat-icon-button .mat-paginator-icon {
-  width: 20px;
-  height: 20px;
-  font-size: 20px;
-  color: #4a5568;
 }
 
 /* Responsive Design */
@@ -934,22 +797,6 @@ mat-paginator {
   .reason-content mat-icon {
     align-self: flex-start;
   }
-  
-  /* Adjust empty state for mobile */
-  .empty-state {
-    padding: 40px 16px;
-  }
-  
-  .empty-icon {
-    font-size: 40px;
-    width: 40px;
-    height: 40px;
-  }
-  
-  .reload-button {
-    padding: 10px 20px;
-    font-size: 13px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -973,19 +820,6 @@ mat-paginator {
   
   .admin-notes-cell {
     min-width: 150px;
-  }
-  
-  /* Adjust empty state for mobile */
-  .empty-state {
-    padding: 30px 12px;
-  }
-  
-  .empty-state h3 {
-    font-size: 16px;
-  }
-  
-  .empty-state p {
-    font-size: 13px;
   }
   
   /* Responsive Modal */
@@ -1035,13 +869,5 @@ mat-paginator {
     padding: 8px 12px !important;
     font-size: 13px !important;
   }
-  
-  .empty-state {
-    padding: 20px 8px;
-  }
-  
-  .reload-button {
-    padding: 8px 16px;
-    font-size: 12px;
-  }
 }
+

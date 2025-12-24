@@ -41,6 +41,14 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+
+  /* Ensure message is visible even when user is scrolled down */
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  z-index: 2000;
 }
 
 .success-message mat-icon {
@@ -76,6 +84,14 @@
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+
+  /* Ensure message is visible even when user is scrolled down */
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  z-index: 2000;
 }
 
 .error-message mat-icon {
@@ -395,6 +411,7 @@
   display: flex;
   gap: 15px;
   margin-top: 30px;
+  width: 100%;
 }
 
 /* Submit Button */
@@ -414,6 +431,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .submit-btn:hover:not([disabled]) {
@@ -449,6 +467,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .reset-btn:hover:not([disabled]) {
@@ -644,6 +663,9 @@
   
   .button-group {
     flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 20px;
   }
   
   .submit-btn {
@@ -651,6 +673,16 @@
   }
   
   .reset-btn {
+    width: 100%;
+  }
+
+  .subject-option {
+    flex-wrap: wrap;
+  }
+
+  .marks-hint {
+    margin-left: 0;
+    padding-left: 0;
     width: 100%;
   }
   
@@ -696,12 +728,30 @@
   .submit-btn {
     font-size: 16px;
     height: 48px;
+    width: 100% !important;
+    max-width: 100%;
+    min-height: 48px;
   }
   
   .reset-btn {
     height: 48px;
     font-size: 15px;
+    padding: 0 16px;
+    width: 100% !important;
+    max-width: 100%;
+    min-height: 48px;
   }
+
+  .button-group {
+    gap: 10px;
+    width: 100%;
+  }
+
+  .button-group button {
+    box-sizing: border-box;
+  }
+
+  
   
   .status-item {
     flex-direction: column;

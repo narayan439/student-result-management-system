@@ -16,7 +16,6 @@ export class MarksService {
   constructor(private http: HttpClient, private configService: ConfigService) {
     this.baseUrl = `${this.configService.getApiUrl()}/marks`;
     console.log('✓ MarksService initialized');
-    this.loadAllMarks();
   }
 
   /**
@@ -254,7 +253,17 @@ export class MarksService {
    * Update marks
    */
   updateMarks(markId: number, marks: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/${markId}`, marks).pipe(
+    const payload = {
+      ...marks,
+      // Ensure NOT NULL backend columns are never sent as null/undefined
+      maxMarks: marks?.maxMarks ?? 100,
+      year: marks?.year ?? new Date().getFullYear(),
+      isRecheckRequested: marks?.isRecheckRequested ?? false,
+      // term is nullable in DB but backend update may overwrite; provide a stable default
+      term: marks?.term ?? 'Term 1'
+    };
+
+    return this.http.put(`${this.baseUrl}/${markId}`, payload).pipe(
       tap(() => this.loadAllMarks()),
       catchError(this.handleError)
     );

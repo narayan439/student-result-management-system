@@ -48,8 +48,13 @@
 
     <!-- Right Section: Logout & Mobile Menu -->
     <div class="nav-right">
+      <!-- Profile Button (Desktop) -->
+      <a routerLink="/admin/profile" class="profile-btn" matTooltip="Admin Profile" matTooltipPosition="below">
+        <i class="fas fa-user-circle"></i> Profile
+      </a>
+
       <!-- Logout Button (Desktop) -->
-      <a (click)="logout()" class="logout-btn" style="cursor: pointer;">
+      <a (click)="logout()" class="logout-btn" style="cursor: pointer;" matTooltip="Logout" matTooltipPosition="below">
         <i class="fas fa-sign-out-alt"></i> Logout
       </a>
       
@@ -144,6 +149,14 @@
           <span>Rechecks</span>
         </a>
       </li>
+
+      <li>
+        <a routerLink="/admin/profile" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="fas fa-user-circle"></i>
+          <span>Profile</span>
+        </a>
+
+
     </ul>
 
     <div class="mobile-logout">

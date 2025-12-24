@@ -17,7 +17,8 @@
       </div>
       <div class="exam-badge">
         <mat-icon>school</mat-icon>
-        Annual Examination 2023
+        Result
+       
       </div>
     </div>
 
@@ -131,23 +132,15 @@
       </mat-card>
       
       <!-- Average -->
-      <mat-card class="summary-card">
-        <mat-card-content>
-          <h4 class="summary-value">{{ average | number:'1.0-0' }}</h4>
-          <p class="summary-label">
-            <mat-icon>average</mat-icon>
-            Average per Subject
-          </p>
-        </mat-card-content>
-      </mat-card>
+      
       
     </div>
     
     <!-- Overall Grade Badge -->
     <div class="overall-grade">
-      <mat-chip class="grade-badge">
-        <mat-icon>verified</mat-icon>
-        Overall Grade: {{ grade }}
+      <mat-chip class="grade-badge" [ngClass]="{ 'grade-badge-fail': !isOverallPass }">
+        <mat-icon>{{ isOverallPass ? 'verified' : 'cancel' }}</mat-icon>
+        Result {{ grade }}
       </mat-chip>
     </div>
     
@@ -183,7 +176,7 @@
           </mat-chip>
           <mat-chip class="grade-item f">
             <div class="grade-color"></div>
-            F (Below 33%)
+            F (Any subject below 33%)
           </mat-chip>
         </div>
       </mat-card-content>

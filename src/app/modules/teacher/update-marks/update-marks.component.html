@@ -61,31 +61,17 @@
 
       <!-- Filter Buttons -->
       <div class="filter-buttons">
-        <button 
-          mat-stroked-button 
-          class="filter-btn"
-          [class.active]="!searchTerm"
-          (click)="clearSearch()"
-        >
-          <mat-icon>filter_alt_off</mat-icon>
-          All
-        </button>
-        <button 
-          mat-stroked-button 
-          class="filter-btn"
-          (click)="toggleFilter('pending')"
-        >
-          <mat-icon>pending</mat-icon>
-          Pending
-        </button>
-        <button 
-          mat-stroked-button 
-          class="filter-btn"
-          (click)="toggleFilter('pass')"
-        >
-          <mat-icon>check_circle</mat-icon>
-          Pass
-        </button>
+       
+
+        <mat-form-field appearance="outline" class="class-filter-field">
+          <mat-label>Class</mat-label>
+          <mat-select [(ngModel)]="selectedClassName" (selectionChange)="applyFilters()">
+            <mat-option [value]="''">All Classes</mat-option>
+            <mat-option *ngFor="let cls of classOptions" [value]="cls">{{ cls }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        
       </div>
 
       <!-- Refresh Button -->
@@ -162,6 +148,7 @@
             
             <!-- Subject Column -->
             <div class="col-subject">
+              <div class="mobile-label">Subject</div>
               <div class="subject-info">
                 <mat-icon class="subject-icon">book</mat-icon>
                 {{ mark.subjectName }}
@@ -170,6 +157,7 @@
             
             <!-- Marks Column -->
             <div class="col-marks">
+              <div class="mobile-label">Marks</div>
               <!-- Edit Mode -->
               <div *ngIf="editingMarkId === mark.marksId" class="edit-marks-input">
                 <mat-form-field appearance="outline" class="input-field">
@@ -206,6 +194,7 @@
 
             <!-- Actions Column -->
             <div class="col-actions">
+              <div class="mobile-label">Actions</div>
               <!-- View Mode Actions -->
               <div *ngIf="editingMarkId !== mark.marksId" class="action-buttons">
                 <button 

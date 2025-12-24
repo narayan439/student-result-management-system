@@ -67,26 +67,31 @@ export class DashboardComponent implements OnInit {
    * Load student's marks
    */
   loadStudentMarks(): void {
-    const studentIdStr = String(this.student?.studentId);
-    
-    this.marksService.getAllMarks().subscribe({
-      next: (marksData: any) => {
-        const marksArray = Array.isArray(marksData) ? marksData : [];
-        this.marks = marksArray
-          .filter((m: any) => m.studentId === studentIdStr)
-          .map((m: any) => ({
-            subject: m.subject,
-            marks: m.marksObtained,
-            maxMarks: m.maxMarks || 100,
-            percentage: Math.round((m.marksObtained / (m.maxMarks || 100)) * 100)
-          }));
-        
+    const studentId = Number(this.student?.studentId);
+    if (!studentId) {
+      console.error('✗ Invalid studentId; cannot load marks');
+      this.marks = [];
+      this.calculateResult();
+      return;
+    }
+
+    this.marksService.getMarksByStudentId(studentId).subscribe({
+      next: (response: any) => {
+        const marksArray = Array.isArray(response?.data) ? response.data : [];
+        this.marks = marksArray.map((m: any) => ({
+          subject: m.subject,
+          marks: m.marksObtained,
+          maxMarks: m.maxMarks || 100,
+          percentage: Math.round((m.marksObtained / (m.maxMarks || 100)) * 100)
+        }));
+
         console.log('✓ Student marks loaded:', this.marks);
         this.calculateResult();
       },
       error: (err) => {
         console.error('Error loading marks:', err);
         this.marks = [];
+        this.calculateResult();
       }
     });
   }

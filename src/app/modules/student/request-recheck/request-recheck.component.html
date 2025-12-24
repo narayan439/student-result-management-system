@@ -89,7 +89,7 @@
             >
               <mat-option *ngFor="let s of subjects" [value]="s.subjectName">
                 <div class="subject-option">
-                  <mat-icon>book</mat-icon>
+                  <mat-icon></mat-icon>
                   <span>{{ s.subjectName }}</span>
                   <span class="marks-hint" *ngIf="subjectMarks[s.subjectName]">
                     ({{ subjectMarks[s.subjectName] }}/{{ recheck.maxMarks }})
@@ -155,17 +155,17 @@
             color="primary" 
             type="submit" 
             class="submit-btn"
-            [disabled]="reForm.invalid || isSubmitting || !canRequest"
+            [disabled]="reForm.invalid || isSubmitting || submitSuccess || !canRequest"
           >
             <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'send' }}</mat-icon>
-            {{ isSubmitting ? 'Submitting...' : 'Submit Recheck Request' }}
+            {{ isSubmitting ? 'Submitting...' : 'Submit Recheck' }}
           </button>
           <button 
             mat-stroked-button 
             type="reset" 
             class="reset-btn"
             (click)="reForm.resetForm()"
-            [disabled]="isSubmitting"
+            [disabled]="isSubmitting || submitSuccess"
           >
             <mat-icon>clear</mat-icon>
             Clear
@@ -255,7 +255,7 @@
 
   <!-- Footer -->
   <div class="recheck-footer">
-    <p>© 2024 Sri Jayadev Shiksha Kendra. All rights reserved.</p>
+    <p>© 2025 Sri Jayadev Shiksha Kendra. All rights reserved.</p>
     <p>Recheck requests are processed by the Examination Department</p>
   </div>
 

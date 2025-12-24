@@ -1,5 +1,15 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+# Eclipse
+.metadata/
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
+
+
 # Environment configuration
 .env
 .env.local

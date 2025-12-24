@@ -20,9 +20,7 @@ export class ConfigService {
     this.initializeConfig();
   }
 
-  /**
-   * Initialize configuration from environment variables or defaults
-   */
+  
   private initializeConfig(): void {
     // Try to get from window object or environment variables
     const backendUrl = this.getConfigValue('BACKEND_URL', 'https://srms-backend-production.up.railway.app/api');

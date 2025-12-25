@@ -4,6 +4,8 @@ import { ClassesService } from '../../../core/services/classes.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { Student } from '../../../core/models/student.model';
+import { NotificationService } from '../../../core/services/notification.service';
+import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-manage-students',
@@ -33,7 +35,9 @@ export class ManageStudentsComponent implements OnInit, AfterViewInit {
 
   constructor(
     private studentService: StudentService,
-    private classesService: ClassesService
+    private classesService: ClassesService,
+    private notify: NotificationService,
+    private confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -86,21 +90,27 @@ export class ManageStudentsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  deleteStudent(studentId: any) {
-    if (confirm("Are you sure you want to delete this student?")) {
-      this.studentService.deleteStudent(studentId).subscribe({
-        next: (response: any) => {
-          this.students = this.students.filter(s => s.studentId !== studentId);
-          this.applyFilters();
-          alert("🎉 Student Deleted Successfully!");
-        },
-        error: (err) => {
-          const errorMsg = err.error?.message || 'Failed to delete student';
-          alert("❌ Error: " + errorMsg);
-          console.error('Error deleting student:', err);
-        }
-      });
-    }
+  async deleteStudent(studentId: any) {
+    const ok = await this.confirmDialog.confirm(
+      'Are you sure you want to delete this student?',
+      'Confirm Delete',
+      'Delete',
+      'Cancel'
+    );
+    if (!ok) return;
+
+    this.studentService.deleteStudent(studentId).subscribe({
+      next: () => {
+        this.students = this.students.filter(s => s.studentId !== studentId);
+        this.applyFilters();
+        this.notify.success('Student deleted successfully!');
+      },
+      error: (err) => {
+        const errorMsg = err.error?.message || 'Failed to delete student';
+        this.notify.error('Error: ' + errorMsg);
+        console.error('Error deleting student:', err);
+      }
+    });
   }
 
   // Search functionality

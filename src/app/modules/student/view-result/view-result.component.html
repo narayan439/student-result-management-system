@@ -95,26 +95,25 @@
         <table class="marks-table">
           <thead>
             <tr>
+              <th class="code-col">Subject Code</th>
               <th class="subject-col">Subject Name</th>
               <th class="marks-col">Maximum Marks</th>
               <th class="marks-col">Marks Obtained</th>
-              <th class="marks-col">Grade</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let mark of result.marks">
-              <td>{{ mark.subject }}</td>
+              <td>{{ mark.subjectCode || '-' }}</td>
+              <td class="subject-name">{{ mark.subject }}</td>
               <td>{{ mark.maxMarks }}</td>
               <td class="obtained">{{ mark.marksObtained }}</td>
-              <td>{{ getGrade(mark.marksObtained) }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr class="total-row">
-              <td class="total-label">GRAND TOTAL</td>
+              <td class="total-label" colspan="2">GRAND TOTAL</td>
               <td class="total-value">{{ result.maxTotal }}</td>
               <td class="total-value obtained">{{ result.total }}</td>
-              <td class="total-value">{{ result.percentage }}%</td>
             </tr>
           </tfoot>
         </table>
@@ -190,9 +189,9 @@
         <div class="signature-section">
           <div class="signature-box">
             <div class="signature-line"></div>
-            <p class="signature-label">Teacher's Signature</p>
-            <p class="teacher-name">Mrs. Sunita Mehta</p>
-            <p class="teacher-designation">Class Teacher</p>
+            <p class="signature-label">Principal's Signature</p>
+            <p class="teacher-name">Debasis Dash</p>
+            <p class="teacher-designation">Principal</p>
           </div>
         </div>
       </div>
@@ -200,10 +199,6 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button class="pdf-btn" (click)="downloadPDF()">
-        <i class="fas fa-file-pdf"></i> Download PDF
-      </button>
-      
       <button class="print-btn" (click)="printResult()">
         <i class="fas fa-print"></i> Print Result
       </button>

@@ -127,6 +127,18 @@
               <mat-icon>done_all</mat-icon>
               {{ student.marks.length }} subject(s)
             </div>
+
+            <button
+              mat-stroked-button
+              color="warn"
+              class="delete-all-btn"
+              (click)="deleteAllMarks(student)"
+              matTooltip="Delete all marks (all subjects) for this student"
+              [disabled]="isSubmitting || !student.marks?.length"
+            >
+              <mat-icon>delete_sweep</mat-icon>
+              Delete All
+            </button>
           </div>
         </div>
 

@@ -3,6 +3,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ClassesService, SchoolClass } from '../../../core/services/classes.service';
 import { StudentService } from '../../../core/services/student.service';
 import { SubjectService } from '../../../core/services/subject.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-manage-classes',
@@ -44,7 +45,12 @@ export class ManageClassesComponent implements OnInit {
   students: any[] = [];
   allSubjects: any[] = [];
 
-  constructor(private classesService: ClassesService, private studentService: StudentService, private subjectService: SubjectService) {
+  constructor(
+    private classesService: ClassesService,
+    private studentService: StudentService,
+    private subjectService: SubjectService,
+    private notify: NotificationService
+  ) {
     this.dataSource = new MatTableDataSource(this.classes);
   }
 
@@ -99,7 +105,7 @@ export class ManageClassesComponent implements OnInit {
         this.classes = this.classesService.getClassesArray();
         this.filterClasses();
         this.isLoading = false;
-        alert('Error loading classes: ' + (err.error?.message || err.message || 'Unknown error'));
+        this.notify.error('Error loading classes: ' + (err.error?.message || err.message || 'Unknown error'));
       }
     });
   }
@@ -256,13 +262,13 @@ export class ManageClassesComponent implements OnInit {
   // Add new class
   addClass(): void {
     if (!this.newClassName.trim() || !this.newClassNumber) {
-      alert('Please fill all fields');
+      this.notify.warn('Please fill all fields');
       return;
     }
 
     // Check for duplicate class
     if (this.classes.some(c => c.classNumber === this.newClassNumber && (!this.editingClass || c.classId !== this.editingClass.classId))) {
-      alert('This class already exists!');
+      this.notify.warn('This class already exists!');
       return;
     }
 
@@ -277,14 +283,14 @@ export class ManageClassesComponent implements OnInit {
 
     this.classesService.createClass(newClass).subscribe({
       next: (response: any) => {
-        alert('✓ Class added successfully!');
+        this.notify.success('Class added successfully!');
         this.resetForm();
         this.showAddForm = false;
         this.loadClasses();
       },
       error: (err: any) => {
         const errorMsg = err.error?.message || 'Failed to add class';
-        alert('Error: ' + errorMsg);
+        this.notify.error('Error: ' + errorMsg);
         console.error('Error adding class:', err);
       }
     });
@@ -295,13 +301,13 @@ export class ManageClassesComponent implements OnInit {
     if (!this.editingClass) return;
 
     if (!this.newClassName.trim() || !this.newClassNumber) {
-      alert('Please fill all fields');
+      this.notify.warn('Please fill all fields');
       return;
     }
 
     // Check for duplicate class
     if (this.classes.some(c => c.classNumber === this.newClassNumber && c.classId !== this.editingClass!.classId)) {
-      alert('This class already exists!');
+      this.notify.warn('This class already exists!');
       return;
     }
 
@@ -314,14 +320,14 @@ export class ManageClassesComponent implements OnInit {
 
     this.classesService.updateClass(this.editingClass.classId, updatedClass).subscribe({
       next: (response: any) => {
-        alert('✓ Class updated successfully!');
+        this.notify.success('Class updated successfully!');
         this.resetForm();
         this.showEditForm = false;
         this.loadClasses();
       },
       error: (err: any) => {
         const errorMsg = err.error?.message || 'Failed to update class';
-        alert('Error: ' + errorMsg);
+        this.notify.error('Error: ' + errorMsg);
         console.error('Error updating class:', err);
       }
     });
@@ -336,12 +342,12 @@ export class ManageClassesComponent implements OnInit {
 
     this.classesService.updateClass(schoolClass.classId, updatedClass).subscribe({
       next: (response: any) => {
-        alert('✓ Class reactivated successfully!');
+        this.notify.success('Class reactivated successfully!');
         this.loadClasses();
       },
       error: (err: any) => {
         const errorMsg = err.error?.message || 'Failed to reactivate class';
-        alert('Error: ' + errorMsg);
+        this.notify.error('Error: ' + errorMsg);
         console.error('Error reactivating class:', err);
       }
     });

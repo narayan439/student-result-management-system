@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TeacherService } from '../../../core/services/teacher.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -31,7 +32,8 @@ teacher: any;
   constructor(
     private router: Router,
     private authService: AuthService,
-    private teacherService: TeacherService
+    private teacherService: TeacherService,
+    private notify: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -86,7 +88,7 @@ teacher: any;
 
   saveMarks() {
     console.log("MARKS SUBMITTED:", this.marks);
-    alert("Marks Submitted Successfully!");
+    this.notify.success('Marks Submitted Successfully!');
   }
 
   logout() {

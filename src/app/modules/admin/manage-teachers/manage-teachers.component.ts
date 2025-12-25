@@ -6,6 +6,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { Teacher } from '../../../core/models/teacher.model';
 import { Subject } from '../../../core/models/subject.model';
 import { Router } from '@angular/router';
+import { NotificationService } from '../../../core/services/notification.service';
+import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 
 // ... existing imports ...
 
@@ -35,7 +37,9 @@ export class ManageTeachersComponent implements OnInit, AfterViewInit {
   constructor(
     private teacherService: TeacherService,
     private subjectService: SubjectService,
-    private router: Router
+    private router: Router,
+    private notify: NotificationService,
+    private confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -136,21 +140,27 @@ export class ManageTeachersComponent implements OnInit, AfterViewInit {
     });
   }
 
-  deleteTeacher(teacherId: string) {
-    if (confirm("Are you sure you want to delete this teacher?")) {
-      this.teacherService.deleteTeacher(teacherId).subscribe({
-        next: (response: any) => {
-          this.teachers = this.teachers.filter(t => t.teacherId !== teacherId);
-          this.applyFilters();
-          alert("✓ Teacher Deleted Successfully!");
-        },
-        error: (err) => {
-          const errorMsg = err.error?.message || 'Failed to delete teacher';
-          alert("✗ Error: " + errorMsg);
-          console.error('Error deleting teacher:', err);
-        }
-      });
-    }
+  async deleteTeacher(teacherId: string) {
+    const ok = await this.confirmDialog.confirm(
+      'Are you sure you want to delete this teacher?',
+      'Confirm Delete',
+      'Delete',
+      'Cancel'
+    );
+    if (!ok) return;
+
+    this.teacherService.deleteTeacher(teacherId).subscribe({
+      next: () => {
+        this.teachers = this.teachers.filter(t => t.teacherId !== teacherId);
+        this.applyFilters();
+        this.notify.success('Teacher deleted successfully!');
+      },
+      error: (err) => {
+        const errorMsg = err.error?.message || 'Failed to delete teacher';
+        this.notify.error('Error: ' + errorMsg);
+        console.error('Error deleting teacher:', err);
+      }
+    });
   }
 
   editTeacher(teacher: Teacher): void {

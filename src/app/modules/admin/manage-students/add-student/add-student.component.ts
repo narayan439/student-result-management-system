@@ -3,6 +3,7 @@ import { StudentService } from '../../../../core/services/student.service';
 import { ClassesService } from '../../../../core/services/classes.service';
 import { Router } from '@angular/router';
 import { Student } from '../../../../core/models/student.model';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-add-student',
@@ -30,7 +31,8 @@ export class AddStudentComponent implements OnInit {
   constructor(
     private studentService: StudentService,
     private classesService: ClassesService,
-    private router: Router
+    private router: Router,
+    private notify: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -135,7 +137,7 @@ export class AddStudentComponent implements OnInit {
       this.studentService.saveStudent(this.student).subscribe({
         next: (response: any) => {
           this.isLoading = false;
-          alert("🎉 Student Added Successfully!");
+          this.notify.success('Student added successfully!');
           this.router.navigate(['/admin/manage-students']);
         },
         error: (err: any) => {
@@ -144,7 +146,7 @@ export class AddStudentComponent implements OnInit {
                           err.message || 
                           (typeof err === 'string' ? err : 'Failed to add student');
           this.errorMessage = errorMsg;
-          alert("❌ Error: " + errorMsg);
+          this.notify.error('Error: ' + errorMsg);
           console.error('Error adding student:', err);
         }
       });
@@ -155,37 +157,37 @@ export class AddStudentComponent implements OnInit {
     // Basic validation
     if (!this.student.name.trim()) {
       this.errorMessage = 'Please enter student name';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.student.email.trim()) {
       this.errorMessage = 'Please enter email address';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.isValidEmail(this.student.email)) {
       this.errorMessage = 'Please enter a valid email address';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.student.className) {
       this.errorMessage = 'Please select class';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.student.rollNo.trim()) {
       this.errorMessage = 'Roll number must be auto-generated. Please select a class first.';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.dobDate) {
       this.errorMessage = 'Please select date of birth';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     

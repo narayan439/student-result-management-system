@@ -4,6 +4,8 @@ import { TeacherService } from '../../../../core/services/teacher.service';
 import { SubjectService } from '../../../../core/services/subject.service';
 import { Teacher } from '../../../../core/models/teacher.model';
 import { Subject } from '../../../../core/models/subject.model';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-edit-teacher',
@@ -34,7 +36,9 @@ export class EditTeacherComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private teacherService: TeacherService,
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private notify: NotificationService,
+    private confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -96,7 +100,7 @@ export class EditTeacherComponent implements OnInit {
           console.log('Teacher found:', this.teacher);
         } else {
           console.warn('Teacher not found in list');
-          alert('Teacher not found');
+          this.notify.error('Teacher not found');
           this.router.navigate(['/admin/manage-teachers']);
         }
       },
@@ -118,7 +122,7 @@ export class EditTeacherComponent implements OnInit {
           this.isLoading = false;
           console.log('Teacher found from local storage:', this.teacher);
         } else {
-          alert('Error loading teacher data');
+          this.notify.error('Error loading teacher data');
           this.router.navigate(['/admin/manage-teachers']);
         }
       }
@@ -130,42 +134,47 @@ export class EditTeacherComponent implements OnInit {
       this.isSaving = true;
       this.teacherService.updateTeacher(this.teacher.teacherId!, this.teacher).subscribe({
         next: (res: any) => {
-          alert('🎉 Teacher Updated Successfully!');
+          this.notify.success('Teacher updated successfully!');
           this.router.navigate(['/admin/manage-teachers']);
         },
         error: (err: any) => {
           this.isSaving = false;
           console.error(err);
-          alert('❌ Error: ' + (err.error?.message || 'Failed to update teacher'));
+          this.notify.error('Error: ' + (err.error?.message || 'Failed to update teacher'));
         }
       });
     }
   }
 
-  resetForm() {
-    if (confirm('Are you sure you want to reset all changes?')) {
-      this.teacher = JSON.parse(JSON.stringify(this.originalTeacher));
-    }
+  async resetForm() {
+    const ok = await this.confirmDialog.confirm(
+      'Are you sure you want to reset all changes?',
+      'Reset Changes',
+      'Reset',
+      'Cancel'
+    );
+    if (!ok) return;
+    this.teacher = JSON.parse(JSON.stringify(this.originalTeacher));
   }
 
   private validateTeacherData(): boolean {
     if (!this.teacher.name.trim()) {
-      alert('Please enter teacher name');
+      this.notify.warn('Please enter teacher name');
       return false;
     }
     
     if (!this.teacher.email.trim()) {
-      alert('Please enter email address');
+      this.notify.warn('Please enter email address');
       return false;
     }
     
     if (!this.isValidEmail(this.teacher.email)) {
-      alert('Please enter a valid email address');
+      this.notify.warn('Please enter a valid email address');
       return false;
     }
     
     if (!this.teacher.subjects || this.teacher.subjects.length === 0) {
-      alert('Please select at least one subject');
+      this.notify.warn('Please select at least one subject');
       return false;
     }
     

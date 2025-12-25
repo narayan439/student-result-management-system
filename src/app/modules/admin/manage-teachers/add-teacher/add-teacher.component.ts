@@ -4,6 +4,7 @@ import { SubjectService } from '../../../../core/services/subject.service';
 import { Router } from '@angular/router';
 import { Teacher } from '../../../../core/models/teacher.model';
 import { Subject } from '../../../../core/models/subject.model';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-add-teacher',
@@ -28,7 +29,8 @@ export class AddTeacherComponent implements OnInit {
   constructor(
     private teacherService: TeacherService,
     private subjectService: SubjectService,
-    private router: Router
+    private router: Router,
+    private notify: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -81,9 +83,9 @@ export class AddTeacherComponent implements OnInit {
    */
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {
-      alert('✅ Password copied to clipboard!');
+      this.notify.success('Password copied to clipboard!');
     }).catch(() => {
-      alert('❌ Failed to copy password');
+      this.notify.error('Failed to copy password');
     });
   }
 
@@ -91,12 +93,12 @@ export class AddTeacherComponent implements OnInit {
     if (this.validateTeacherData()) {
       this.teacherService.addTeacher(this.teacher).subscribe({
         next: (res: any) => {
-          alert('🎉 Teacher Added Successfully!');
+          this.notify.success('Teacher added successfully!');
           this.router.navigate(['/admin/manage-teachers']);
         },
         error: (err: any) => {
           console.error(err);
-          alert('❌ Error: ' + (err.error?.message || 'Failed to add teacher'));
+          this.notify.error('Error: ' + (err.error?.message || 'Failed to add teacher'));
         }
       });
     }
@@ -104,22 +106,22 @@ export class AddTeacherComponent implements OnInit {
 
   private validateTeacherData(): boolean {
     if (!this.teacher.name.trim()) {
-      alert('Please enter teacher name');
+      this.notify.warn('Please enter teacher name');
       return false;
     }
     
     if (!this.teacher.email.trim()) {
-      alert('Please enter email address');
+      this.notify.warn('Please enter email address');
       return false;
     }
     
     if (!this.isValidEmail(this.teacher.email)) {
-      alert('Please enter a valid email address');
+      this.notify.warn('Please enter a valid email address');
       return false;
     }
     
     if (!this.teacher.subjects || this.teacher.subjects.length === 0) {
-      alert('Please select at least one subject');
+      this.notify.warn('Please select at least one subject');
       return false;
     }
     

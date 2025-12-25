@@ -4,6 +4,7 @@ import { StudentService } from '../../../core/services/student.service';
 import { RequestRecheckService } from '../../../core/services/request-recheck.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Student } from '../../../core/models/student.model';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-track-recheck',
@@ -29,7 +30,8 @@ export class TrackRecheckComponent implements OnInit {
     private studentService: StudentService,
     private requestRecheckService: RequestRecheckService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notify: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -58,7 +60,7 @@ export class TrackRecheckComponent implements OnInit {
         },
         error: (err) => {
           console.error('❌ Failed to refresh student data:', err);
-          alert('Student profile not found. Please login again.');
+          this.notify.error('Student profile not found. Please login again.');
           this.router.navigate(['/login']);
         }
       });
@@ -76,7 +78,7 @@ export class TrackRecheckComponent implements OnInit {
 
     if (!this.student) {
       console.error('❌ Student not found for email:', email);
-      alert('Student profile not found. Please login again.');
+      this.notify.error('Student profile not found. Please login again.');
       this.router.navigate(['/login']);
       return;
     }
@@ -87,7 +89,7 @@ export class TrackRecheckComponent implements OnInit {
     // Load recheck requests from backend using student ID
     if (!this.student || !this.student.studentId) {
       console.error('❌ Student or studentId is undefined');
-      alert('Invalid student data. Please login again.');
+      this.notify.error('Invalid student data. Please login again.');
       this.router.navigate(['/login']);
       return;
     }

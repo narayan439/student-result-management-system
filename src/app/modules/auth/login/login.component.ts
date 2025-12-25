@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NgForm } from '@angular/forms';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,11 @@ export class LoginComponent {
   isLoading: boolean = false;
   showPassword: boolean = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private notify: NotificationService
+  ) {}
 
   onLogin() {
     // Check if form is valid
@@ -35,7 +40,7 @@ export class LoginComponent {
 
     // If no form reference, do basic validation
     if (!this.loginData.email || !this.loginData.password) {
-      alert("Please enter both email and password");
+      this.notify.warn('Please enter both email and password');
       return;
     }
 
@@ -72,18 +77,18 @@ export class LoginComponent {
         }
         else {
           console.warn('⚠️ Unknown role:', role);
-          alert(`Unknown user role: ${role}`);
+          this.notify.error(`Unknown user role: ${role}`);
         }
       }
       else {
         console.error('❌ Login failed - No role returned');
-        alert("❌ Invalid email or password");
+        this.notify.error('Invalid email or password');
       }
       
       this.isLoading = false;
     }).catch((error) => {
       console.error('❌ Login error caught:', error);
-      alert("❌ Invalid email or password");
+      this.notify.error('Invalid email or password');
       this.isLoading = false;
     });
   }

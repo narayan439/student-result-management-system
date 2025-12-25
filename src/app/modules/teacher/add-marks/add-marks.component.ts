@@ -3,6 +3,7 @@ import { StudentService } from '../../../core/services/student.service';
 import { SubjectService } from '../../../core/services/subject.service';
 import { ClassesService } from '../../../core/services/classes.service';
 import { MarksService } from '../../../core/services/marks.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { Student } from '../../../core/models/student.model';
 import { GetMarkForSubjectPipe } from '../../../shared/pipes/get-mark-for-subject.pipe';
 
@@ -51,7 +52,8 @@ export class AddMarksComponent implements OnInit {
     private studentService: StudentService,
     private subjectService: SubjectService,
     private classesService: ClassesService,
-    private marksService: MarksService
+    private marksService: MarksService,
+    private notifications: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +64,7 @@ export class AddMarksComponent implements OnInit {
   searchStudent(): void {
     if (!this.rollNo.trim()) {
       this.submitError = 'Please enter a roll number';
+      this.notifications.warn('Please enter a roll number');
       this.student = null;
       this.subjects = [];
       this.marksData = {};
@@ -93,6 +96,7 @@ export class AddMarksComponent implements OnInit {
           
           if (!foundStudent) {
             this.submitError = `Student with roll number ${this.rollNo} not found in database`;
+            this.notifications.error(`Student with roll number ${this.rollNo} not found`);
             this.subjects = [];
             this.marksData = {};
             this.studentClass = null;
@@ -107,6 +111,7 @@ export class AddMarksComponent implements OnInit {
         error: (err: any) => {
           console.error('✗ Error querying backend:', err);
           this.submitError = 'Error searching student. Please try again.';
+          this.notifications.error('Error searching student. Please try again.');
           this.isSearching = false;
         }
       });
@@ -127,6 +132,7 @@ export class AddMarksComponent implements OnInit {
     
     if (!this.student) {
       this.submitError = 'Student data is invalid';
+      this.notifications.error('Student data is invalid');
       this.isSearching = false;
       return;
     }
@@ -196,6 +202,7 @@ export class AddMarksComponent implements OnInit {
             },
             error: (err: any) => {
               console.error('Error loading subjects by class:', err);
+              this.notifications.warn('Could not load subjects from backend. Trying fallback...');
               this.loadSubjectsByClass();
             }
           });
@@ -208,6 +215,7 @@ export class AddMarksComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading class details:', err);
+        this.notifications.warn('Could not load class details. Trying fallback...');
         // Fallback to service-based subject loading
         this.loadSubjectsByClass();
       }
@@ -264,6 +272,7 @@ export class AddMarksComponent implements OnInit {
       error: (err) => {
         console.error('Error loading subjects:', err);
         this.submitError = 'Could not load subjects for this class';
+        this.notifications.error('Could not load subjects for this class');
         this.subjects = [];
         this.marksData = {};
         this.isSearching = false;
@@ -288,6 +297,7 @@ export class AddMarksComponent implements OnInit {
   submitAllMarks(): void {
     if (!this.student) {
       this.submitError = 'Please search for a student first';
+      this.notifications.warn('Please search for a student first');
       return;
     }
 
@@ -295,6 +305,7 @@ export class AddMarksComponent implements OnInit {
     const hasMarks = Object.values(this.marksData).some(m => m !== null && m !== undefined);
     if (!hasMarks) {
       this.submitError = 'Please enter marks for at least one subject';
+      this.notifications.warn('Please enter marks for at least one subject');
       return;
     }
 
@@ -303,6 +314,7 @@ export class AddMarksComponent implements OnInit {
       if (marks !== null && marks !== undefined) {
         if (marks < 0 || marks > 100) {
           this.submitError = `Marks for ${subject} must be between 0 and 100`;
+          this.notifications.warn(`Marks for ${subject} must be between 0 and 100`);
           return;
         }
       }
@@ -335,6 +347,7 @@ export class AddMarksComponent implements OnInit {
           failed++;
           this.submittedMarks.push({ subject: subjectName, marks, status: 'failed', message: 'Missing subject ID' });
           console.error(`❌ Cannot submit marks: missing subjectId for ${subjectName}`);
+          this.notifications.error(`Cannot submit marks for ${subjectName}: missing subject ID`);
           if (submitted + failed + duplicate === totalSubjects) {
             this.completeSubmission(submitted, failed, duplicate);
           }
@@ -405,6 +418,7 @@ export class AddMarksComponent implements OnInit {
         msg += ` ${duplicate} already existed (not added again).`;
       }
       this.submitError = '';
+      this.notifications.success(msg);
       console.log(`✓ Marks submission complete for ${this.rollNo}: ${msg}`);
 
       // 🔄 Refresh existing marks so the "Already Added" badge appears
@@ -420,6 +434,7 @@ export class AddMarksComponent implements OnInit {
     if (submitted === 0 && duplicate > 0 && failed === 0) {
       this.submitSuccess = false;
       this.submitError = `❌ All marks were already added for this student. No new marks added.`;
+      this.notifications.info('All marks were already added for this student. No new marks added.');
       return;
     }
 
@@ -427,10 +442,13 @@ export class AddMarksComponent implements OnInit {
     this.submitSuccess = false;
     if (failed > 0 && duplicate > 0) {
       this.submitError = `${submitted} added, ${duplicate} already existed, ${failed} failed. Please check and try again.`;
+      this.notifications.error(`${failed} mark(s) failed to add. Please check and try again.`);
     } else if (failed > 0) {
       this.submitError = `${submitted} added, ${failed} failed. Please try again.`;
+      this.notifications.error(`${failed} mark(s) failed to add. Please try again.`);
     } else {
       this.submitError = 'Error occurred. Please try again.';
+      this.notifications.error('Error occurred. Please try again.');
     }
   }
 }

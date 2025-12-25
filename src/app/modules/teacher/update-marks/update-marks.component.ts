@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MarksService } from '../../../core/services/marks.service';
 import { StudentService } from '../../../core/services/student.service';
+import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-update-marks',
@@ -32,7 +33,8 @@ export class UpdateMarksComponent implements OnInit {
 
   constructor(
     private marksService: MarksService,
-    private studentService: StudentService
+    private studentService: StudentService,
+    private confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -274,10 +276,14 @@ export class UpdateMarksComponent implements OnInit {
   /**
    * Delete a mark
    */
-  deleteMark(mark: any): void {
-    if (!confirm(`Are you sure you want to delete marks for ${mark.studentName} - ${mark.subjectName}?`)) {
-      return;
-    }
+  async deleteMark(mark: any): Promise<void> {
+    const ok = await this.confirmDialog.confirm(
+      `Are you sure you want to delete marks for ${mark.studentName} - ${mark.subjectName}?`,
+      'Confirm Delete',
+      'Delete',
+      'Cancel'
+    );
+    if (!ok) return;
 
     this.isSubmitting = true;
     this.submitError = '';
@@ -296,6 +302,61 @@ export class UpdateMarksComponent implements OnInit {
       },
       error: (err: any) => {
         const errorMsg = err.error?.message || err.message || 'Failed to delete mark';
+        this.submitError = `Error: ${errorMsg}`;
+        this.isSubmitting = false;
+      }
+    });
+  }
+
+  /**
+   * Delete ALL marks (all subjects) for a student
+   */
+  async deleteAllMarks(student: any): Promise<void> {
+    const markIds: number[] = (student?.marks || [])
+      .map((m: any) => m?.marksId)
+      .filter((id: any) => typeof id === 'number');
+
+    if (markIds.length === 0) {
+      this.submitError = `No marks found to delete for ${student?.studentName || 'this student'}.`;
+      return;
+    }
+
+    const ok = await this.confirmDialog.confirm(
+      `Delete ALL marks for ${student.studentName} (${student.rollNo}) across ${markIds.length} subject(s)? This cannot be undone.`,
+      'Confirm Delete All',
+      'Delete All',
+      'Cancel'
+    );
+    if (!ok) return;
+
+    this.isSubmitting = true;
+    this.submitError = '';
+    this.submitSuccess = '';
+    this.editingMarkId = null;
+    this.editedMarks = {};
+
+    this.marksService.deleteMarksBulk(markIds).subscribe({
+      next: (result) => {
+        const failed = (result?.results || []).filter((r: any) => !r.ok).length;
+
+        // Remove deleted marks from local list (even if backend refresh is slightly delayed)
+        this.marksList = this.marksList.filter((m: any) => !markIds.includes(m.marksId));
+        this.groupMarksByStudent();
+
+        if (failed > 0) {
+          this.submitError = `Deleted ${markIds.length - failed} mark(s). ${failed} failed to delete.`;
+        } else {
+          this.submitSuccess = `✓ Deleted all marks for ${student.studentName}`;
+        }
+
+        this.isSubmitting = false;
+
+        setTimeout(() => {
+          this.submitSuccess = '';
+        }, 3000);
+      },
+      error: (err: any) => {
+        const errorMsg = err.error?.message || err.message || 'Failed to delete all marks';
         this.submitError = `Error: ${errorMsg}`;
         this.isSubmitting = false;
       }

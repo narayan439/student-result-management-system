@@ -383,6 +383,10 @@
   color: #4caf50;
 }
 
+.delete-all-btn {
+  margin-left: 8px;
+}
+
 
 .student-marks-section {
   padding: 0;

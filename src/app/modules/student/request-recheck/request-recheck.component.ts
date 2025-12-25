@@ -6,6 +6,7 @@ import { MarksService } from '../../../core/services/marks.service';
 import { RequestRecheckService } from '../../../core/services/request-recheck.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Student } from '../../../core/models/student.model';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-request-recheck',
@@ -69,7 +70,8 @@ export class RequestRecheckComponent implements OnInit {
     private marksService: MarksService,
     private requestRecheckService: RequestRecheckService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notify: NotificationService
   ) {}
 
   /**
@@ -184,7 +186,7 @@ export class RequestRecheckComponent implements OnInit {
         },
         error: (err) => {
           console.error('❌ Failed to refresh student data:', err);
-          alert('Student profile not found. Please login again.');
+          this.notify.error('Student profile not found. Please login again.');
           this.router.navigate(['/login']);
         }
       });
@@ -222,7 +224,7 @@ export class RequestRecheckComponent implements OnInit {
         this.checkCanRequestRecheck();
       });
     } else {
-      alert('Student profile not found. Please login again.');
+      this.notify.error('Student profile not found. Please login again.');
       this.router.navigate(['/login']);
       return;
     }

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { StudentService } from '../../../core/services/student.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Student } from '../../../core/models/student.model';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-profile',
@@ -18,7 +19,8 @@ export class ProfileComponent implements OnInit {
   constructor(
     private studentService: StudentService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notify: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +85,7 @@ export class ProfileComponent implements OnInit {
         },
         error: (err) => {
           console.error('❌ Failed to refresh student data:', err);
-          alert('Student profile not found. Please login again.');
+          this.notify.error('Student profile not found. Please login again.');
           this.router.navigate(['/login']);
         }
       });
@@ -104,7 +106,7 @@ export class ProfileComponent implements OnInit {
       console.log('✓ Student profile loaded:', this.student);
     } else {
       console.error('✗ Student not found for email:', email);
-      alert('Student profile not found. Please login again.');
+      this.notify.error('Student profile not found. Please login again.');
       this.router.navigate(['/login']);
     }
   }
@@ -120,7 +122,7 @@ export class ProfileComponent implements OnInit {
     if (this.student) {
       this.student = { ...this.editData };
       this.isEditing = false;
-      alert('Profile updated successfully!');
+      this.notify.success('Profile updated successfully!');
       console.log('Profile saved:', this.student);
     }
   }

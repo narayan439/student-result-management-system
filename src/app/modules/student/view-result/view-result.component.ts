@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../../core/services/student.service';
 import { MarksService } from '../../../core/services/marks.service';
 import { SubjectService } from '../../../core/services/subject.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { forkJoin } from 'rxjs';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -75,7 +76,8 @@ export class ViewResultComponent implements OnInit {
     private router: Router,
     private studentService: StudentService,
     private marksService: MarksService,
-    private subjectService: SubjectService
+    private subjectService: SubjectService,
+    private notify: NotificationService
   ) {}
 
   ngOnInit() {
@@ -410,6 +412,17 @@ export class ViewResultComponent implements OnInit {
       });
       resultStatus = hasAnyFailedSubject ? "FAIL" : "PASS";
     }
+
+    const subjectCodeByName = new Map<string, string>();
+    if (this.classSubjects && this.classSubjects.length > 0) {
+      for (const s of this.classSubjects) {
+        const nameKey = (s?.subjectName || s?.name || '').toString().trim().toLowerCase();
+        const code = (s?.code || s?.subjectCode || '').toString().trim();
+        if (nameKey && code) {
+          subjectCodeByName.set(nameKey, code);
+        }
+      }
+    }
     
     this.result = {
       name: this.student.name,
@@ -421,6 +434,9 @@ export class ViewResultComponent implements OnInit {
       marks: validMarks.map((m: any) => ({
         marksId: m.marksId,
         subject: m.subject || m.subjectName || 'Unknown',
+        subjectCode: subjectCodeByName.get((m.subject || m.subjectName || '').toString().trim().toLowerCase())
+          || (m.code || m.subjectCode || '').toString().trim()
+          || '-',
         marksObtained: parseInt(m.marksObtained) || 0,
         maxMarks: parseInt(m.maxMarks) || 100,
         term: m.term || 'N/A',
@@ -466,10 +482,35 @@ export class ViewResultComponent implements OnInit {
     const DATA: any = document.querySelector('.result-container');
     
     if (!DATA) {
-      alert('Error: Result container not found. Please refresh the page.');
+      this.notify.error('Result container not found. Please refresh the page.');
       return;
     }
     
+    // Force desktop layout for export (so PDF looks like desktop even on mobile)
+    const bodyEl = document.body as HTMLBodyElement;
+    const hadForceDesktopClass = bodyEl.classList.contains('force-desktop-export');
+    if (!hadForceDesktopClass) {
+      bodyEl.classList.add('force-desktop-export');
+    }
+
+    const prevWidth = (DATA as HTMLElement).style.width;
+    const prevMaxWidth = (DATA as HTMLElement).style.maxWidth;
+    const prevMargin = (DATA as HTMLElement).style.margin;
+    const prevOverflowX = (DATA as HTMLElement).style.overflowX;
+
+    // Use a fixed desktop capture width; html2canvas will capture full element
+    (DATA as HTMLElement).style.width = '900px';
+    (DATA as HTMLElement).style.maxWidth = '900px';
+    (DATA as HTMLElement).style.margin = '30px auto';
+    (DATA as HTMLElement).style.overflowX = 'visible';
+
+    // Hide action buttons so they don't appear in the PDF
+    const actionButtonsEl = DATA.querySelector('.action-buttons') as HTMLElement | null;
+    const prevActionButtonsDisplay = actionButtonsEl ? actionButtonsEl.style.display : '';
+    if (actionButtonsEl) {
+      actionButtonsEl.style.display = 'none';
+    }
+
     html2canvas(DATA, {
       scale: 2,
       useCORS: true,
@@ -481,29 +522,33 @@ export class ViewResultComponent implements OnInit {
     }).then((canvas: HTMLCanvasElement) => {
       try {
         const imgData = canvas.toDataURL('image/png');
+
+        // Tabloid size (11 x 17 inches) in millimeters
+        const tabloid: [number, number] = [279.4, 431.8];
+        const margin = 8; // mm
+
         const pdf = new jsPDF({
           orientation: 'portrait',
           unit: 'mm',
-          format: 'a4'
+          format: tabloid
         });
 
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = pageWidth - 10;
+
+        const imgWidth = pageWidth - (margin * 2);
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        let heightLeft = imgHeight;
-        let position = 0;
 
-        pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight - 10;
-        position = 0;
+        // First page
+        let heightLeft = imgHeight - (pageHeight - (margin * 2));
+        pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
 
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeight;
+        // Additional pages (shift image up)
+        while (heightLeft > 0) {
           pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 5, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight - 10;
+          const position = margin - (imgHeight - heightLeft);
+          pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+          heightLeft -= (pageHeight - (margin * 2));
         }
 
         const timestamp = new Date().toISOString().split('T')[0];
@@ -511,14 +556,40 @@ export class ViewResultComponent implements OnInit {
         
         pdf.save(filename);
         console.log('✅ PDF downloaded successfully:', filename);
-        alert(`✅ PDF downloaded: ${filename}`);
+        this.notify.success(`PDF downloaded: ${filename}`);
       } catch (error) {
         console.error('Error generating PDF:', error);
-        alert('Error generating PDF. Please try again.');
+        this.notify.error('Error generating PDF. Please try again.');
+      } finally {
+        (DATA as HTMLElement).style.width = prevWidth;
+        (DATA as HTMLElement).style.maxWidth = prevMaxWidth;
+        (DATA as HTMLElement).style.margin = prevMargin;
+        (DATA as HTMLElement).style.overflowX = prevOverflowX;
+
+        if (!hadForceDesktopClass) {
+          bodyEl.classList.remove('force-desktop-export');
+        }
+
+        if (actionButtonsEl) {
+          actionButtonsEl.style.display = prevActionButtonsDisplay;
+        }
       }
     }).catch((error: any) => {
       console.error('Error generating PDF:', error);
-      alert('Error capturing result image. Please try again.');
+      this.notify.error('Error capturing result image. Please try again.');
+
+      (DATA as HTMLElement).style.width = prevWidth;
+      (DATA as HTMLElement).style.maxWidth = prevMaxWidth;
+      (DATA as HTMLElement).style.margin = prevMargin;
+      (DATA as HTMLElement).style.overflowX = prevOverflowX;
+
+      if (!hadForceDesktopClass) {
+        bodyEl.classList.remove('force-desktop-export');
+      }
+
+      if (actionButtonsEl) {
+        actionButtonsEl.style.display = prevActionButtonsDisplay;
+      }
     });
   }
 
@@ -546,7 +617,7 @@ export class ViewResultComponent implements OnInit {
       // Fallback: Copy to clipboard
       const textToCopy = `Name: ${this.result.name}\nRoll No: ${this.result.rollNo}\nPercentage: ${this.result.percentage}%\nStatus: ${this.result.status}`;
       navigator.clipboard.writeText(textToCopy).then(() => {
-        alert('Result details copied to clipboard!');
+        this.notify.success('Result details copied to clipboard!');
       });
     }
   }

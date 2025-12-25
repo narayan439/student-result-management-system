@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../../../core/services/student.service';
 import { ClassesService } from '../../../../core/services/classes.service';
 import { Student } from '../../../../core/models/student.model';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-edit-student',
@@ -33,7 +34,8 @@ export class EditStudentComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private studentService: StudentService,
-    private classesService: ClassesService
+    private classesService: ClassesService,
+    private notify: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -104,7 +106,7 @@ export class EditStudentComponent implements OnInit {
     const id = parseInt(this.studentId);
     if (!id && id !== 0) {
       this.errorMessage = 'Student ID is invalid';
-      alert("❌ Error: " + this.errorMessage);
+      this.notify.error('Error: ' + this.errorMessage);
       return;
     }
     
@@ -119,7 +121,7 @@ export class EditStudentComponent implements OnInit {
       this.studentService.updateStudent(id, this.student).subscribe({
         next: (response: any) => {
           this.isLoading = false;
-          alert('🎉 Student Updated Successfully!');
+          this.notify.success('Student updated successfully!');
           this.router.navigate(['/admin/manage-students']);
         },
         error: (err: any) => {
@@ -128,7 +130,7 @@ export class EditStudentComponent implements OnInit {
                           err.message || 
                           (typeof err === 'string' ? err : 'Failed to update student');
           this.errorMessage = errorMsg;
-          alert("❌ Error: " + errorMsg);
+          this.notify.error('Error: ' + errorMsg);
           console.error('Error updating student:', err);
         }
       });
@@ -139,37 +141,37 @@ export class EditStudentComponent implements OnInit {
     // Basic validation
     if (!this.student.name.trim()) {
       this.errorMessage = 'Please enter student name';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.student.email.trim()) {
       this.errorMessage = 'Please enter email address';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.isValidEmail(this.student.email)) {
       this.errorMessage = 'Please enter a valid email address';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.student.className) {
       this.errorMessage = 'Please select class';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.student.rollNo.trim()) {
       this.errorMessage = 'Please enter roll number';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     
     if (!this.dobDate) {
       this.errorMessage = 'Please select date of birth';
-      alert(this.errorMessage);
+      this.notify.warn(this.errorMessage);
       return false;
     }
     

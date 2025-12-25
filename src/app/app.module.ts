@@ -32,11 +32,13 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppDateAdapter, APP_DATE_FORMATS } from './core/date-formats';
+import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     // Angular Modules

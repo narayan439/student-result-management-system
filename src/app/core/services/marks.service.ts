@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, of, forkJoin } from 'rxjs';
 import { catchError, tap, map, retry, timeout } from 'rxjs/operators';
 import { Mark, MarkResponse, MarkListResponse } from '../models/marks.model';
 import { ConfigService } from './config.service';
@@ -271,6 +271,33 @@ export class MarksService {
     return this.http.delete(`${this.baseUrl}/${markId}`).pipe(
       tap(() => this.loadAllMarks()),
       catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Delete multiple marks in one go.
+   * Useful for deleting a student's marks across all subjects.
+   * Refreshes marks only once at the end.
+   */
+  deleteMarksBulk(markIds: number[]): Observable<{ success: boolean; results: { markId: number; ok: boolean }[] }> {
+    const ids = (markIds || []).filter((id) => typeof id === 'number');
+    if (ids.length === 0) {
+      return of({ success: true, results: [] });
+    }
+
+    const deletes = ids.map((markId) =>
+      this.http.delete(`${this.baseUrl}/${markId}`).pipe(
+        map(() => ({ markId, ok: true as const })),
+        catchError((error) => {
+          console.error('❌ Failed to delete mark:', { markId, error });
+          return of({ markId, ok: false as const });
+        })
+      )
+    );
+
+    return forkJoin(deletes).pipe(
+      tap(() => this.loadAllMarks()),
+      map((results) => ({ success: results.every((r) => r.ok), results }))
     );
   }
 

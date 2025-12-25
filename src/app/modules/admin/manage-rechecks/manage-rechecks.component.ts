@@ -3,6 +3,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { RequestRecheckService } from '../../../core/services/request-recheck.service';
 import { Recheck } from '../../../core/models/recheck.model';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-manage-rechecks',
@@ -33,7 +34,8 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
   adminNote = '';
 
   constructor(
-    private recheckService: RequestRecheckService
+    private recheckService: RequestRecheckService,
+    private notify: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -169,19 +171,19 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
   // Submit admin note and update recheck
   submitNote(): void {
     if (!this.selectedRecheck) {
-      alert('No recheck selected');
+      this.notify.warn('No recheck selected');
       return;
     }
 
     const recheckId = this.selectedRecheck.recheckId;
     if (typeof recheckId !== 'number') {
-      alert('Invalid recheck ID');
+      this.notify.error('Invalid recheck ID');
       return;
     }
 
     // For approve/reject, require note
     if ((this.currentAction === 'APPROVE' || this.currentAction === 'REJECT') && !this.adminNote.trim()) {
-      alert('Please enter a note for ' + (this.currentAction === 'APPROVE' ? 'approval' : 'rejection'));
+      this.notify.warn('Please enter a note for ' + (this.currentAction === 'APPROVE' ? 'approval' : 'rejection'));
       return;
     }
 
@@ -196,18 +198,18 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
         next: () => {
           this.recheckService.updateRecheckStatus(recheckId, status).subscribe({
             next: () => {
-              alert(`✓ Recheck ${status.toLowerCase()} with note!`);
+              this.notify.success(`Recheck ${status.toLowerCase()} with note!`);
               this.loadRechecks();
               this.closeNoteModal();
             },
             error: (err: any) => {
-              alert('Failed to update status: ' + (err?.error?.message || 'Unknown error'));
+              this.notify.error('Failed to update status: ' + (err?.error?.message || 'Unknown error'));
               this.closeNoteModal();
             }
           });
         },
         error: (err: any) => {
-          alert('Failed to update note: ' + (err?.error?.message || 'Unknown error'));
+          this.notify.error('Failed to update note: ' + (err?.error?.message || 'Unknown error'));
           this.closeNoteModal();
         }
       });
@@ -223,7 +225,7 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
   // Update only admin note
   updateAdminNote(recheck: Recheck, note: string): void {
     if (!recheck.recheckId) {
-      alert('❌ Invalid recheck ID');
+      this.notify.error('Invalid recheck ID');
       return;
     }
 
@@ -233,15 +235,15 @@ export class ManageRechecksComponent implements OnInit, AfterViewInit {
       next: (updatedRecheck: Recheck | undefined) => {
         if (updatedRecheck) {
           console.log('✅ Admin note updated successfully');
-          alert('✓ Admin note updated successfully!');
+          this.notify.success('Admin note updated successfully!');
           this.loadRechecks(); // Reload to get updated data
         } else {
-          alert('⚠️ Failed to update note');
+          this.notify.warn('Failed to update note');
         }
       },
       error: (err: any) => {
         const errorMsg = err?.error?.message || 'Failed to update note';
-        alert(`✗ Error: ${errorMsg}`);
+        this.notify.error(`Error: ${errorMsg}`);
         console.error('Error updating note:', err);
       }
     });

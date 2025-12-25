@@ -4,6 +4,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { RequestRecheckService } from '../../../core/services/request-recheck.service';
 import { MarksService } from '../../../core/services/marks.service';
 import { StudentService } from '../../../core/services/student.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-recheck-requests',
@@ -39,7 +41,9 @@ export class RecheckRequestsComponent implements OnInit {
   constructor(
     private requestRecheckService: RequestRecheckService,
     private marksService: MarksService,
-    private studentService: StudentService
+    private studentService: StudentService,
+    private notifications: NotificationService,
+    private confirmDialogs: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -325,7 +329,7 @@ export class RecheckRequestsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error updating recheck status:', err);
-        alert('Failed to update status. Please try again.');
+        this.notifications.error('Failed to update status. Please try again.');
       }
     });
   }
@@ -333,31 +337,45 @@ export class RecheckRequestsComponent implements OnInit {
   /**
    * View request details
    */
-  viewDetails(request: any): void {
-    alert(
-      `Recheck Request Details\n\n` +
+  async viewDetails(request: any): Promise<void> {
+    const details =
       `Student: ${request.studentName} (${request.rollNo})\n` +
       `Subject: ${request.subject}\n` +
       `Status: ${this.getStatusText(request.status)}\n` +
       `Reason: ${request.reason}\n` +
-      `Marks: ${request.marksObtained}/${request.maxMarks}`
-    );
+      `Marks: ${request.marksObtained}/${request.maxMarks}`;
+
+    await this.confirmDialogs.info(details, 'Recheck Request Details');
   }
 
   /**
    * Send notification to student
    */
-  sendNotification(request: any): void {
-    if (confirm(`Send notification to ${request.studentName} about recheck status?`)) {
-      alert(`Notification sent to ${request.studentName}`);
+  async sendNotification(request: any): Promise<void> {
+    const ok = await this.confirmDialogs.confirm(
+      `Send notification to ${request.studentName} about recheck status?`,
+      'Send Notification',
+      'Send',
+      'Cancel'
+    );
+
+    if (ok) {
+      this.notifications.success(`Notification sent to ${request.studentName}`);
     }
   }
 
   /**
    * Approve request
    */
-  approveRequest(request: any): void {
-    if (confirm(`Approve recheck request for ${request.studentName} in ${request.subject}?`)) {
+  async approveRequest(request: any): Promise<void> {
+    const ok = await this.confirmDialogs.confirm(
+      `Approve recheck request for ${request.studentName} in ${request.subject}?`,
+      'Approve Request',
+      'Approve',
+      'Cancel'
+    );
+
+    if (ok) {
       this.updateStatus(request.recheckId, 'approved');
     }
   }
@@ -365,8 +383,15 @@ export class RecheckRequestsComponent implements OnInit {
   /**
    * Reject request
    */
-  rejectRequest(request: any): void {
-    if (confirm(`Reject recheck request for ${request.studentName} in ${request.subject}?`)) {
+  async rejectRequest(request: any): Promise<void> {
+    const ok = await this.confirmDialogs.confirm(
+      `Reject recheck request for ${request.studentName} in ${request.subject}?`,
+      'Reject Request',
+      'Reject',
+      'Cancel'
+    );
+
+    if (ok) {
       this.updateStatus(request.recheckId, 'rejected');
     }
   }
@@ -374,8 +399,15 @@ export class RecheckRequestsComponent implements OnInit {
   /**
    * Complete request
    */
-  completeRequest(request: any): void {
-    if (confirm(`Mark recheck request as completed for ${request.studentName} in ${request.subject}?`)) {
+  async completeRequest(request: any): Promise<void> {
+    const ok = await this.confirmDialogs.confirm(
+      `Mark recheck request as completed for ${request.studentName} in ${request.subject}?`,
+      'Complete Request',
+      'Complete',
+      'Cancel'
+    );
+
+    if (ok) {
       this.updateStatus(request.recheckId, 'completed');
     }
   }

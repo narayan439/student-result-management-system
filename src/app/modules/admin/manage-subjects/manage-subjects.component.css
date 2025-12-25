@@ -116,7 +116,8 @@
 /* Table Styles */
 .table-container {
   padding: 0;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -282,6 +283,10 @@ button[color="warn"]:hover {
   
   .mat-column-actions {
     width: 120px;
+  }
+
+  table {
+    min-width: 520px;
   }
 }
 

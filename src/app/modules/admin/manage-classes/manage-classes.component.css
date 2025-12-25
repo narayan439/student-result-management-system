@@ -372,6 +372,14 @@
     font-size: 13px;
   }
 
+  .table-view {
+    padding: 12px;
+  }
+
+  .table-view table {
+    min-width: 640px;
+  }
+
   .action-buttons {
     justify-content: space-between;
   }
@@ -498,6 +506,13 @@
 /* Table View */
 .table-view {
   animation: fadeIn 0.3s ease;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 24px;
+}
+
+.table-view table {
+  min-width: 720px;
 }
 
 /* Cards View */
@@ -646,6 +661,12 @@
   align-items: center;
   gap: 8px;
   color: #4a5568;
+  flex-wrap: wrap;
+}
+
+.subjects-cell span {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .subjects-icon {

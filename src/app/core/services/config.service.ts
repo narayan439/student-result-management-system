@@ -13,8 +13,8 @@ export class ConfigService {
   // private apiUrl = 'https://srms-backend-production.up.railway.app/api';
   
 
-  private apiBaseUrl = 'https://srms-backend-production.up.railway.app';
-  private apiUrl = 'https://srms-backend-production.up.railway.app/api';
+  private apiBaseUrl = 'https://student-result-management-system-backend-npop.onrender.com';
+  private apiUrl = 'https://student-result-management-system-backend-npop.onrender.com/api';
   // private apiUrl = 'http://localhost:8080/api';
 
   constructor() {
@@ -24,8 +24,8 @@ export class ConfigService {
   
   private initializeConfig(): void {
     // Try to get from window object or environment variables
-    const backendUrl = this.getConfigValue('BACKEND_URL', 'https://srms-backend-production.up.railway.app/api');
-    const apiBase = this.getConfigValue('API_BASE_URL', 'https://srms-backend-production.up.railway.app');
+    const backendUrl = this.getConfigValue('BACKEND_URL', 'https://student-result-management-system-backend-npop.onrender.com/api');
+    const apiBase = this.getConfigValue('API_BASE_URL', 'https://student-result-management-system-backend-npop.onrender.com');
     
     this.apiUrl = backendUrl;
     this.apiBaseUrl = apiBase;
